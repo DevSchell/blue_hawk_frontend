@@ -1,0 +1,11 @@
+.feed-page {
+  flex: 1;
+  padding-block: clamp(40px, 6vw, 72px);
+}
+
+.feed-page__title {
+  font-size: clamp(40px, 5.5vw, 64px);
+  line-height: 1;
+  margin-bottom: clamp(24px, 3vw, 36px);
+  overflow-wrap: anywhere;
+}

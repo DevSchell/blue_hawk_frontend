@@ -1,45 +1,18 @@
-import { useState } from 'react'
-import LoginPage from './pages/login'
-import FeedPage from './pages/feed'
+import { useAuthController } from './controllers/useAuthController'
+import { AppLayout } from './views/layout/AppLayout'
+import { FeedPage } from './views/pages/FeedPage/FeedPage'
+import LoginPage from './views/pages/LoginPage/LoginPage'
 
 function App() {
-    const [isAuthenticated, setIsAuthenticated] = useState(false)
-    const [username, setUsername] = useState('')
+  const { session, isLoginOpen, openLogin, closeLogin, completeLogin, logout } = useAuthController()
 
-    const handleLogin = (loggedInUsername: string, accessToken?: string) => {
-        setUsername(loggedInUsername)
-        if (accessToken) {
-            localStorage.setItem('blue-hawk-token', accessToken)
-        }
-        setIsAuthenticated(true)
-    }
-
-    return (
-        <div className="relative min-h-screen w-full overflow-hidden bg-[#0a0705] font-serif text-slate-100">
-            <div
-                className="fixed inset-0 z-0 bg-cover bg-center brightness-[0.45]"
-                style={{
-                    backgroundImage:
-                        "radial-gradient(circle at center, rgba(30, 20, 15, 0.4) 0%, rgba(10, 7, 5, 0.95) 100%), url('https://images.unsplash.com/photo-1514933651103-005eec06c04b?q=80&w=1920&auto=format&fit=crop')",
-                }}
-            />
-
-            <div className="relative z-10 min-h-screen">
-                {isAuthenticated ? (
-                    <FeedPage
-                        username={username}
-                        onLogout={() => {
-                            localStorage.removeItem('blue-hawk-token')
-                            setUsername('')
-                            setIsAuthenticated(false)
-                        }}
-                    />
-                ) : (
-                    <LoginPage onLogin={handleLogin} />
-                )}
-            </div>
-        </div>
-    )
+  return (
+    <AppLayout session={session} onSignIn={openLogin} onSignOut={logout}>
+      {/* Remonta o feed ao entrar/sair, para buscar de novo com (ou sem) o token */}
+      <FeedPage key={session?.email ?? 'visitante'} />
+      {isLoginOpen && <LoginPage onLogin={completeLogin} onClose={closeLogin} />}
+    </AppLayout>
+  )
 }
 
 export default App

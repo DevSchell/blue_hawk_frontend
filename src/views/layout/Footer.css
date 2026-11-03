@@ -1,0 +1,17 @@
+.footer {
+  background: var(--ultramar);
+  color: var(--giz);
+  padding-block: clamp(36px, 5vw, 56px);
+}
+
+.footer__inner {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 12px 28px;
+}
+
+.footer p {
+  font-size: 14px;
+}

@@ -1,0 +1,54 @@
+/* Topo do menu: mesma cor e altura da topbar, nos dois temas */
+.user-menu__header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 72px;
+  padding: 0 12px 0 max(20px, env(safe-area-inset-left, 0px));
+  background: var(--noite);
+  color: var(--giz);
+}
+
+.user-menu__header svg.m {
+  width: 36px;
+  height: 38px;
+}
+
+.user-menu__close {
+  margin-left: auto;
+}
+
+.user-menu__profile {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 20px;
+}
+
+.user-menu__profile small {
+  display: block;
+  font-size: 14px;
+  color: var(--text-muted);
+}
+
+.user-menu__profile b {
+  font: 800 30px/1 var(--display);
+}
+
+.user-menu__theme {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-top: auto;
+  padding: 16px 20px;
+  border-top: 1px solid var(--line);
+  font-weight: 600;
+}
+
+.user-menu__theme .switch {
+  margin-left: auto;
+}
+
+.user-menu__signin {
+  padding: 24px 20px;
+}

@@ -1,0 +1,39 @@
+.menu-list {
+  list-style: none;
+  padding: 0;
+  border-top: 1px solid var(--line);
+}
+
+.menu-item {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  width: 100%;
+  padding: 14px 20px;
+  border: 0;
+  background: transparent;
+  font-size: 17px;
+  font-weight: 600;
+  text-align: left;
+  cursor: pointer;
+}
+
+.menu-item[aria-disabled='true'] {
+  cursor: default;
+}
+
+.menu-item:hover {
+  background: var(--hover);
+}
+
+.menu-item:focus-visible {
+  outline: 3px solid var(--acafrao);
+  outline-offset: -3px;
+}
+
+.menu-item__hint {
+  margin-left: auto;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-muted);
+}

@@ -1,10 +1,24 @@
 <!doctype html>
-<html lang="en">
+<html lang="pt-BR">
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>blue_hawk_app</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="theme-color" content="#2438E8" />
+    <meta name="description" content="Descubra boardgames no Blue Hawk." />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Grenze+Gotisch:wght@800&family=Grenze:wght@700;800&family=Hanken+Grotesk:wght@400;600;800&display=swap"
+    />
+    <title>Blue Hawk</title>
+    <script>
+      // Aplica o tema salvo antes do primeiro render, sem piscar o tema errado
+      try {
+        if (localStorage.getItem('bluehawk.theme') === 'light') document.documentElement.dataset.theme = 'light'
+      } catch (e) {}
+    </script>
   </head>
   <body>
     <div id="root"></div>

@@ -1,99 +1,53 @@
-import React, { useState } from 'react';
-import {
-    BookOpen,
-    ShoppingBag,
-    Swords,
-    User,
-    PlusCircle,
-    Dices,
-    Clock,
-    Calendar,
-    Sparkles,
-    KeyRound,
-    Eye,
-    EyeOff
-} from 'lucide-react';
+import { useEffect, useRef } from 'react';
+import { Sparkles, KeyRound, Eye, EyeOff, X } from 'lucide-react';
+import { useLoginController } from '../../../controllers/useLoginController';
 
-export default function LoginPage({ onLogin }) {
-    // Form states
-    const [username, setUsername] = useState('');
-    const [password, setPassword] = useState('');
-    const [showPassword, setShowPassword] = useState(false);
-    const [isLoading, setIsLoading] = useState(false);
-    const [errorMessage, setErrorMessage] = useState('');
+/**
+ * Login em modal sobre a página. O estado e a chamada à API ficam no useLoginController;
+ * aqui só a marcação. Fecha pelo X, pelo Esc ou clicando fora do card.
+ */
+export default function LoginPage({ onLogin, onClose }) {
+    const {
+        email,
+        setEmail,
+        password,
+        setPassword,
+        showPassword,
+        toggleShowPassword,
+        isLoading,
+        error: errorMessage,
+        submit: handleSubmit,
+    } = useLoginController(onLogin);
 
-    // Handle Form Submission
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-        setErrorMessage('');
-
-        if (!username.trim()) {
-            setErrorMessage('Por favor, informe o nome.');
-            return;
-        }
-        if (!password) {
-            setErrorMessage('Por favor, insira a sua senha.');
-            return;
-        }
-
-        setIsLoading(true);
-
-        const apiUrl = (import.meta.env.VITE_API_URL || '').replace(/\/$/, '');
-        const configuredEndpoint = import.meta.env.VITE_LOGIN_ENDPOINT || '/api/auth/login';
-        const loginEndpoint = configuredEndpoint.startsWith('/')
-            ? configuredEndpoint
-            : `/${configuredEndpoint}`;
-
-        try {
-            const response = await fetch(`${apiUrl}${loginEndpoint}`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    Accept: 'application/json',
-                },
-                body: JSON.stringify({
-                    username: username.trim(),
-                    password,
-                }),
-            });
-
-            let data = {};
-            try {
-                data = await response.json();
-            } catch {
-                if (!response.ok) {
-                    throw new Error('A API retornou uma resposta inválida.');
-                }
-            }
-
-            const payload = data && typeof data === 'object' ? data : {};
-
-            if (!response.ok) {
-                throw new Error(
-                    payload.message || payload.error || 'Nome ou senha inválidos.'
-                );
-            }
-
-            onLogin(
-                payload.user?.username || payload.username || username.trim(),
-                payload.token || payload.accessToken
-            );
-        } catch (error) {
-            setErrorMessage(
-                error instanceof TypeError
-                    ? 'Não foi possível conectar ao servidor.'
-                    : error.message
-            );
-        } finally {
-            setIsLoading(false);
-        }
-    };
+    // Em efeito (e não autoFocus): o menu lateral, ao fechar, devolve o foco ao botão dele;
+    // este efeito roda depois e traz o foco para o e-mail
+    const emailRef = useRef(null);
+    useEffect(() => {
+        emailRef.current?.focus();
+    }, []);
 
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-[2px] animate-fadeIn">
+        <div
+            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-[2px] animate-fadeIn"
+            role="dialog"
+            aria-modal="true"
+            aria-label="Entrar no Blue Hawk"
+            onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}
+            onKeyDown={(e) => { if (e.key === 'Escape') onClose(); }}
+        >
 
                     {/* Main Card Container */}
                     <div className="relative w-full max-w-md bg-[#162542] rounded-lg border-2 border-[#c59b27]/80 shadow-[0_0_50px_rgba(0,0,0,0.8)] overflow-hidden transition-all duration-300">
+
+                        {/* Close Button */}
+                        <button
+                            type="button"
+                            onClick={onClose}
+                            aria-label="Fechar"
+                            className="absolute top-3 right-3 z-30 p-1 text-slate-400 hover:text-amber-200 transition-colors cursor-pointer"
+                        >
+                            <X className="w-5 h-5" />
+                        </button>
 
                         {/* Outer Accent Gold Border Inner Layer */}
                         <div className="absolute inset-1 border border-[#c59b27]/30 rounded pointer-events-none z-10" />
@@ -146,17 +100,20 @@ export default function LoginPage({ onLogin }) {
                             {/* Login Form */}
                             <form onSubmit={handleSubmit} className="w-full space-y-5">
 
-                                {/* Field 1: Nome do Aventureiro */}
+                                {/* Field 1: E-mail do Aventureiro (a API autentica por e-mail) */}
                                 <div>
-                                    <label className="block text-[11px] font-bold tracking-wider text-amber-200/90 uppercase mb-2 font-sans">
-                                        NOME DO AVENTUREIRO
+                                    <label htmlFor="login-email" className="block text-[11px] font-bold tracking-wider text-amber-200/90 uppercase mb-2 font-sans">
+                                        E-MAIL DO AVENTUREIRO
                                     </label>
                                     <div className="relative">
                                         <input
-                                            type="text"
-                                            value={username}
-                                            onChange={(e) => setUsername(e.target.value)}
-                                            placeholder="Ex: Lord Roderick"
+                                            id="login-email"
+                                            type="email"
+                                            ref={emailRef}
+                                            autoComplete="email"
+                                            value={email}
+                                            onChange={(e) => setEmail(e.target.value)}
+                                            placeholder="Ex: roderick@taverna.com"
                                             className="w-full bg-[#0d182b] border border-[#2b3e61] focus:border-[#c59b27] focus:ring-1 focus:ring-[#c59b27] rounded-md px-4 py-3 text-sm text-slate-100 placeholder-slate-500 outline-none transition-all duration-200 font-sans shadow-inner"
                                         />
                                     </div>
@@ -164,11 +121,13 @@ export default function LoginPage({ onLogin }) {
 
                                 {/* Field 2: Palavra-Passe / Runa */}
                                 <div>
-                                    <label className="block text-[11px] font-bold tracking-wider text-amber-200/90 uppercase mb-2 font-sans">
+                                    <label htmlFor="login-password" className="block text-[11px] font-bold tracking-wider text-amber-200/90 uppercase mb-2 font-sans">
                                         PALAVRA-PASSE / RUNA
                                     </label>
                                     <div className="relative">
                                         <input
+                                            id="login-password"
+                                            autoComplete="current-password"
                                             type={showPassword ? 'text' : 'password'}
                                             value={password}
                                             onChange={(e) => setPassword(e.target.value)}
@@ -177,7 +136,8 @@ export default function LoginPage({ onLogin }) {
                                         />
                                         <button
                                             type="button"
-                                            onClick={() => setShowPassword(!showPassword)}
+                                            onClick={toggleShowPassword}
+                                            aria-label={showPassword ? 'Esconder senha' : 'Mostrar senha'}
                                             className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-amber-200 transition-colors p-1"
                                             tabIndex={-1}
                                         >
