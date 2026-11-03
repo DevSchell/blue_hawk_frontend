@@ -1,0 +1,116 @@
+/* Tokens da identidade Blue Hawk (Identidade Blue Hawk.html) */
+:root {
+  --noite: #0b1147;
+  --painel: #161e66;
+  --ultramar: #2438e8;
+  --claro: #7e92ff;
+  --gelo: #c6d0ff;
+  --giz: #f3f4fc;
+  --acafrao: #ffb000;
+  --acafrao-hover: #ffc53d;
+
+  --marca: 'Grenze Gotisch', 'Times New Roman', serif;
+  --display: 'Grenze', 'Times New Roman', serif;
+  --texto: 'Hanken Grotesk', 'Segoe UI', system-ui, sans-serif;
+
+  /* Canto cortado dos botões e etiquetas */
+  --corte: 14px;
+
+  /* Tema escuro (padrão da marca). Cabeçalho, hero e rodapé ficam em ultramar nos dois temas. */
+  --bg: var(--noite);
+  --surface: var(--painel);
+  --surface-edge: transparent;
+  --text: var(--giz);
+  --text-muted: var(--gelo);
+  --line: var(--ultramar);
+  --skeleton: var(--ultramar);
+  --hover: var(--ultramar);
+  --overlay: rgb(11 17 71 / 0.72);
+
+  color-scheme: dark;
+}
+
+:root[data-theme='light'] {
+  --bg: var(--giz);
+  --surface: #fff;
+  --surface-edge: var(--gelo);
+  --text: var(--noite);
+  --text-muted: #3a4384;
+  --line: var(--gelo);
+  --skeleton: var(--gelo);
+  --hover: var(--gelo);
+  --overlay: rgb(11 17 71 / 0.45);
+
+  color-scheme: light;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+}
+
+body {
+  min-height: 100vh;
+  background: var(--bg);
+  color: var(--text);
+  font: 400 17px/1.6 var(--texto);
+  -webkit-font-smoothing: antialiased;
+}
+
+#root {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+h1,
+h2,
+h3 {
+  font-family: var(--display);
+  font-weight: 800;
+  text-wrap: balance;
+}
+
+svg {
+  display: block;
+}
+
+a {
+  color: inherit;
+}
+
+button,
+input {
+  font: inherit;
+  color: inherit;
+}
+
+/* Coluna central do conteúdo (componente Container) */
+.container {
+  width: 100%;
+  max-width: 1180px;
+  margin: 0 auto;
+  padding-left: max(20px, env(safe-area-inset-left, 0px));
+  padding-right: max(20px, env(safe-area-inset-right, 0px));
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}

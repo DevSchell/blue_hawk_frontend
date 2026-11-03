@@ -1,0 +1,10 @@
+/* O alerta de erro sem itens vem antes da grade; com itens, depois dela */
+.boardgame-feed__error {
+  margin-top: 28px;
+}
+
+.boardgame-feed__more {
+  display: flex;
+  justify-content: center;
+  margin-top: clamp(32px, 4vw, 48px);
+}

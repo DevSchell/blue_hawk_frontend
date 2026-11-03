@@ -1,0 +1,25 @@
+.alert {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 16px;
+  align-items: center;
+  padding: 14px 20px;
+}
+
+.alert--info {
+  background: var(--ultramar);
+  color: var(--giz);
+}
+
+.alert--warn {
+  background: var(--acafrao);
+  color: var(--noite);
+}
+
+.alert__title {
+  font: 800 28px/1.1 var(--display);
+}
+
+.alert__text {
+  flex: 1 1 24ch;
+}
