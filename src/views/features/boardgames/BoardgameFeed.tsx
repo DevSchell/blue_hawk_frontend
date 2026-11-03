@@ -1,4 +1,5 @@
 import { FEED_PAGE_SIZE, type BoardgameFeedState } from '../../../controllers/useBoardgameFeed'
+import type { Boardgame } from '../../../models/boardgame'
 import { Raven } from '../../components/Brand/Raven'
 import { Button } from '../../components/Button/Button'
 import { EmptyState } from '../../components/EmptyState/EmptyState'
@@ -13,10 +14,12 @@ type BoardgameFeedProps = {
   /** Busca em vigor, para a mensagem de lista vazia */
   query: string
   isEmpty: boolean
+  /** Clique num card: abre os detalhes do jogo */
+  onOpenGame: (game: Boardgame) => void
 }
 
 /** Lista de jogos com seus estados: carregando, vazio, erro e "carregar mais" */
-export function BoardgameFeed({ feed, query, isEmpty }: BoardgameFeedProps) {
+export function BoardgameFeed({ feed, query, isEmpty, onOpenGame }: BoardgameFeedProps) {
   const hasError = feed.error !== null
 
   return (
@@ -39,7 +42,7 @@ export function BoardgameFeed({ feed, query, isEmpty }: BoardgameFeedProps) {
       <GameGrid busy={feed.loadingFirstPage}>
         {feed.loadingFirstPage
           ? Array.from({ length: FEED_PAGE_SIZE / 2 }, (_, i) => <GameCardSkeleton key={i} />)
-          : feed.items.map((game) => <GameCard key={game.id} game={game} />)}
+          : feed.items.map((game) => <GameCard key={game.id} game={game} onOpen={onOpenGame} />)}
       </GameGrid>
 
       {hasError && feed.items.length > 0 && (

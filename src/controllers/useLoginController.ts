@@ -14,7 +14,6 @@ function errorMessage(error: unknown) {
 export function useLoginController(onLogin: (email: string, token: string) => void) {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
-  const [showPassword, setShowPassword] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState('')
 
@@ -23,11 +22,11 @@ export function useLoginController(onLogin: (email: string, token: string) => vo
     setError('')
 
     if (!email.trim()) {
-      setError('Por favor, informe o e-mail.')
+      setError('Informe o seu e-mail.')
       return
     }
     if (!password) {
-      setError('Por favor, insira a sua senha.')
+      setError('Informe a sua senha.')
       return
     }
 
@@ -42,15 +41,5 @@ export function useLoginController(onLogin: (email: string, token: string) => vo
     }
   }
 
-  return {
-    email,
-    setEmail,
-    password,
-    setPassword,
-    showPassword,
-    toggleShowPassword: () => setShowPassword((v) => !v),
-    isLoading,
-    error,
-    submit,
-  }
+  return { email, setEmail, password, setPassword, isLoading, error, submit }
 }
