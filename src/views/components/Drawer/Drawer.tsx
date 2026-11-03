@@ -1,4 +1,4 @@
-import { useEffect, useRef, type ReactNode } from 'react'
+import { useLayoutEffect, useRef, type ReactNode } from 'react'
 import './Drawer.css'
 
 type DrawerProps = {
@@ -16,7 +16,9 @@ type DrawerProps = {
 export function Drawer({ open, onClose, label, children }: DrawerProps) {
   const dialogRef = useRef<HTMLDialogElement>(null)
 
-  useEffect(() => {
+  // useLayoutEffect, como no Modal: se a gaveta fechar e uma modal abrir no mesmo clique,
+  // a gaveta fecha primeiro e a modal guarda o botão do menu como quem a abriu
+  useLayoutEffect(() => {
     const dialog = dialogRef.current
     if (!dialog) return
     if (open && !dialog.open) dialog.showModal()

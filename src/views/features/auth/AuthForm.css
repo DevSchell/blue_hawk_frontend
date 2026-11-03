@@ -1,0 +1,21 @@
+.auth-form {
+  display: grid;
+  gap: 16px;
+}
+
+.auth-form .button[type='submit'] {
+  margin-top: 6px;
+}
+
+.auth-form__switch {
+  margin-top: 22px;
+  padding-top: 16px;
+  border-top: 1px solid var(--line);
+  font-size: 15px;
+  text-align: center;
+  color: var(--text-muted);
+}
+
+.auth-form__switch .button--link {
+  color: var(--text);
+}

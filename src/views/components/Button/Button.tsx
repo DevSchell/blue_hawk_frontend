@@ -3,8 +3,8 @@ import { cx } from '../../utils/classNames'
 import './Button.css'
 
 type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
-  /** primary (açafrão) marca a ação principal; secondary (giz) as demais */
-  variant?: 'primary' | 'secondary'
+  /** primary (açafrão) marca a ação principal; secondary (giz) as demais; link é só texto */
+  variant?: 'primary' | 'secondary' | 'link'
   fullWidth?: boolean
 }
 

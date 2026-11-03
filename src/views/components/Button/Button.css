@@ -45,3 +45,28 @@
     inset 0 0 0 3px var(--noite),
     inset 0 0 0 5px var(--giz);
 }
+
+/* Botão com cara de link, para ações secundárias dentro de um texto */
+.button--link {
+  display: inline;
+  padding: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  font-weight: 800;
+  text-decoration: underline;
+  text-decoration-color: var(--acafrao);
+  text-decoration-thickness: 2px;
+  text-underline-offset: 3px;
+  clip-path: none;
+}
+
+.button--link:hover {
+  text-decoration-color: currentColor;
+}
+
+.button--link:focus-visible {
+  box-shadow: none;
+  outline: 3px solid var(--acafrao);
+  outline-offset: 2px;
+}
