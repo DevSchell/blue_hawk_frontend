@@ -1,13 +1,5 @@
 import React, { useState } from 'react';
 import {
-    BookOpen,
-    ShoppingBag,
-    Swords,
-    User,
-    PlusCircle,
-    Dices,
-    Clock,
-    Calendar,
     Sparkles,
     KeyRound,
     Eye,
@@ -39,7 +31,7 @@ export default function LoginPage({ onLogin }) {
         setIsLoading(true);
 
         const apiUrl = (import.meta.env.VITE_API_URL || '').replace(/\/$/, '');
-        const configuredEndpoint = import.meta.env.VITE_LOGIN_ENDPOINT || '/api/auth/login';
+        const configuredEndpoint = import.meta.env.VITE_LOGIN_ENDPOINT || '/authenticate';
         const loginEndpoint = configuredEndpoint.startsWith('/')
             ? configuredEndpoint
             : `/${configuredEndpoint}`;
@@ -53,7 +45,7 @@ export default function LoginPage({ onLogin }) {
                 },
                 body: JSON.stringify({
                     username: username.trim(),
-                    password,
+                    password: password,
                 }),
             });
 
