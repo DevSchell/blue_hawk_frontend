@@ -6,8 +6,11 @@ function App() {
     const [isAuthenticated, setIsAuthenticated] = useState(false)
     const [username, setUsername] = useState('')
 
-    const handleLogin = (loggedInUsername: string) => {
+    const handleLogin = (loggedInUsername: string, accessToken?: string) => {
         setUsername(loggedInUsername)
+        if (accessToken) {
+            localStorage.setItem('blue-hawk-token', accessToken)
+        }
         setIsAuthenticated(true)
     }
 
@@ -25,7 +28,11 @@ function App() {
                 {isAuthenticated ? (
                     <FeedPage
                         username={username}
-                        onLogout={() => setIsAuthenticated(false)}
+                        onLogout={() => {
+                            localStorage.removeItem('blue-hawk-token')
+                            setUsername('')
+                            setIsAuthenticated(false)
+                        }}
                     />
                 ) : (
                     <LoginPage onLogin={handleLogin} />

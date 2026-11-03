@@ -23,7 +23,7 @@ export default function LoginPage({ onLogin }) {
     const [errorMessage, setErrorMessage] = useState('');
 
     // Handle Form Submission
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
         setErrorMessage('');
 
@@ -38,11 +38,55 @@ export default function LoginPage({ onLogin }) {
 
         setIsLoading(true);
 
-        // Simulate login request delay
-        setTimeout(() => {
+        const apiUrl = (import.meta.env.VITE_API_URL || '').replace(/\/$/, '');
+        const configuredEndpoint = import.meta.env.VITE_LOGIN_ENDPOINT || '/api/auth/login';
+        const loginEndpoint = configuredEndpoint.startsWith('/')
+            ? configuredEndpoint
+            : `/${configuredEndpoint}`;
+
+        try {
+            const response = await fetch(`${apiUrl}${loginEndpoint}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    Accept: 'application/json',
+                },
+                body: JSON.stringify({
+                    username: username.trim(),
+                    password,
+                }),
+            });
+
+            let data = {};
+            try {
+                data = await response.json();
+            } catch {
+                if (!response.ok) {
+                    throw new Error('A API retornou uma resposta inválida.');
+                }
+            }
+
+            const payload = data && typeof data === 'object' ? data : {};
+
+            if (!response.ok) {
+                throw new Error(
+                    payload.message || payload.error || 'Nome ou senha inválidos.'
+                );
+            }
+
+            onLogin(
+                payload.user?.username || payload.username || username.trim(),
+                payload.token || payload.accessToken
+            );
+        } catch (error) {
+            setErrorMessage(
+                error instanceof TypeError
+                    ? 'Não foi possível conectar ao servidor.'
+                    : error.message
+            );
+        } finally {
             setIsLoading(false);
-            onLogin(username.trim());
-        }, 1200);
+        }
     };
 
     return (
