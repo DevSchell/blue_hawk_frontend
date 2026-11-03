@@ -1,0 +1,5 @@
+/*
+ * Tailwind, usado pela LoginPage. Os estilos do Tailwind ficam em camadas (@layer), então o CSS
+ * dos componentes, fora de camadas, continua valendo por cima do reset dele.
+ */
+@import 'tailwindcss';

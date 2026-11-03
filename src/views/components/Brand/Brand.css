@@ -1,0 +1,59 @@
+/* Corvo: --rv corpo, --hi cortes (cor do fundo, para parecer vazado), --eye olho, --pu pupila */
+.m {
+  --rv: var(--noite);
+  --hi: var(--giz);
+  --eye: var(--acafrao);
+  --pu: var(--noite);
+}
+
+.m-ultra {
+  --rv: var(--noite);
+  --hi: var(--ultramar);
+}
+
+.m-noite {
+  --rv: var(--claro);
+  --hi: var(--noite);
+}
+
+.m-acaf {
+  --rv: var(--noite);
+  --hi: var(--acafrao);
+  --eye: var(--giz);
+}
+
+/* Nome da marca em Grenze Gotisch */
+.wordmark {
+  font: 800 32px/1 var(--marca);
+}
+
+.wordmark--sm {
+  font-size: 26px;
+}
+
+.wordmark--md {
+  font-size: 30px;
+}
+
+.wordmark--lg {
+  font-size: clamp(56px, 10vw, 120px);
+  line-height: 0.9;
+}
+
+/* Logotipo: corvo + nome, linkando para o início */
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  text-decoration: none;
+}
+
+.logo svg {
+  width: 40px;
+  height: 42px;
+}
+
+.logo:focus-visible {
+  outline: 3px solid var(--acafrao);
+  outline-offset: 4px;
+}

@@ -1,0 +1,136 @@
+.game-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  background: var(--surface);
+  box-shadow: 0 0 0 1px var(--surface-edge);
+  min-width: 0;
+}
+
+/* Botão do título esticado sobre o card inteiro */
+.game-card__open {
+  padding: 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.game-card__open::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+}
+
+.game-card:hover {
+  box-shadow: 0 0 0 3px var(--acafrao);
+}
+
+.game-card:has(.game-card__open:focus-visible) {
+  box-shadow:
+    0 0 0 3px var(--acafrao),
+    0 0 0 6px var(--bg);
+}
+
+.game-card__open:focus-visible {
+  outline: 0;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .game-card {
+    transition: transform 0.15s ease;
+  }
+
+  .game-card:hover {
+    transform: translateY(-3px);
+  }
+}
+
+.game-card > svg {
+  width: 100%;
+  height: auto;
+}
+
+.game-card__body {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  padding: 14px 16px 16px;
+}
+
+.game-card__title {
+  font-size: 34px;
+  line-height: 1;
+  overflow-wrap: anywhere;
+}
+
+.game-card__tags {
+  font-size: 14px;
+  color: var(--text-muted);
+  margin: 6px 0 10px;
+  font-variant-numeric: tabular-nums;
+}
+
+.game-card__desc {
+  font-size: 15px;
+  line-height: 1.5;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+  line-clamp: 3;
+  overflow: hidden;
+  margin-bottom: 14px;
+}
+
+.game-card__meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-top: auto;
+  padding-top: 10px;
+  border-top: 1px solid var(--line);
+  font-size: 14px;
+  color: var(--text-muted);
+}
+
+.game-card__meta b {
+  font: 800 18px/1 var(--texto);
+  color: var(--text);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Carregando */
+.skeleton {
+  height: 12px;
+  margin-bottom: 10px;
+  background: var(--skeleton);
+  opacity: 0.35;
+}
+
+.skeleton--cover {
+  height: auto;
+  margin: 0;
+  aspect-ratio: 300 / 170;
+}
+
+.skeleton--title {
+  height: 30px;
+  width: 70%;
+}
+
+.skeleton--short {
+  width: 45%;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .skeleton {
+    animation: skeleton-pulse 1.4s ease-in-out infinite;
+  }
+}
+
+@keyframes skeleton-pulse {
+  50% {
+    opacity: 0.6;
+  }
+}
