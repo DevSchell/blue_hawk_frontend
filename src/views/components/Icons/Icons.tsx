@@ -71,3 +71,10 @@ export const CloseIcon = () => (
     <path d="M6 6l12 12M18 6 6 18" />
   </Icon>
 )
+
+export const LogoutIcon = () => (
+  <Icon>
+    <path d="M14 4h4a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-4" />
+    <path d="M9 16l-4-4 4-4M5 12h11" />
+  </Icon>
+)

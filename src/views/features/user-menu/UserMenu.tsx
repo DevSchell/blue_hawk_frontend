@@ -1,20 +1,39 @@
 import { useUserMenuController } from '../../../controllers/useUserMenuController'
+import type { Session } from '../../../models/session'
 import { Avatar } from '../../components/Avatar/Avatar'
 import { Raven } from '../../components/Brand/Raven'
 import { Wordmark } from '../../components/Brand/Wordmark'
 import { Button } from '../../components/Button/Button'
 import { Drawer } from '../../components/Drawer/Drawer'
 import { IconButton } from '../../components/IconButton/IconButton'
-import { CloseIcon, GamesIcon, MatchesIcon, MoonIcon, SettingsIcon, SunIcon, UserIcon } from '../../components/Icons/Icons'
+import {
+  CloseIcon,
+  GamesIcon,
+  LogoutIcon,
+  MatchesIcon,
+  MoonIcon,
+  SettingsIcon,
+  SunIcon,
+  UserIcon,
+} from '../../components/Icons/Icons'
 import { MenuItem, MenuList } from '../../components/MenuList/MenuList'
 import { Switch } from '../../components/Switch/Switch'
 import './UserMenu.css'
 
 const SOON = 'Em breve'
 
+type UserMenuProps = {
+  session: Session | null
+  onSignIn: () => void
+  onSignOut: () => void
+}
+
 /** Botão da topbar + menu lateral. Deslogado, mostra só "Cadastrar/Entrar". */
-export function UserMenu() {
-  const { session, isDarkTheme, toggleTheme, isOpen, openMenu, closeMenu } = useUserMenuController()
+export function UserMenu({ session, onSignIn, onSignOut }: UserMenuProps) {
+  const { isDarkTheme, toggleTheme, isOpen, openMenu, closeMenu, signIn, signOut } = useUserMenuController({
+    onSignIn,
+    onSignOut,
+  })
 
   return (
     <>
@@ -51,6 +70,7 @@ export function UserMenu() {
               <MenuItem icon={<GamesIcon />} label="Meus Jogos" hint={SOON} disabled />
               <MenuItem icon={<MatchesIcon />} label="Minhas Partidas" hint={SOON} disabled />
               <MenuItem icon={<SettingsIcon />} label="Configurações" hint={SOON} disabled />
+              <MenuItem icon={<LogoutIcon />} label="Sair" onClick={signOut} />
             </MenuList>
 
             <div className="user-menu__theme">
@@ -61,7 +81,7 @@ export function UserMenu() {
           </>
         ) : (
           <div className="user-menu__signin">
-            <Button fullWidth aria-disabled="true">
+            <Button fullWidth onClick={signIn}>
               Cadastrar/Entrar
             </Button>
           </div>
