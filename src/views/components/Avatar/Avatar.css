@@ -1,0 +1,20 @@
+.avatar {
+  flex: none;
+  display: grid;
+  place-items: center;
+  background: var(--acafrao);
+  color: var(--noite);
+  font: 800 16px/1 var(--texto);
+  clip-path: polygon(0 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%);
+}
+
+.avatar--md {
+  width: 46px;
+  height: 46px;
+}
+
+.avatar--lg {
+  width: 52px;
+  height: 52px;
+  font-size: 19px;
+}

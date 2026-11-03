@@ -1,0 +1,31 @@
+.empty-state {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  padding: 24px;
+  background: var(--surface);
+  box-shadow: 0 0 0 1px var(--surface-edge);
+}
+
+.empty-state__icon {
+  flex: none;
+}
+
+.empty-state__icon svg {
+  width: 72px;
+  height: 76px;
+}
+
+/* Corvo recortado na cor da superfície */
+.empty-state .m {
+  --rv: var(--claro);
+  --hi: var(--surface);
+}
+
+:root[data-theme='light'] .empty-state .m {
+  --rv: var(--ultramar);
+}
+
+.empty-state__title {
+  font: 800 28px/1.1 var(--display);
+}

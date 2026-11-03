@@ -1,0 +1,36 @@
+.alert {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 16px;
+  align-items: center;
+  padding: 14px 20px;
+}
+
+.alert--info {
+  background: var(--ultramar);
+  color: var(--giz);
+}
+
+.alert--warn {
+  background: var(--acafrao);
+  color: var(--noite);
+}
+
+.alert__title {
+  font: 800 28px/1.1 var(--display);
+}
+
+.alert__text {
+  flex: 1 1 24ch;
+}
+
+.alert--sm {
+  gap: 2px 10px;
+  padding: 10px 14px;
+  font-size: 15px;
+  line-height: 1.4;
+}
+
+.alert--sm .alert__title {
+  font-size: 20px;
+}

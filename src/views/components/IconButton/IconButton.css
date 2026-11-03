@@ -1,0 +1,54 @@
+.icon-button {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 46px;
+  height: 46px;
+  padding: 0;
+  border: 0;
+  color: inherit;
+  cursor: pointer;
+}
+
+/* Quadrado com o canto cortado, como os botões e o campo de busca */
+.icon-button--solid {
+  background: var(--ultramar);
+  color: var(--giz);
+  clip-path: polygon(0 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%);
+}
+
+.icon-button--solid:hover {
+  background: var(--claro);
+  color: var(--noite);
+}
+
+.icon-button--solid:focus-visible {
+  outline: 0;
+  box-shadow:
+    inset 0 0 0 3px var(--noite),
+    inset 0 0 0 5px var(--acafrao);
+}
+
+.icon-button--ghost {
+  width: 44px;
+  height: 44px;
+  background: transparent;
+}
+
+.icon-button--ghost:hover {
+  background: var(--ultramar);
+}
+
+.icon-button--ghost:focus-visible {
+  outline: 3px solid var(--acafrao);
+  outline-offset: -3px;
+}
+
+/* Com um avatar dentro, o próprio avatar é o fundo */
+.icon-button--solid:has(.avatar) {
+  background: transparent;
+}
+
+.icon-button--solid:has(.avatar):hover .avatar {
+  background: var(--acafrao-hover);
+}
