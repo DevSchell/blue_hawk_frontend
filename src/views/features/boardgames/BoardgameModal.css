@@ -1,0 +1,60 @@
+/* Números principais em blocos, como os placares da identidade (Hanken Grotesk 800) */
+.boardgame-modal__facts {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 10px;
+  margin: 20px 0 24px;
+}
+
+.boardgame-modal__fact {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: center;
+  column-gap: 10px;
+  padding: 12px 14px;
+  background: var(--bg);
+  box-shadow: inset 0 0 0 1px var(--surface-edge);
+  clip-path: polygon(0 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%);
+}
+
+.boardgame-modal__fact .icon {
+  grid-row: 1 / span 2;
+  width: 28px;
+  height: 28px;
+  color: var(--acafrao);
+}
+
+:root[data-theme='light'] .boardgame-modal__fact .icon {
+  color: var(--ultramar);
+}
+
+/* No HTML o rótulo (dt) vem antes do valor (dd); na tela, o número fica em cima */
+.boardgame-modal__fact dd {
+  grid-column: 2;
+  grid-row: 1;
+  margin: 0;
+  font: 800 24px/1.1 var(--texto);
+  font-variant-numeric: tabular-nums;
+}
+
+.boardgame-modal__fact dt {
+  grid-column: 2;
+  grid-row: 2;
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+.boardgame-modal__about h3 {
+  font-size: 24px;
+  line-height: 1.1;
+  margin-bottom: 8px;
+}
+
+.boardgame-modal__about p {
+  white-space: pre-line;
+  overflow-wrap: anywhere;
+}
+
+.boardgame-modal__empty {
+  color: var(--text-muted);
+}
