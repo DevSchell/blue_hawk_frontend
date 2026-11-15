@@ -1,4 +1,5 @@
 import type { Boardgame } from '../../../models/boardgame'
+import { CategoryTag } from './CategoryTag'
 import { formatPlayers } from './format'
 import { GameCover } from './GameCover'
 import './GameCard.css'
@@ -19,6 +20,7 @@ export function GameCard({ game, onOpen }: GameCardProps) {
     <article className="game-card">
       <GameCover id={game.id} name={game.name} />
       <div className="game-card__body">
+        <CategoryTag game={game} className="game-card__category" />
         <h3 className="game-card__title">
           {/* O botão fica no título (é o nome acessível) e se estende pelo card todo */}
           <button type="button" className="game-card__open" aria-haspopup="dialog" onClick={() => onOpen(game)}>
