@@ -4,6 +4,7 @@ import { Logo } from '../components/Brand/Logo'
 import { RavenSymbols } from '../components/Brand/Raven'
 import { UserMenu } from '../features/user-menu/UserMenu'
 import { Footer } from './Footer'
+import { MainNav } from './MainNav'
 import { Topbar } from './Topbar'
 
 type AppLayoutProps = {
@@ -13,14 +14,17 @@ type AppLayoutProps = {
   children: ReactNode
 }
 
-/** Moldura comum das páginas: topbar com menu do usuário e logo, conteúdo e rodapé */
+/** Moldura comum das páginas: topbar com logo, navegação e menu do usuário, conteúdo e rodapé */
 export function AppLayout({ session, onSignIn, onSignOut, children }: AppLayoutProps) {
   return (
     <>
       <RavenSymbols />
       <Topbar>
-        <UserMenu session={session} onSignIn={onSignIn} onSignOut={onSignOut} />
         <Logo variant="noite" />
+        <MainNav />
+        <div className="topbar__end">
+          <UserMenu session={session} onSignIn={onSignIn} onSignOut={onSignOut} />
+        </div>
       </Topbar>
       {children}
       <Footer />

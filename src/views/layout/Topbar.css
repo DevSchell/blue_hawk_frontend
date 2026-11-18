@@ -8,3 +8,20 @@
   background: var(--noite);
   color: var(--giz);
 }
+
+/* Menu do usuário fica na ponta direita */
+.topbar__end {
+  margin-left: auto;
+  flex-shrink: 0;
+}
+
+.topbar .wordmark {
+  white-space: nowrap;
+}
+
+/* Em telas estreitas o logo fica só com o corvo, para caber a navegação */
+@media (max-width: 480px) {
+  .topbar .logo .wordmark {
+    display: none;
+  }
+}

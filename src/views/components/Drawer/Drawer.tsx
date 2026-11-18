@@ -10,7 +10,7 @@ type DrawerProps = {
 }
 
 /**
- * Painel lateral sobre a página, aberto pela esquerda. Usa <dialog> modal, que já prende o foco,
+ * Painel lateral sobre a página, aberto pela direita. Usa <dialog> modal, que já prende o foco,
  * fecha com Esc e devolve o foco a quem abriu. Clique fora do painel também fecha.
  */
 export function Drawer({ open, onClose, label, children }: DrawerProps) {

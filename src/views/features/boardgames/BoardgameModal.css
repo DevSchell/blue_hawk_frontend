@@ -1,3 +1,7 @@
+.boardgame-modal__category {
+  margin-top: 4px;
+}
+
 /* Números principais em blocos, como os placares da identidade (Hanken Grotesk 800) */
 .boardgame-modal__facts {
   display: grid;
