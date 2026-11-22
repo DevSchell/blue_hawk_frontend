@@ -1,4 +1,5 @@
 import { useLayoutEffect, useRef, type ReactNode } from 'react'
+import { lockBodyScroll } from '../../utils/scrollLock'
 import './Drawer.css'
 
 type DrawerProps = {
@@ -21,8 +22,10 @@ export function Drawer({ open, onClose, label, children }: DrawerProps) {
   useLayoutEffect(() => {
     const dialog = dialogRef.current
     if (!dialog) return
+    const unlockScroll = open ? lockBodyScroll() : undefined
     if (open && !dialog.open) dialog.showModal()
     if (!open && dialog.open) dialog.close()
+    return unlockScroll
   }, [open])
 
   return (

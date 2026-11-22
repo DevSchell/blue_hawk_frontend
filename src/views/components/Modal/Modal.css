@@ -10,6 +10,7 @@
   background: transparent;
   color: var(--text);
   overflow-y: auto;
+  overscroll-behavior: contain;
 }
 
 .modal[open] {
