@@ -17,10 +17,9 @@ import {
   UserIcon,
 } from '../../components/Icons/Icons'
 import { MenuItem, MenuList } from '../../components/MenuList/MenuList'
+import { ACCOUNT_ROUTES } from '../../layout/navigation'
 import { Switch } from '../../components/Switch/Switch'
 import './UserMenu.css'
-
-const SOON = 'Em breve'
 
 type UserMenuProps = {
   session: Session | null
@@ -64,12 +63,11 @@ export function UserMenu({ session, onSignIn, onSignOut }: UserMenuProps) {
               </div>
             </div>
 
-            {/* Ainda sem páginas: os itens aparecem, mas não abrem nada */}
             <MenuList label="Sua conta">
-              <MenuItem icon={<UserIcon />} label="Meu Perfil" hint={SOON} disabled />
-              <MenuItem icon={<GamesIcon />} label="Meus Jogos" hint={SOON} disabled />
-              <MenuItem icon={<MatchesIcon />} label="Minhas Partidas" hint={SOON} disabled />
-              <MenuItem icon={<SettingsIcon />} label="Configurações" hint={SOON} disabled />
+              <MenuItem icon={<UserIcon />} label="Meu Perfil" href={ACCOUNT_ROUTES.profile} />
+              <MenuItem icon={<GamesIcon />} label="Meus Jogos" href={ACCOUNT_ROUTES.shelf} />
+              <MenuItem icon={<MatchesIcon />} label="Minhas Partidas" href={ACCOUNT_ROUTES.matches} />
+              <MenuItem icon={<SettingsIcon />} label="Configurações" href={ACCOUNT_ROUTES.settings} />
               <MenuItem icon={<LogoutIcon />} label="Sair" onClick={signOut} />
             </MenuList>
 

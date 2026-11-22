@@ -31,7 +31,7 @@ export async function listMatches(copies: UserBoardgame[], signal?: AbortSignal)
         { matchId: match.id, size: PAGE_SIZE },
         signal,
       )
-      return { ...match, participantIds: players.map((p) => p.userId) }
+      return { ...match, participantIds: players.map((p) => p.userId), participants: players }
     }),
   )
 }

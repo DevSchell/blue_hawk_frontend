@@ -77,6 +77,14 @@ export function updateToken(token: string) {
   if (stored) writeStored({ ...stored, token })
 }
 
+/** Nome e e-mail reais do usuário (o login só devolve o token) */
+export function updateStoredProfile(name: string, email: string): Session | null {
+  const stored = readStored()
+  if (!stored) return null
+  writeStored({ ...stored, name, email })
+  return { name, email }
+}
+
 export function clearSession() {
   writeStored(null)
 }

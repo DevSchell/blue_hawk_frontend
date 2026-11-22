@@ -37,3 +37,12 @@
   font-weight: 600;
   color: var(--text-muted);
 }
+
+a.menu-item {
+  color: inherit;
+  text-decoration: none;
+}
+
+a.menu-item[aria-current='page'] {
+  box-shadow: inset 4px 0 0 var(--acafrao);
+}

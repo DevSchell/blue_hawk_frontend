@@ -8,6 +8,7 @@ import {
   listCopies,
   listMatches,
 } from '../models/services/marketService'
+import { createMatch, removeParticipant } from '../models/services/matchesService'
 import { readUserId } from '../models/session'
 
 type Data = {
@@ -88,6 +89,30 @@ export function useGameMarket(boardgameId: string) {
     reload()
   }
 
+  /** Cria a partida com a cópia do usuário (pondo o jogo na estante dele, se preciso) e já o coloca nela */
+  async function startMatch() {
+    if (!userId) return
+    const copy = data?.copies.find((c) => c.userId === userId) ?? (await addCopy(userId, boardgameId))
+    const match = await createMatch(copy.id)
+    await joinMatch(match.id, userId)
+    reload()
+  }
+
+  async function leaveMatch(matchId: string) {
+    const mine = data?.matches.find((m) => m.id === matchId)?.participants.find((p) => p.userId === userId)
+    if (!mine) return
+    setJoining(matchId)
+    setJoinErrors((list) => list.filter((id) => id !== matchId))
+    try {
+      await removeParticipant(mine.id)
+      reload()
+    } catch {
+      setJoinErrors((list) => [...list, matchId])
+    } finally {
+      setJoining(null)
+    }
+  }
+
   return {
     signedIn: Boolean(userId),
     loading,
@@ -99,5 +124,7 @@ export function useGameMarket(boardgameId: string) {
     retry: reload,
     requestToJoin,
     publishOffer,
+    startMatch,
+    leaveMatch,
   }
 }

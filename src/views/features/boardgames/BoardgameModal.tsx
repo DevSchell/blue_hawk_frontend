@@ -1,8 +1,11 @@
-import type { ReactNode } from 'react'
+import { useState, type ReactNode } from 'react'
 import type { Boardgame } from '../../../models/boardgame'
+import { readUserId } from '../../../models/session'
+import { Button } from '../../components/Button/Button'
 import { CalendarIcon, ClockIcon, UsersIcon } from '../../components/Icons/Icons'
 import { Modal } from '../../components/Modal/Modal'
 import { GameMarket } from '../market/GameMarket'
+import { BoardgameForm } from './BoardgameForm'
 import { CategoryTag } from './CategoryTag'
 import { GameCover } from './GameCover'
 import './BoardgameModal.css'
@@ -23,11 +26,31 @@ function facts(game: Boardgame): Fact[] {
 type BoardgameModalProps = {
   game: Boardgame
   onClose: () => void
+  /** Chamado depois de editar o jogo, para a lista de trás se atualizar */
+  onChanged?: () => void
 }
 
 /** Detalhes de um jogo do feed: capa, números principais e a descrição completa */
-export function BoardgameModal({ game, onClose }: BoardgameModalProps) {
+export function BoardgameModal({ game: initial, onClose, onChanged }: BoardgameModalProps) {
+  const [game, setGame] = useState(initial)
+  const [editing, setEditing] = useState(false)
   const items = facts(game)
+
+  if (editing) {
+    return (
+      <Modal open onClose={() => setEditing(false)} title="Editar jogo" lead={game.name}>
+        <BoardgameForm
+          game={game}
+          onCancel={() => setEditing(false)}
+          onSaved={(saved) => {
+            setGame(saved)
+            setEditing(false)
+            onChanged?.()
+          }}
+        />
+      </Modal>
+    )
+  }
 
   return (
     <Modal open onClose={onClose} title={game.name} size="lg" media={<GameCover id={game.id} name={game.name} />}>
@@ -51,6 +74,12 @@ export function BoardgameModal({ game, onClose }: BoardgameModalProps) {
           {game.description || 'Este jogo ainda não tem descrição.'}
         </p>
       </section>
+
+      {readUserId() && (
+        <Button variant="link" onClick={() => setEditing(true)}>
+          Editar jogo
+        </Button>
+      )}
 
       <GameMarket boardgameId={game.id} />
     </Modal>
