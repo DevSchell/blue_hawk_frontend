@@ -2,6 +2,8 @@ import type { ReactNode } from 'react'
 import type { Boardgame } from '../../../models/boardgame'
 import { CalendarIcon, ClockIcon, UsersIcon } from '../../components/Icons/Icons'
 import { Modal } from '../../components/Modal/Modal'
+import { GameMarket } from '../market/GameMarket'
+import { CategoryTag } from './CategoryTag'
 import { GameCover } from './GameCover'
 import './BoardgameModal.css'
 
@@ -29,6 +31,8 @@ export function BoardgameModal({ game, onClose }: BoardgameModalProps) {
 
   return (
     <Modal open onClose={onClose} title={game.name} size="lg" media={<GameCover id={game.id} name={game.name} />}>
+      <CategoryTag game={game} className="boardgame-modal__category" />
+
       {items.length > 0 && (
         <dl className="boardgame-modal__facts">
           {items.map((fact) => (
@@ -47,6 +51,8 @@ export function BoardgameModal({ game, onClose }: BoardgameModalProps) {
           {game.description || 'Este jogo ainda não tem descrição.'}
         </p>
       </section>
+
+      <GameMarket boardgameId={game.id} />
     </Modal>
   )
 }

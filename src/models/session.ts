@@ -53,6 +53,18 @@ export function readToken(): string | null {
   return readStored()?.token ?? null
 }
 
+/** Id do usuário logado: a API o coloca no "sub" do JWT (JwtTokenService) */
+export function readUserId(): string | null {
+  const payload = readToken()?.split('.')[1]
+  if (!payload) return null
+  try {
+    const json: unknown = JSON.parse(atob(payload.replace(/-/g, '+').replace(/_/g, '/')))
+    return json && typeof json === 'object' && 'sub' in json && typeof json.sub === 'string' ? json.sub : null
+  } catch {
+    return null
+  }
+}
+
 export function saveSession(email: string, token: string): Session {
   const session = { name: email.split('@')[0], email }
   writeStored({ ...session, token })

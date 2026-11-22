@@ -59,6 +59,10 @@
   padding: 14px 16px 16px;
 }
 
+.game-card__category {
+  margin-bottom: 8px;
+}
+
 .game-card__title {
   font-size: 34px;
   line-height: 1;

@@ -1,0 +1,24 @@
+.category-tag {
+  display: inline-block;
+  align-self: flex-start;
+  padding: 3px 10px;
+  font: 800 12px/1.4 var(--texto);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--noite);
+  background: var(--acafrao);
+}
+
+/* Prévia: ainda não é dado da API */
+.category-tag--preview {
+  color: var(--acafrao);
+  background: transparent;
+  box-shadow: none;
+  outline: 1px dashed var(--acafrao);
+  outline-offset: -1px;
+}
+
+:root[data-theme='light'] .category-tag--preview {
+  color: var(--ultramar);
+  outline-color: var(--ultramar);
+}
