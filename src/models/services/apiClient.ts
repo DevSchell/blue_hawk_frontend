@@ -2,6 +2,11 @@ import { readToken, updateToken } from '../session'
 
 const API_BASE = (import.meta.env.VITE_API_URL || '/api').replace(/\/$/, '')
 
+/** URL completa de um caminho da API (ex.: a foto de capa, usada direto num <img>) */
+export function apiUrl(path: string) {
+  return `${API_BASE}${path}`
+}
+
 export class ApiError extends Error {
   readonly status: number
 
@@ -59,6 +64,28 @@ export async function apiPost<T>(path: string, payload: unknown, signal?: AbortS
     signal,
   })
   return readBody<T>(response, `POST ${path}`)
+}
+
+/** POST multipart (upload de arquivo). O navegador define o Content-Type com o boundary. */
+export async function apiPostForm<T>(path: string, form: FormData, signal?: AbortSignal): Promise<T> {
+  const response = await fetch(`${API_BASE}${path}`, { method: 'POST', headers: headers(), body: form, signal })
+  return readBody<T>(response, `POST ${path}`)
+}
+
+/** DELETE que devolve um corpo (ex.: o jogo atualizado depois de remover a capa) */
+export async function apiDeleteJson<T>(path: string, signal?: AbortSignal): Promise<T> {
+  const response = await fetch(`${API_BASE}${path}`, { method: 'DELETE', headers: headers(), signal })
+  return readBody<T>(response, `DELETE ${path}`)
+}
+
+export async function apiPut<T>(path: string, payload: unknown, signal?: AbortSignal): Promise<T> {
+  const response = await fetch(`${API_BASE}${path}`, {
+    method: 'PUT',
+    headers: headers({ 'Content-Type': 'application/json' }),
+    body: JSON.stringify(payload),
+    signal,
+  })
+  return readBody<T>(response, `PUT ${path}`)
 }
 
 export async function apiDelete(path: string, signal?: AbortSignal): Promise<void> {

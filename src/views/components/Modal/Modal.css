@@ -29,8 +29,35 @@
   clip-path: polygon(0 0, 100% 0, 100% calc(100% - 22px), calc(100% - 22px) 100%, 0 100%);
 }
 
+/* md (formulários de login/cadastro): tudo um pouco mais compacto que o lg */
 .modal__panel--md {
-  max-width: 440px;
+  max-width: 400px;
+}
+
+.modal__panel--md .modal__header {
+  min-height: 56px;
+}
+
+.modal__panel--md .modal__header svg.m {
+  width: 28px;
+  height: 30px;
+}
+
+.modal__panel--md .modal__header .wordmark {
+  font-size: 22px;
+}
+
+.modal__panel--md .modal__body {
+  padding: 20px 22px 26px;
+}
+
+.modal__panel--md .modal__title {
+  font-size: 32px;
+}
+
+.modal__panel--md .modal__lead {
+  margin: 6px 0 18px;
+  font-size: 14px;
 }
 
 .modal__panel--lg {

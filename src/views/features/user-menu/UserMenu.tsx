@@ -13,9 +13,11 @@ import {
   MatchesIcon,
   MoonIcon,
   SettingsIcon,
+  ShieldCheckIcon,
   SunIcon,
   UserIcon,
 } from '../../components/Icons/Icons'
+import { PLAY_PATH, REVIEW_PATH, SHELF_PATH } from '../../layout/navigation'
 import { MenuItem, MenuList } from '../../components/MenuList/MenuList'
 import { Switch } from '../../components/Switch/Switch'
 import './UserMenu.css'
@@ -72,10 +74,27 @@ export function UserMenu({ session, onSignIn, onSignOut }: UserMenuProps) {
                 label="Meus Jogos"
                 onClick={() => {
                   closeMenu()
-                  window.location.href = '/estante'
+                  window.location.href = SHELF_PATH
                 }}
               />
-              <MenuItem icon={<MatchesIcon />} label="Minhas Partidas" hint={SOON} disabled />
+              {session.isAdmin && (
+                <MenuItem
+                  icon={<ShieldCheckIcon />}
+                  label="Aprovar jogos"
+                  onClick={() => {
+                    closeMenu()
+                    window.location.href = REVIEW_PATH
+                  }}
+                />
+              )}
+              <MenuItem
+                icon={<MatchesIcon />}
+                label="Minhas Partidas"
+                onClick={() => {
+                  closeMenu()
+                  window.location.href = `${PLAY_PATH}?aba=minhas`
+                }}
+              />
               <MenuItem icon={<SettingsIcon />} label="Configurações" hint={SOON} disabled />
               <MenuItem icon={<LogoutIcon />} label="Sair" onClick={signOut} />
             </MenuList>
