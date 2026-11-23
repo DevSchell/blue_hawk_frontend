@@ -42,7 +42,11 @@ function writeStored(session: StoredSession | null) {
 
 /** Em dev, ?sessao=demo simula um usuário logado (sem token) para ver o menu completo. */
 export function readSession(): Session | null {
-  if (import.meta.env.DEV && new URLSearchParams(window.location.search).get('sessao') === 'demo') {
+  if (
+    Boolean(import.meta.env?.DEV) &&
+    typeof window !== 'undefined' &&
+    new URLSearchParams(window.location.search).get('sessao') === 'demo'
+  ) {
     return { name: 'Maho', email: 'maho@exemplo.com' }
   }
   const stored = readStored()
@@ -87,4 +91,73 @@ export function updateStoredProfile(name: string, email: string): Session | null
 
 export function clearSession() {
   writeStored(null)
+}
+
+const AVATAR_PREFIX = 'bluehawk.avatar.'
+const PROFILE_EXTRAS_PREFIX = 'bluehawk.profile-extras.'
+
+export type UserProfileExtras = {
+  bio?: string
+  city?: string
+  favoriteGenres?: string
+  experienceLevel?: 'Iniciante' | 'Intermediário' | 'Veterano'
+  isPublic?: boolean
+  showShelf?: boolean
+  matchAlerts?: boolean
+  offerAlerts?: boolean
+}
+
+export function getUserAvatar(userId?: string | null): string | null {
+  if (typeof window === 'undefined' || !window.localStorage) return null
+  const id = userId || readUserId() || 'guest'
+  try {
+    return window.localStorage.getItem(`${AVATAR_PREFIX}${id}`)
+  } catch {
+    return null
+  }
+}
+
+export function saveUserAvatar(avatarUrl: string, userId?: string | null): void {
+  if (typeof window === 'undefined' || !window.localStorage) return
+  const id = userId || readUserId() || 'guest'
+  try {
+    window.localStorage.setItem(`${AVATAR_PREFIX}${id}`, avatarUrl)
+    window.dispatchEvent(new CustomEvent('bluehawk:avatar-changed', { detail: { userId: id, avatarUrl } }))
+  } catch {
+    // LocalStorage indisponível
+  }
+}
+
+export function clearUserAvatar(userId?: string | null): void {
+  if (typeof window === 'undefined' || !window.localStorage) return
+  const id = userId || readUserId() || 'guest'
+  try {
+    window.localStorage.removeItem(`${AVATAR_PREFIX}${id}`)
+    window.dispatchEvent(new CustomEvent('bluehawk:avatar-changed', { detail: { userId: id, avatarUrl: null } }))
+  } catch {
+    // LocalStorage indisponível
+  }
+}
+
+export function getUserProfileExtras(userId?: string | null): UserProfileExtras {
+  if (typeof window === 'undefined' || !window.localStorage) return {}
+  const id = userId || readUserId() || 'guest'
+  try {
+    const raw = window.localStorage.getItem(`${PROFILE_EXTRAS_PREFIX}${id}`)
+    return raw ? JSON.parse(raw) : {}
+  } catch {
+    return {}
+  }
+}
+
+export function saveUserProfileExtras(extras: UserProfileExtras, userId?: string | null): void {
+  if (typeof window === 'undefined' || !window.localStorage) return
+  const id = userId || readUserId() || 'guest'
+  try {
+    const current = getUserProfileExtras(id)
+    window.localStorage.setItem(`${PROFILE_EXTRAS_PREFIX}${id}`, JSON.stringify({ ...current, ...extras }))
+    window.dispatchEvent(new CustomEvent('bluehawk:profile-extras-changed', { detail: { userId: id } }))
+  } catch {
+    // LocalStorage indisponível
+  }
 }

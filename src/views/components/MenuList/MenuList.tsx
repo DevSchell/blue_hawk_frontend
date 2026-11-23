@@ -31,12 +31,16 @@ export function MenuItem({ icon, label, hint, onClick, href, disabled = false }:
   )
 
   if (href) {
+    const activePath = window.location.pathname.replace(/\/+$/, '') || '/'
+    const fullActive = activePath + window.location.search
+    const isCurrent = fullActive === href || (href === activePath && !window.location.search)
+
     return (
       <li>
         <a
           className="menu-item"
           href={href}
-          aria-current={window.location.pathname.replace(/\/+$/, '') === href ? 'page' : undefined}
+          aria-current={isCurrent ? 'page' : undefined}
           onClick={onClick}
         >
           {content}

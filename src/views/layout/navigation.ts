@@ -8,6 +8,7 @@ export const NAV_ITEMS = [
 /** Páginas da conta, abertas pelo menu do usuário */
 export const ACCOUNT_ROUTES = {
   profile: '/perfil',
+  profilePhoto: '/perfil?aba=foto',
   shelf: '/estante',
   matches: '/partidas',
   settings: '/configuracoes',
