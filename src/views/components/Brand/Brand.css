@@ -36,7 +36,7 @@
 }
 
 .wordmark--lg {
-  font-size: clamp(56px, 10vw, 120px);
+  font-size: clamp(40px, 6vw, 72px);
   line-height: 0.9;
 }
 

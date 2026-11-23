@@ -1,9 +1,11 @@
+import { approvalStatusOf } from '../../../models/boardgame'
 import type { ShelfGame } from '../../../models/shelf'
 import { cx } from '../../utils/classNames'
 import { CategoryTag } from '../boardgames/CategoryTag'
 import { formatPlayers } from '../boardgames/format'
 import { GameCover } from '../boardgames/GameCover'
 import './ShelfGameCard.css'
+import { coverOf } from '../../../models/services/boardgameService'
 
 type ShelfGameCardProps = {
   game: ShelfGame
@@ -15,6 +17,7 @@ type ShelfGameCardProps = {
 
 export function ShelfGameCard({ game, isLit, isAltLit, isWinner, onOpen }: ShelfGameCardProps) {
   const { boardgame, plays, hours, forSale, salePrice } = game
+  const status = approvalStatusOf(boardgame)
 
   return (
     <article
@@ -28,12 +31,17 @@ export function ShelfGameCard({ game, isLit, isAltLit, isWinner, onOpen }: Shelf
       )}
     >
       <div className="shelf-card__media">
-        <GameCover id={boardgame.id} name={boardgame.name} />
+        <GameCover id={boardgame.id} name={boardgame.name} {...coverOf(boardgame)} />
         {forSale && (
           <>
             <span className="shelf-card__ribbon">À venda</span>
             <span className="shelf-card__price-tag">R$ {salePrice}</span>
           </>
+        )}
+        {status !== 'APPROVED' && (
+          <span className={cx('shelf-card__status', `shelf-card__status--${status.toLowerCase()}`)}>
+            {status === 'PENDING' ? 'Em aprovação' : 'Recusado'}
+          </span>
         )}
         {isWinner && <span className="shelf-card__winner-badge">★ Jogo Sorteado (D20) ★</span>}
       </div>

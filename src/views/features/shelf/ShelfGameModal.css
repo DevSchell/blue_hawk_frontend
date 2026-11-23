@@ -115,27 +115,6 @@
   font-variant-numeric: tabular-nums;
 }
 
-.shelf-modal__price-row {
-  margin-top: 14px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--text-muted);
-}
-
-.shelf-modal__price-row input {
-  width: 110px;
-  padding: 6px 10px;
-  border: 1px solid var(--line);
-  background: var(--bg);
-  color: var(--text);
-  font-weight: 800;
-  font-variant-numeric: tabular-nums;
-}
-
 .shelf-modal__actions {
   margin-top: 16px;
   display: flex;
@@ -145,4 +124,22 @@
 
 .shelf-modal__actions > button {
   flex: 1 1 180px;
+}
+
+/* Aviso de aprovação (pendente / recusado) acima dos dados do jogo */
+.shelf-modal__review {
+  margin-top: 14px;
+}
+
+.shelf-modal__review-note {
+  display: block;
+  margin-top: 4px;
+  font-style: italic;
+}
+
+/* "Marcar partida": link com cara de botão, para o Jogue */
+.shelf-modal__play-link {
+  text-decoration: none;
+  padding: 10px 20px;
+  font-size: 14px;
 }

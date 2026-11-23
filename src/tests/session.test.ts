@@ -52,7 +52,8 @@ test('Session - ciclo de vida completo de sessão (save, read, clear)', () => {
   assert.strictEqual(created.email, 'leo@bluehawk.gg')
 
   const active = readSession()
-  assert.deepStrictEqual(active, { name: 'leo', email: 'leo@bluehawk.gg' })
+  // isAdmin vem do claim "scope" do token (este token de teste não tem: não é admin)
+  assert.deepStrictEqual(active, { name: 'leo', email: 'leo@bluehawk.gg', isAdmin: false })
   assert.strictEqual(readToken(), 'token.abc.123')
 
   // Atualização de token rotacionado
@@ -61,8 +62,8 @@ test('Session - ciclo de vida completo de sessão (save, read, clear)', () => {
 
   // Atualização de perfil armazenado
   const updated = updateStoredProfile('Leonardo Schell', 'leo.schell@bluehawk.gg')
-  assert.deepStrictEqual(updated, { name: 'Leonardo Schell', email: 'leo.schell@bluehawk.gg' })
-  assert.deepStrictEqual(readSession(), { name: 'Leonardo Schell', email: 'leo.schell@bluehawk.gg' })
+  assert.deepStrictEqual(updated, { name: 'Leonardo Schell', email: 'leo.schell@bluehawk.gg', isAdmin: false })
+  assert.deepStrictEqual(readSession(), { name: 'Leonardo Schell', email: 'leo.schell@bluehawk.gg', isAdmin: false })
 
   // Encerramento de sessão
   clearSession()
