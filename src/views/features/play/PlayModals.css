@@ -1,0 +1,136 @@
+.play-modal__muted {
+  color: var(--text-muted);
+  font-size: 14px;
+}
+
+.play-modal__notice {
+  margin-bottom: 12px;
+}
+
+.play-modal__textarea {
+  display: block;
+  min-height: 84px;
+  resize: vertical;
+  font-family: inherit;
+  line-height: 1.45;
+}
+
+.play-modal__select {
+  appearance: none;
+  padding-right: 40px;
+  cursor: pointer;
+  background-image: linear-gradient(45deg, transparent 50%, var(--noite) 50%),
+    linear-gradient(135deg, var(--noite) 50%, transparent 50%);
+  background-position:
+    calc(100% - 20px) 52%,
+    calc(100% - 14px) 52%;
+  background-size: 6px 6px;
+  background-repeat: no-repeat;
+}
+
+/* "Quando" + "Jogadores" lado a lado */
+.play-modal__row {
+  display: grid;
+  grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr);
+  align-items: start;
+  gap: 12px;
+}
+
+@media (max-width: 380px) {
+  .play-modal__row {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Pedidos (visão do host) */
+.join-requests {
+  display: grid;
+  gap: 10px;
+  padding: 0;
+  list-style: none;
+}
+
+.join-request {
+  padding: 14px 16px;
+  background: var(--bg);
+  box-shadow: inset 3px 0 0 var(--claro), inset 0 0 0 1px var(--surface-edge);
+}
+
+.join-request--accepted {
+  box-shadow: inset 3px 0 0 var(--acafrao), inset 0 0 0 1px var(--surface-edge);
+}
+
+.join-request--rejected,
+.join-request--cancelled {
+  opacity: 0.7;
+  box-shadow: inset 3px 0 0 var(--line), inset 0 0 0 1px var(--surface-edge);
+}
+
+.join-request__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 6px 12px;
+}
+
+.join-request__status {
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.join-request--accepted .join-request__status {
+  color: var(--acafrao);
+}
+
+:root[data-theme='light'] .join-request--accepted .join-request__status {
+  color: #8a5a00;
+}
+
+.join-request__message {
+  margin-top: 6px;
+  font-size: 15px;
+}
+
+.join-request__reply {
+  margin-top: 6px;
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+.join-request__decide {
+  display: grid;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.join-request__reply-input {
+  width: 100%;
+  padding: 9px 12px;
+  border: 0;
+  background: var(--giz);
+  color: var(--noite);
+  font: 400 14px/1.4 var(--texto);
+  box-shadow: inset 0 0 0 1px var(--surface-edge);
+}
+
+.join-request__reply-input:focus-visible {
+  outline: 0;
+  box-shadow:
+    inset 0 0 0 3px var(--noite),
+    inset 0 0 0 5px var(--acafrao);
+}
+
+.join-request__buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.join-request__buttons .button {
+  padding: 9px 18px;
+  font-size: 14px;
+}
