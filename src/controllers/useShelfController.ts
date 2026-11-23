@@ -107,20 +107,37 @@ export function useShelfController() {
           offers.filter((o) => o.status === 'ACTIVE').map((o) => [o.userBoardgameId, o]),
         )
 
-        const seenBoardgames = new Set<string>()
+        const groupedByBoardgame = new Map<string, string[]>()
+        for (const entry of entries) {
+          const list = groupedByBoardgame.get(entry.boardgameId) ?? []
+          list.push(entry.id)
+          groupedByBoardgame.set(entry.boardgameId, list)
+        }
+
         const resolved: ShelfGame[] = []
 
-        for (const entry of entries) {
+        for (const [boardgameId, copyIds] of groupedByBoardgame.entries()) {
           if (controller.signal.aborted) return
-          if (seenBoardgames.has(entry.boardgameId)) continue
           try {
-            const boardgame = await getBoardgameById(entry.boardgameId, controller.signal)
-            const matches = await listMatchesByUserBoardgame(entry.id, controller.signal).catch(() => [])
-            const plays = matches.length
-            const activeOffer = activeOffersByCopy.get(entry.id)
-            seenBoardgames.add(entry.boardgameId)
+            const boardgame = await getBoardgameById(boardgameId, controller.signal)
+            let plays = 0
+            let activeOffer = undefined
+            let primaryCopyId = copyIds[0]
+
+            for (const copyId of copyIds) {
+              if (controller.signal.aborted) return
+              const matches = await listMatchesByUserBoardgame(copyId, controller.signal).catch(() => [])
+              plays += matches.length
+              const foundOffer = activeOffersByCopy.get(copyId)
+              if (foundOffer && !activeOffer) {
+                activeOffer = foundOffer
+                primaryCopyId = copyId
+              }
+            }
+
             resolved.push({
-              userBoardgameId: entry.id,
+              userBoardgameId: primaryCopyId,
+              copyIds,
               boardgame,
               category: resolveGameCategory(boardgame),
               plays,
@@ -131,7 +148,7 @@ export function useShelfController() {
             })
           } catch (itemErr) {
             if (controller.signal.aborted) return
-            if (entries.length === 1) throw itemErr
+            if (groupedByBoardgame.size === 1) throw itemErr
           }
         }
         if (!controller.signal.aborted) {
@@ -166,15 +183,21 @@ export function useShelfController() {
     const totalPlays = games.reduce((acc, g) => acc + g.plays, 0)
     const totalHours = games.reduce((acc, g) => acc + g.hours, 0)
 
-    const playsByCategory: Record<string, number> = {}
+    const statsByCategory: Record<string, { plays: number; count: number }> = {}
     for (const g of games) {
-      playsByCategory[g.category] = (playsByCategory[g.category] ?? 0) + Math.max(1, g.plays)
+      const current = statsByCategory[g.category] ?? { plays: 0, count: 0 }
+      statsByCategory[g.category] = {
+        plays: current.plays + g.plays,
+        count: current.count + 1,
+      }
     }
     let topCategory = '—'
-    let topCategoryScore = 0
-    for (const [cat, score] of Object.entries(playsByCategory)) {
-      if (score > topCategoryScore) {
-        topCategoryScore = score
+    let bestPlays = -1
+    let bestCount = -1
+    for (const [cat, stat] of Object.entries(statsByCategory)) {
+      if (stat.plays > bestPlays || (stat.plays === bestPlays && stat.count > bestCount)) {
+        bestPlays = stat.plays
+        bestCount = stat.count
         topCategory = cat
       }
     }
@@ -424,7 +447,7 @@ export function useShelfController() {
     if (!selectedGame || removingGame) return
     setRemovingGame(true)
     try {
-      await removeFromShelf(selectedGame.userBoardgameId, userId)
+      await removeFromShelf(selectedGame.copyIds, userId)
       const removedId = selectedGame.userBoardgameId
       const removedName = selectedGame.boardgame.name
       setFetchState((prev) => ({
@@ -442,6 +465,7 @@ export function useShelfController() {
   }, [selectedGame, removingGame, userId, winnerGameId, showToast])
 
   return {
+    signedIn: Boolean(userId),
     games,
     filteredGames,
     podiumGames,

@@ -15,10 +15,12 @@ import './ShelfPage.css'
 
 type ShelfPageProps = {
   onGoToFeed: () => void
+  onSignIn: () => void
 }
 
-export function ShelfPage({ onGoToFeed }: ShelfPageProps) {
+export function ShelfPage({ onGoToFeed, onSignIn }: ShelfPageProps) {
   const {
+    signedIn,
     games,
     filteredGames,
     podiumGames,
@@ -269,6 +271,15 @@ export function ShelfPage({ onGoToFeed }: ShelfPageProps) {
             </div>
           ) : error ? (
             <FeedError error={error} onRetry={retry} />
+          ) : !signedIn ? (
+            <EmptyState icon={<Raven variant="noite" />} title="Entre para ver sua estante">
+              Faça login ou crie sua conta para montar sua coleção, registrar partidas e anunciar jogos.
+              <div className="shelf-empty-action">
+                <Button type="button" variant="primary" onClick={onSignIn}>
+                  Cadastrar / Entrar
+                </Button>
+              </div>
+            </EmptyState>
           ) : games.length === 0 ? (
             <EmptyState icon={<Raven variant="noite" />} title="Sua estante está vazia">
               Explore o catálogo de boardgames e adicione seus primeiros jogos à coleção.

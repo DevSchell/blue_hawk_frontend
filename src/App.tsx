@@ -29,6 +29,7 @@ function App() {
       ) : page.href === '/estante' ? (
         <ShelfPage
           key={session?.email ?? 'shelf'}
+          onSignIn={openLogin}
           onGoToFeed={() => {
             window.location.href = '/'
           }}

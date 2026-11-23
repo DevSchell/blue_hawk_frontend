@@ -89,17 +89,23 @@ export function deleteShelfOffer(offerId: string, signal?: AbortSignal) {
   return shelfDelete(`/offers/${encodeURIComponent(offerId)}`, signal)
 }
 
-export async function removeFromShelf(userBoardgameId: string, userId?: string | null) {
+export async function removeFromShelf(userBoardgameIds: string | string[], userId?: string | null) {
+  const ids = Array.isArray(userBoardgameIds) ? userBoardgameIds : [userBoardgameIds]
+  const idSet = new Set(ids)
+
   if (userId) {
     const offers = await listUserOffers(userId).catch(() => [])
-    const linkedOffers = offers.filter((o) => o.userBoardgameId === userBoardgameId)
+    const linkedOffers = offers.filter((o) => idSet.has(o.userBoardgameId))
     for (const offer of linkedOffers) {
       await deleteShelfOffer(offer.id)
     }
   }
-  const matches = await listMatchesByUserBoardgame(userBoardgameId).catch(() => [])
-  for (const match of matches) {
-    await deleteMatch(match.id)
+
+  for (const copyId of ids) {
+    const matches = await listMatchesByUserBoardgame(copyId).catch(() => [])
+    for (const match of matches) {
+      await deleteMatch(match.id)
+    }
+    await shelfDelete(`/user-boardgames/${encodeURIComponent(copyId)}`)
   }
-  await shelfDelete(`/user-boardgames/${encodeURIComponent(userBoardgameId)}`)
 }

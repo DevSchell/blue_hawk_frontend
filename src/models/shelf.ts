@@ -5,6 +5,7 @@ export type { Match, MatchParticipant, Offer, UserBoardgame }
 
 export type ShelfGame = {
   userBoardgameId: string
+  copyIds: string[]
   boardgame: Boardgame
   category: string
   plays: number
