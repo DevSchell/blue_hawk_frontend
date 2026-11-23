@@ -1,0 +1,148 @@
+.shelf-modal__top-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  margin-top: 8px;
+}
+
+.shelf-modal__publisher {
+  border: 1.5px dashed var(--acafrao);
+  color: var(--acafrao);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 3px 9px;
+}
+
+:root[data-theme='light'] .shelf-modal__publisher {
+  border-color: var(--ultramar);
+  color: var(--ultramar);
+}
+
+.shelf-modal__sale-tag {
+  background: var(--acafrao);
+  color: var(--noite);
+  padding: 4px 10px;
+  font-size: 12px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  clip-path: polygon(0 0, 100% 0, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0 100%);
+}
+
+.shelf-modal__facts {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 10px;
+  margin: 18px 0 20px;
+}
+
+.shelf-modal__fact {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: center;
+  column-gap: 10px;
+  padding: 12px 14px;
+  background: var(--bg);
+  box-shadow: inset 0 0 0 1px var(--surface-edge);
+  clip-path: polygon(0 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%);
+}
+
+.shelf-modal__fact .icon {
+  grid-row: 1 / span 2;
+  width: 26px;
+  height: 26px;
+  color: var(--acafrao);
+}
+
+:root[data-theme='light'] .shelf-modal__fact .icon {
+  color: var(--ultramar);
+}
+
+.shelf-modal__fact dd {
+  grid-column: 2;
+  grid-row: 1;
+  margin: 0;
+  font: 800 22px/1.1 var(--texto);
+  font-variant-numeric: tabular-nums;
+}
+
+.shelf-modal__fact dt {
+  grid-column: 2;
+  grid-row: 2;
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+.shelf-modal__about h3 {
+  font-size: 22px;
+  line-height: 1.1;
+  margin-bottom: 6px;
+}
+
+.shelf-modal__about p {
+  white-space: pre-line;
+  overflow-wrap: anywhere;
+}
+
+.shelf-modal__empty {
+  color: var(--text-muted);
+}
+
+.shelf-modal__plays-bar {
+  margin-top: 18px;
+  padding: 12px 14px;
+  background: var(--bg);
+  border-left: 4px solid var(--ultramar);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.shelf-modal__plays-info {
+  font-size: 14px;
+  color: var(--text-muted);
+}
+
+.shelf-modal__plays-info strong {
+  display: block;
+  color: var(--text);
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+}
+
+.shelf-modal__price-row {
+  margin-top: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+.shelf-modal__price-row input {
+  width: 110px;
+  padding: 6px 10px;
+  border: 1px solid var(--line);
+  background: var(--bg);
+  color: var(--text);
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+}
+
+.shelf-modal__actions {
+  margin-top: 16px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.shelf-modal__actions > button {
+  flex: 1 1 180px;
+}

@@ -67,7 +67,14 @@ export function UserMenu({ session, onSignIn, onSignOut }: UserMenuProps) {
             {/* Ainda sem páginas: os itens aparecem, mas não abrem nada */}
             <MenuList label="Sua conta">
               <MenuItem icon={<UserIcon />} label="Meu Perfil" hint={SOON} disabled />
-              <MenuItem icon={<GamesIcon />} label="Meus Jogos" hint={SOON} disabled />
+              <MenuItem
+                icon={<GamesIcon />}
+                label="Meus Jogos"
+                onClick={() => {
+                  closeMenu()
+                  window.location.href = '/estante'
+                }}
+              />
               <MenuItem icon={<MatchesIcon />} label="Minhas Partidas" hint={SOON} disabled />
               <MenuItem icon={<SettingsIcon />} label="Configurações" hint={SOON} disabled />
               <MenuItem icon={<LogoutIcon />} label="Sair" onClick={signOut} />

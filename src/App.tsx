@@ -5,6 +5,7 @@ import { AppLayout } from './views/layout/AppLayout'
 import { currentNavItem } from './views/layout/navigation'
 import { ComingSoonPage } from './views/pages/ComingSoonPage/ComingSoonPage'
 import { FeedPage } from './views/pages/FeedPage/FeedPage'
+import { ShelfPage } from './views/pages/ShelfPage/ShelfPage'
 
 function App() {
   const {
@@ -25,6 +26,14 @@ function App() {
       {page.href === '/' ? (
         // Remonta o feed ao entrar/sair, para buscar de novo com (ou sem) o token
         <FeedPage key={session?.email ?? 'visitante'} />
+      ) : page.href === '/estante' ? (
+        <ShelfPage
+          key={session?.email ?? 'shelf'}
+          onSignIn={openLogin}
+          onGoToFeed={() => {
+            window.location.href = '/'
+          }}
+        />
       ) : (
         <ComingSoonPage title={page.label} />
       )}

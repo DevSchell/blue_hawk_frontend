@@ -8,6 +8,7 @@ export type Boardgame = {
   playTime: number | null
   /** Ainda não vem da API; quando vier, a UI passa a usar este valor no lugar da prévia */
   category?: string | null
+  publisher?: string | null
 }
 
 /** Query de GET /boardgames */

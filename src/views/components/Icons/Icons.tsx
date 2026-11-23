@@ -114,3 +114,31 @@ export const LogoutIcon = () => (
     <path d="M9 16l-4-4 4-4M5 12h11" />
   </Icon>
 )
+
+export const D20Icon = ({ className }: { className?: string }) => (
+  <svg className={className} viewBox="0 0 48 48" fill="none" aria-hidden="true">
+    <polygon points="24,2.5 43.5,13.75 43.5,34.25 24,45.5 4.5,34.25 4.5,13.75" fill="currentColor" />
+    <polygon points="24,10.5 37.5,32.5 10.5,32.5" fill="none" stroke="var(--noite)" strokeWidth="2" strokeLinejoin="round" />
+    <line x1="24" y1="2.5" x2="24" y2="10.5" stroke="var(--noite)" strokeWidth="2" strokeLinecap="round" />
+    <line x1="43.5" y1="13.75" x2="37.5" y2="32.5" stroke="var(--noite)" strokeWidth="2" strokeLinecap="round" />
+    <line x1="4.5" y1="13.75" x2="10.5" y2="32.5" stroke="var(--noite)" strokeWidth="2" strokeLinecap="round" />
+    <line x1="43.5" y1="13.75" x2="24" y2="10.5" stroke="var(--noite)" strokeWidth="1.8" strokeLinecap="round" />
+    <line x1="4.5" y1="13.75" x2="24" y2="10.5" stroke="var(--noite)" strokeWidth="1.8" strokeLinecap="round" />
+    <line x1="24" y1="45.5" x2="37.5" y2="32.5" stroke="var(--noite)" strokeWidth="1.8" strokeLinecap="round" />
+    <line x1="24" y1="45.5" x2="10.5" y2="32.5" stroke="var(--noite)" strokeWidth="1.8" strokeLinecap="round" />
+    <line x1="43.5" y1="34.25" x2="37.5" y2="32.5" stroke="var(--noite)" strokeWidth="1.8" strokeLinecap="round" />
+    <line x1="4.5" y1="34.25" x2="10.5" y2="32.5" stroke="var(--noite)" strokeWidth="1.8" strokeLinecap="round" />
+    <text
+      x="24"
+      y="28"
+      textAnchor="middle"
+      fill="var(--noite)"
+      fontFamily="var(--texto)"
+      fontWeight="800"
+      fontSize="11"
+      letterSpacing="-0.5"
+    >
+      20
+    </text>
+  </svg>
+)

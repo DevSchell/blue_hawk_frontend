@@ -1,5 +1,8 @@
-import type { ReactNode } from 'react'
+import { useState, type ReactNode } from 'react'
 import type { Boardgame } from '../../../models/boardgame'
+import { addToShelf } from '../../../models/services/shelfService'
+import { readUserId } from '../../../models/session'
+import { Button } from '../../components/Button/Button'
 import { CalendarIcon, ClockIcon, UsersIcon } from '../../components/Icons/Icons'
 import { Modal } from '../../components/Modal/Modal'
 import { GameMarket } from '../market/GameMarket'
@@ -28,6 +31,19 @@ type BoardgameModalProps = {
 /** Detalhes de um jogo do feed: capa, números principais e a descrição completa */
 export function BoardgameModal({ game, onClose }: BoardgameModalProps) {
   const items = facts(game)
+  const userId = readUserId()
+  const [shelfStatus, setShelfStatus] = useState<'idle' | 'saving' | 'added' | 'error'>('idle')
+
+  const handleAddToShelf = async () => {
+    if (!userId || shelfStatus === 'saving' || shelfStatus === 'added') return
+    setShelfStatus('saving')
+    try {
+      await addToShelf(userId, game.id)
+      setShelfStatus('added')
+    } catch {
+      setShelfStatus('error')
+    }
+  }
 
   return (
     <Modal open onClose={onClose} title={game.name} size="lg" media={<GameCover id={game.id} name={game.name} />}>
@@ -51,6 +67,25 @@ export function BoardgameModal({ game, onClose }: BoardgameModalProps) {
           {game.description || 'Este jogo ainda não tem descrição.'}
         </p>
       </section>
+
+      {userId && (
+        <div className="boardgame-modal__actions">
+          <Button
+            type="button"
+            variant={shelfStatus === 'added' ? 'secondary' : 'primary'}
+            disabled={shelfStatus === 'saving' || shelfStatus === 'added'}
+            onClick={handleAddToShelf}
+          >
+            {shelfStatus === 'saving'
+              ? 'Adicionando...'
+              : shelfStatus === 'added'
+                ? 'Adicionado à estante!'
+                : shelfStatus === 'error'
+                  ? 'Erro ao adicionar — tentar de novo'
+                  : 'Adicionar à estante'}
+          </Button>
+        </div>
+      )}
 
       <GameMarket boardgameId={game.id} />
     </Modal>

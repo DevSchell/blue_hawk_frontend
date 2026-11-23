@@ -60,3 +60,14 @@ export async function apiPost<T>(path: string, payload: unknown, signal?: AbortS
   })
   return readBody<T>(response, `POST ${path}`)
 }
+
+export async function apiDelete(path: string, signal?: AbortSignal): Promise<void> {
+  const response = await fetch(`${API_BASE}${path}`, {
+    method: 'DELETE',
+    headers: headers(),
+    signal,
+  })
+  if (!response.ok) {
+    throw new ApiError(response.status, `DELETE ${path} falhou com ${response.status}`)
+  }
+}
