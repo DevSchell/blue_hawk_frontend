@@ -3,12 +3,15 @@ import type { Boardgame } from '../../../models/boardgame'
 import { addToShelf } from '../../../models/services/shelfService'
 import { readUserId } from '../../../models/session'
 import { Button } from '../../components/Button/Button'
-import { CalendarIcon, ClockIcon, UsersIcon } from '../../components/Icons/Icons'
+import { useGameMarket } from '../../../controllers/useGameMarket'
+import { CalendarIcon, CheckIcon, ClockIcon, UsersIcon } from '../../components/Icons/Icons'
 import { Modal } from '../../components/Modal/Modal'
 import { GameMarket } from '../market/GameMarket'
 import { CategoryTag } from './CategoryTag'
 import { GameCover } from './GameCover'
+import { LikeButton } from './LikeButton'
 import './BoardgameModal.css'
+import { coverOf } from '../../../models/services/boardgameService'
 
 type Fact = { icon: ReactNode; value: string; label: string }
 
@@ -32,22 +35,29 @@ type BoardgameModalProps = {
 export function BoardgameModal({ game, onClose }: BoardgameModalProps) {
   const items = facts(game)
   const userId = readUserId()
-  const [shelfStatus, setShelfStatus] = useState<'idle' | 'saving' | 'added' | 'error'>('idle')
+  const market = useGameMarket(game.id)
+  const [shelfStatus, setShelfStatus] = useState<'idle' | 'saving' | 'error'>('idle')
+  const [isCreatingOffer, setIsCreatingOffer] = useState(false)
 
   const handleAddToShelf = async () => {
-    if (!userId || shelfStatus === 'saving' || shelfStatus === 'added') return
+    if (!userId || shelfStatus === 'saving' || market.ownsGame) return
     setShelfStatus('saving')
     try {
       await addToShelf(userId, game.id)
-      setShelfStatus('added')
+      setShelfStatus('idle')
+      // Recarrega as cópias: agora o jogo é do usuário e ele pode anunciar venda
+      market.reload()
     } catch {
       setShelfStatus('error')
     }
   }
 
   return (
-    <Modal open onClose={onClose} title={game.name} size="lg" media={<GameCover id={game.id} name={game.name} />}>
-      <CategoryTag game={game} className="boardgame-modal__category" />
+    <Modal open onClose={onClose} title={game.name} size="lg" media={<GameCover id={game.id} name={game.name} {...coverOf(game)} />}>
+      <div className="boardgame-modal__top">
+        <CategoryTag game={game} className="boardgame-modal__category" />
+        <LikeButton game={game} variant="inline" />
+      </div>
 
       {items.length > 0 && (
         <dl className="boardgame-modal__facts">
@@ -68,26 +78,42 @@ export function BoardgameModal({ game, onClose }: BoardgameModalProps) {
         </p>
       </section>
 
-      {userId && (
+      {/* Uma barra só para as ações do usuário com este jogo: estante e venda */}
+      {userId && !market.loading && !market.error && (
         <div className="boardgame-modal__actions">
-          <Button
-            type="button"
-            variant={shelfStatus === 'added' ? 'secondary' : 'primary'}
-            disabled={shelfStatus === 'saving' || shelfStatus === 'added'}
-            onClick={handleAddToShelf}
-          >
-            {shelfStatus === 'saving'
-              ? 'Adicionando...'
-              : shelfStatus === 'added'
-                ? 'Adicionado à estante!'
+          {market.ownsGame ? (
+            <span className="boardgame-modal__owned">
+              <CheckIcon />
+              Na sua estante
+            </span>
+          ) : (
+            <Button type="button" disabled={shelfStatus === 'saving'} onClick={handleAddToShelf}>
+              {shelfStatus === 'saving'
+                ? 'Adicionando...'
                 : shelfStatus === 'error'
                   ? 'Erro ao adicionar — tentar de novo'
                   : 'Adicionar à estante'}
-          </Button>
+            </Button>
+          )}
+
+          {/* Vender exige ter o jogo na estante */}
+          {market.ownsGame &&
+            (market.hasMyOffer ? (
+              <span className="boardgame-modal__owned boardgame-modal__owned--sale">Venda anunciada</span>
+            ) : (
+              <Button
+                type="button"
+                variant="secondary"
+                disabled={isCreatingOffer}
+                onClick={() => setIsCreatingOffer(true)}
+              >
+                Anunciar venda
+              </Button>
+            ))}
         </div>
       )}
 
-      <GameMarket boardgameId={game.id} />
+      <GameMarket market={market} isCreating={isCreatingOffer} onCloseCreate={() => setIsCreatingOffer(false)} />
     </Modal>
   )
 }

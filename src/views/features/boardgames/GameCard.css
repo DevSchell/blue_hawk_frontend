@@ -47,7 +47,13 @@
   }
 }
 
-.game-card > svg {
+/* Capa + coração no canto */
+.game-card__media {
+  position: relative;
+}
+
+.game-card__media > svg {
+  display: block;
   width: 100%;
   height: auto;
 }

@@ -1,4 +1,10 @@
-.boardgame-modal__category {
+/* Categoria à esquerda, curtir à direita */
+.boardgame-modal__top {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
   margin-top: 4px;
 }
 
@@ -63,8 +69,52 @@
   color: var(--text-muted);
 }
 
+/* Barra de ações do usuário com o jogo: estante à esquerda, venda ao lado, no mesmo alinhamento */
 .boardgame-modal__actions {
-  margin-top: 20px;
   display: flex;
-  justify-content: flex-end;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  margin-top: 20px;
+  padding: 14px 0;
+  border-block: 1px solid var(--line);
+}
+
+.boardgame-modal__actions .button {
+  padding: 10px 20px;
+  font-size: 14px;
+}
+
+/* Selo "Na sua estante" / "Venda anunciada": mesma altura dos botões */
+.boardgame-modal__owned {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 39px;
+  padding: 0 14px 0 10px;
+  font-size: 14px;
+  font-weight: 800;
+  color: var(--text);
+  background: var(--bg);
+  box-shadow: inset 0 0 0 1px var(--line);
+}
+
+.boardgame-modal__owned .icon {
+  width: 18px;
+  height: 18px;
+  color: var(--acafrao);
+}
+
+:root[data-theme='light'] .boardgame-modal__owned .icon {
+  color: var(--ultramar);
+}
+
+.boardgame-modal__owned--sale {
+  padding-left: 14px;
+  color: var(--acafrao);
+  box-shadow: inset 3px 0 0 var(--acafrao), inset 0 0 0 1px var(--line);
+}
+
+:root[data-theme='light'] .boardgame-modal__owned--sale {
+  color: #8a5a00;
 }

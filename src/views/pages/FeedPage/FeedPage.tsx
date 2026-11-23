@@ -5,6 +5,7 @@ import { Hero } from '../../components/Hero/Hero'
 import { SearchField } from '../../components/SearchField/SearchField'
 import { BoardgameFeed } from '../../features/boardgames/BoardgameFeed'
 import { BoardgameModal } from '../../features/boardgames/BoardgameModal'
+import { MostLiked } from '../../features/boardgames/MostLiked'
 import './FeedPage.css'
 
 /** Página inicial: hero com a busca, o feed de jogos e a modal de detalhes */
@@ -29,6 +30,8 @@ export function FeedPage() {
 
       <main className="feed-page">
         <Container>
+          {/* O ranking só aparece sem busca, para não empurrar os resultados para baixo */}
+          {!query && <MostLiked onOpenGame={openGame} />}
           <h2 className="feed-page__title">{query ? `Resultados para “${query}”` : 'Jogos'}</h2>
           <BoardgameFeed feed={feed} query={query} isEmpty={isEmpty} onOpenGame={openGame} />
         </Container>

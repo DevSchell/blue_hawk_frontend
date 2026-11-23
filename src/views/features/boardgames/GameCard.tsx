@@ -2,6 +2,8 @@ import type { Boardgame } from '../../../models/boardgame'
 import { CategoryTag } from './CategoryTag'
 import { formatPlayers } from './format'
 import { GameCover } from './GameCover'
+import { coverOf } from '../../../models/services/boardgameService'
+import { LikeButton } from './LikeButton'
 import './GameCard.css'
 
 type GameCardProps = {
@@ -18,7 +20,10 @@ export function GameCard({ game, onOpen }: GameCardProps) {
 
   return (
     <article className="game-card">
-      <GameCover id={game.id} name={game.name} />
+      <div className="game-card__media">
+        <GameCover id={game.id} name={game.name} {...coverOf(game)} />
+        <LikeButton game={game} />
+      </div>
       <div className="game-card__body">
         <CategoryTag game={game} className="game-card__category" />
         <h3 className="game-card__title">

@@ -4,16 +4,23 @@ import { Alert } from '../../components/Alert/Alert'
 import { Button } from '../../components/Button/Button'
 import { UsersIcon } from '../../components/Icons/Icons'
 import { TextField } from '../../components/TextField/TextField'
+import { PLAY_PATH } from '../../layout/navigation'
+import { formatMatchDate } from '../play/format'
 import './GameMarket.css'
 
 const brl = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' })
 const shortDate = new Intl.DateTimeFormat('pt-BR', { day: '2-digit', month: 'short' })
 
-/** Ofertas à venda e partidas abertas do jogo, dentro da modal de detalhes */
-export function GameMarket({ boardgameId }: { boardgameId: string }) {
-  const market = useGameMarket(boardgameId)
-  const [isCreating, setIsCreating] = useState(false)
+type GameMarketProps = {
+  /** Estado do mercado do jogo, compartilhado com a barra de ações da modal */
+  market: ReturnType<typeof useGameMarket>
+  /** Formulário "Anunciar venda" aberto (pela barra de ações da modal) */
+  isCreating: boolean
+  onCloseCreate: () => void
+}
 
+/** Ofertas à venda e partidas abertas do jogo, dentro da modal de detalhes */
+export function GameMarket({ market, isCreating, onCloseCreate }: GameMarketProps) {
   // Mesmo aviso nas duas seções enquanto não há sessão, carregamento ou erro
   const status = !market.signedIn ? (
     <Alert title="Entre para ver" size="sm">
@@ -40,24 +47,14 @@ export function GameMarket({ boardgameId }: { boardgameId: string }) {
 
   return (
     <>
-      <MarketSection
-        title="Ofertas disponíveis"
-        action={
-          market.signedIn &&
-          !isCreating && (
-            <Button className="market__new" onClick={() => setIsCreating(true)}>
-              Nova Oferta
-            </Button>
-          )
-        }
-      >
-        {isCreating && (
+      <MarketSection title="Ofertas disponíveis">
+        {isCreating && market.ownsGame && (
           <NewOfferForm
             onSubmit={async (price, description) => {
               await market.publishOffer(price, description)
-              setIsCreating(false)
+              onCloseCreate()
             }}
-            onCancel={() => setIsCreating(false)}
+            onCancel={onCloseCreate}
           />
         )}
         {status ??
@@ -72,10 +69,16 @@ export function GameMarket({ boardgameId }: { boardgameId: string }) {
           ))}
       </MarketSection>
 
-      <MarketSection title="Matches abertas">
+      {/* Partidas do Jogue (matchmaking): pedir vaga acontece lá, com mensagem para o host */}
+      <MarketSection title="Próximas partidas">
         {status ??
           (market.matches.length === 0 ? (
-            <p className="market__empty">Nenhuma partida aberta para este jogo.</p>
+            <p className="market__empty">
+              Ninguém abriu partida deste jogo ainda.{' '}
+              <a className="market__link" href={PLAY_PATH}>
+                Abrir uma no Jogue
+              </a>
+            </p>
           ) : (
             <ul className="market__list">
               {market.matches.map((match) => (
@@ -83,30 +86,21 @@ export function GameMarket({ boardgameId }: { boardgameId: string }) {
                   <div className="market-card__main">
                     <b className="market-card__headline">
                       <UsersIcon />
-                      {match.maxUsers
-                        ? `${match.participantIds.length} de ${match.maxUsers} jogadores`
-                        : `${match.participantIds.length} ${match.participantIds.length === 1 ? 'jogador' : 'jogadores'}`}
+                      {match.city} • {formatMatchDate(match.scheduledAt)}
                     </b>
                     <span className="market-card__meta">
-                      {match.isHost ? 'Partida sua' : match.maxUsers ? `${match.maxUsers - match.participantIds.length} vagas` : 'Vagas livres'}
+                      {match.isHost
+                        ? 'Partida sua'
+                        : `Com ${match.host.name} • ${
+                            match.seatsLeft > 0
+                              ? `${match.seatsLeft} ${match.seatsLeft === 1 ? 'vaga' : 'vagas'}`
+                              : 'lotada'
+                          }`}
                     </span>
-                    {market.joinErrors.includes(match.id) && (
-                      <span className="market-card__note market-card__note--warn" role="alert">
-                        Não deu para enviar o pedido. Tente de novo.
-                      </span>
-                    )}
                   </div>
-                  {match.isIn ? (
-                    <span className="market-card__tag">Você está nesta</span>
-                  ) : (
-                    <Button
-                      variant="secondary"
-                      disabled={market.joining === match.id}
-                      onClick={() => market.requestToJoin(match.id)}
-                    >
-                      {market.joining === match.id ? 'Enviando…' : 'Pedir para participar'}
-                    </Button>
-                  )}
+                  <a className="market__link" href={`${PLAY_PATH}?cidade=${encodeURIComponent(match.city)}`}>
+                    Ver no Jogue
+                  </a>
                 </li>
               ))}
             </ul>

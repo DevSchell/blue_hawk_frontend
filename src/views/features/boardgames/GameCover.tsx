@@ -1,7 +1,9 @@
 /**
- * A API ainda não tem imagem de capa, então cada jogo ganha uma capa
- * geométrica na paleta da marca, sempre a mesma para o mesmo id.
+ * Capa de um jogo: a foto enviada (se houver) ou uma arte geométrica na paleta da marca.
+ * A arte é a escolhida no cadastro (COVER_PRESETS) ou, sem escolha, uma automática, sempre a mesma para o mesmo id.
  */
+
+import { COVER_PRESETS, type CoverArt } from './coverPresets'
 
 const NOITE = '#0B1147'
 const PAINEL = '#161E66'
@@ -101,18 +103,41 @@ function Board({ offset }: { offset: number }) {
   )
 }
 
-export function GameCover({ id, name }: { id: string; name: string }) {
+/** Arte automática, sempre a mesma para o mesmo id */
+function autoArt(id: string): CoverArt {
   const h = hash(id)
-  const variant = h % 5
-  const offset = (h >>> 3) % 2
+  return { variant: h % 5, offset: (h >>> 3) % 2 }
+}
+
+type GameCoverProps = {
+  id: string
+  name: string
+  /** Arte escolhida no cadastro (chave de COVER_PRESETS); sem ela, a automática */
+  preset?: string | null
+  /** Foto enviada: tem prioridade sobre a arte */
+  imageUrl?: string | null
+}
+
+export function GameCover({ id, name, preset, imageUrl }: GameCoverProps) {
+  const { variant, offset } = COVER_PRESETS.find((p) => p.key === preset)?.art ?? autoArt(id)
 
   return (
-    <svg viewBox="0 0 300 170" role="img" aria-label={`Capa ilustrativa de ${name}`}>
-      {variant === 0 && <Waves offset={offset} />}
-      {variant === 1 && <Beam flip={offset === 1} />}
-      {variant === 2 && <Peaks offset={offset} />}
-      {variant === 3 && <Valley />}
-      {variant === 4 && <Board offset={offset} />}
+    <svg viewBox="0 0 300 170" role="img" aria-label={imageUrl ? `Capa de ${name}` : `Capa ilustrativa de ${name}`}>
+      {imageUrl ? (
+        <>
+          <rect width="300" height="170" fill={NOITE} />
+          {/* slice: a foto preenche a capa toda, cortando as sobras, como object-fit: cover */}
+          <image href={imageUrl} width="300" height="170" preserveAspectRatio="xMidYMid slice" />
+        </>
+      ) : (
+        <>
+          {variant === 0 && <Waves offset={offset} />}
+          {variant === 1 && <Beam flip={offset === 1} />}
+          {variant === 2 && <Peaks offset={offset} />}
+          {variant === 3 && <Valley />}
+          {variant === 4 && <Board offset={offset} />}
+        </>
+      )}
     </svg>
   )
 }
