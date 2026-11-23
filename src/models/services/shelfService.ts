@@ -56,10 +56,6 @@ export function listMatchesByUserBoardgame(userBoardgameId: string, signal?: Abo
   return apiGet<Match[]>('/matches', { userBoardgameId, page: 0, size: 100 }, signal)
 }
 
-export function registerMatch(userBoardgameId: string) {
-  return apiPost<Match>('/matches', { userBoardgameId })
-}
-
 export async function deleteMatch(matchId: string, signal?: AbortSignal) {
   const participants = await apiGet<MatchParticipant[]>(
     '/match-participants',

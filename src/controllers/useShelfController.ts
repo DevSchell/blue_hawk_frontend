@@ -1,13 +1,15 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { readUserId } from '../models/session'
+import { approvalStatusOf, type Boardgame } from '../models/boardgame'
+import { readIsAdmin, readUserId } from '../models/session'
+import { ApiError } from '../models/services/apiClient'
 import { getBoardgameById } from '../models/services/boardgameService'
+import { listPlayedByMe } from '../models/services/openMatchService'
 import {
+  addToShelf,
   createShelfOffer,
   deleteShelfOffer,
-  listMatchesByUserBoardgame,
   listUserBoardgames,
   listUserOffers,
-  registerMatch,
   removeFromShelf,
 } from '../models/services/shelfService'
 import {
@@ -67,7 +69,6 @@ export function useShelfController() {
   const [sortBy, setSortBy] = useState<ShelfSortOption>('most-played')
 
   const [selectedId, setSelectedId] = useState<string | null>(null)
-  const [registeringMatch, setRegisteringMatch] = useState(false)
   const [togglingSale, setTogglingSale] = useState(false)
   const [removingGame, setRemovingGame] = useState(false)
 
@@ -75,6 +76,14 @@ export function useShelfController() {
   const [litGameId, setLitGameId] = useState<string | null>(null)
   const [altLitGameId, setAltLitGameId] = useState<string | null>(null)
   const [winnerGameId, setWinnerGameId] = useState<string | null>(null)
+
+  /** Modal de jogo: 'create' cadastra um novo; um Boardgame abre a correção dele */
+  const [gameForm, setGameForm] = useState<'create' | Boardgame | null>(null)
+  /** Cópia sendo anunciada na modal de venda */
+  const [saleGameId, setSaleGameId] = useState<string | null>(null)
+  const [saleError, setSaleError] = useState('')
+  /** Modal "Adicionar jogo": escolher um jogo da Wiki */
+  const [isAddGameOpen, setIsAddGameOpen] = useState(false)
 
   const [toasts, setToasts] = useState<ToastMessage[]>([])
   const timersRef = useRef<number[]>([])
@@ -106,6 +115,9 @@ export function useShelfController() {
         const activeOffersByCopy = new Map(
           offers.filter((o) => o.status === 'ACTIVE').map((o) => [o.userBoardgameId, o]),
         )
+        // Partidas jogadas = partidas do Jogue já realizadas (host ou aceito), por jogo
+        const played = await listPlayedByMe(controller.signal).catch(() => [])
+        const playsByBoardgame = new Map<string, number>(played.map((p) => [p.boardgameId, p.plays] as const))
 
         const groupedByBoardgame = new Map<string, string[]>()
         for (const entry of entries) {
@@ -120,14 +132,11 @@ export function useShelfController() {
           if (controller.signal.aborted) return
           try {
             const boardgame = await getBoardgameById(boardgameId, controller.signal)
-            let plays = 0
+            const plays = playsByBoardgame.get(boardgameId) ?? 0
             let activeOffer = undefined
             let primaryCopyId = copyIds[0]
 
             for (const copyId of copyIds) {
-              if (controller.signal.aborted) return
-              const matches = await listMatchesByUserBoardgame(copyId, controller.signal).catch(() => [])
-              plays += matches.length
               const foundOffer = activeOffersByCopy.get(copyId)
               if (foundOffer && !activeOffer) {
                 activeOffer = foundOffer
@@ -166,6 +175,8 @@ export function useShelfController() {
   const games: ShelfGame[] = useMemo(() => {
     return userId ? fetchState.games : []
   }, [userId, fetchState.games])
+
+  const ownedBoardgameIds = useMemo(() => new Set(games.map((g) => g.boardgame.id)), [games])
 
   const categoryCounts = useMemo(() => {
     const counts: Record<string, number> = { Todas: games.length }
@@ -253,6 +264,11 @@ export function useShelfController() {
   const selectedGame = useMemo(
     () => games.find((g) => g.userBoardgameId === selectedId) ?? null,
     [games, selectedId],
+  )
+
+  const saleGame = useMemo(
+    () => games.find((g) => g.userBoardgameId === saleGameId) ?? null,
+    [games, saleGameId],
   )
 
   const clearRouletteWinner = useCallback(() => {
@@ -377,70 +393,109 @@ export function useShelfController() {
     stepLight()
   }, [isRollingD20, filteredGames, clearRouletteWinner, showToast])
 
-  const registerMatchForSelected = useCallback(async () => {
-    if (!selectedGame || registeringMatch) return
-    setRegisteringMatch(true)
+  const handleGameSaved = useCallback(
+    async (saved: Boardgame, warning?: string) => {
+      const editing = gameForm !== 'create' && gameForm !== null
+      setGameForm(null)
+      if (warning) showToast(warning)
+
+      if (editing) {
+        const wasRejected = approvalStatusOf(gameForm) === 'REJECTED'
+        setFetchState((prev) => ({
+          ...prev,
+          games: prev.games.map((item) =>
+            item.boardgame.id === saved.id
+              ? { ...item, boardgame: saved, category: resolveGameCategory(saved) }
+              : item,
+          ),
+        }))
+        showToast(
+          wasRejected
+            ? `"${saved.name}" corrigido e reenviado para aprovação.`
+            : `Dados de "${saved.name}" atualizados.`,
+        )
+        return
+      }
+
+      // Cadastro de admin não cria cópia na estante (vai direto ao catálogo): adiciona aqui
+      if (!saved.userBoardgameId && userId) {
+        try {
+          await addToShelf(userId, saved.id)
+        } catch {
+          showToast(`"${saved.name}" entrou no catálogo, mas não foi adicionado à sua estante.`)
+        }
+      }
+      showToast(
+        approvalStatusOf(saved) === 'APPROVED'
+          ? `"${saved.name}" cadastrado no catálogo e na sua estante.`
+          : `"${saved.name}" está na sua estante e aguarda aprovação para entrar na Wiki.`,
+      )
+      setAttempt((n) => n + 1)
+    },
+    [gameForm, userId, showToast],
+  )
+
+  /** Tira o anúncio do jogo aberto da loja */
+  const removeSaleForSelected = useCallback(async () => {
+    if (!selectedGame || togglingSale || !selectedGame.offerId) return
+    setTogglingSale(true)
     try {
-      await registerMatch(selectedGame.userBoardgameId)
+      await deleteShelfOffer(selectedGame.offerId)
       setFetchState((prev) => ({
         ...prev,
-        games: prev.games.map((item) => {
-          if (item.userBoardgameId !== selectedGame.userBoardgameId) return item
-          const nextPlays = item.plays + 1
-          return {
-            ...item,
-            plays: nextPlays,
-            hours: estimateHours(nextPlays, item.boardgame.playTime),
-          }
-        }),
+        games: prev.games.map((item) =>
+          item.userBoardgameId === selectedGame.userBoardgameId ? { ...item, forSale: false, offerId: null } : item,
+        ),
       }))
-      showToast(`+1 partida registrada para "${selectedGame.boardgame.name}"!`)
+      showToast(`Anúncio de "${selectedGame.boardgame.name}" removido da loja.`)
     } catch {
-      showToast('Não foi possível registrar a partida. Tente novamente.')
+      showToast('Não foi possível remover o anúncio da loja.')
     } finally {
-      setRegisteringMatch(false)
+      setTogglingSale(false)
     }
-  }, [selectedGame, registeringMatch, showToast])
+  }, [selectedGame, togglingSale, showToast])
 
-  const toggleSaleForSelected = useCallback(
-    async (priceInput?: number) => {
-      if (!selectedGame || togglingSale) return
+  /** "Anunciar venda": troca a modal de detalhes pela modal de venda, onde o preço é informado */
+  const openSaleForSelected = useCallback(() => {
+    if (!selectedGame) return
+    if (approvalStatusOf(selectedGame.boardgame) !== 'APPROVED') {
+      showToast('Só jogos aprovados podem ser anunciados na loja.')
+      return
+    }
+    setSaleError('')
+    setSaleGameId(selectedGame.userBoardgameId)
+    setSelectedId(null)
+  }, [selectedGame, showToast])
+
+  /** Confirma o anúncio com o preço (e a observação) da modal de venda */
+  const confirmSale = useCallback(
+    async (price: number, description: string) => {
+      if (!saleGame || togglingSale) return
       setTogglingSale(true)
+      setSaleError('')
       try {
-        if (selectedGame.forSale && selectedGame.offerId) {
-          await deleteShelfOffer(selectedGame.offerId)
-          setFetchState((prev) => ({
-            ...prev,
-            games: prev.games.map((item) =>
-              item.userBoardgameId === selectedGame.userBoardgameId
-                ? { ...item, forSale: false, offerId: null }
-                : item,
-            ),
-          }))
-          showToast(`Anúncio de "${selectedGame.boardgame.name}" removido da loja.`)
-        } else {
-          const nextPrice =
-            typeof priceInput === 'number' && Number.isFinite(priceInput) && priceInput > 0
-              ? Math.round(priceInput)
-              : selectedGame.salePrice
-          const created = await createShelfOffer(selectedGame.userBoardgameId, nextPrice)
-          setFetchState((prev) => ({
-            ...prev,
-            games: prev.games.map((item) =>
-              item.userBoardgameId === selectedGame.userBoardgameId
-                ? { ...item, forSale: true, salePrice: Math.round(Number(created.price)), offerId: created.id }
-                : item,
-            ),
-          }))
-          showToast(`"${selectedGame.boardgame.name}" anunciado na loja por R$ ${nextPrice}!`)
-        }
-      } catch {
-        showToast('Não foi possível atualizar o anúncio na loja.')
+        const created = await createShelfOffer(saleGame.userBoardgameId, price, description.trim() || undefined)
+        setFetchState((prev) => ({
+          ...prev,
+          games: prev.games.map((item) =>
+            item.userBoardgameId === saleGame.userBoardgameId
+              ? { ...item, forSale: true, salePrice: Math.round(Number(created.price)), offerId: created.id }
+              : item,
+          ),
+        }))
+        setSaleGameId(null)
+        showToast(`"${saleGame.boardgame.name}" anunciado na loja por R$ ${price}!`)
+      } catch (err) {
+        setSaleError(
+          err instanceof ApiError && err.status === 409
+            ? 'Este jogo ainda não foi aprovado para a Wiki e não pode ir para a loja.'
+            : 'Não foi possível criar o anúncio. Tente de novo.',
+        )
       } finally {
         setTogglingSale(false)
       }
     },
-    [selectedGame, togglingSale, showToast],
+    [saleGame, togglingSale, showToast],
   )
 
   const removeSelectedFromShelf = useCallback(async () => {
@@ -466,6 +521,29 @@ export function useShelfController() {
 
   return {
     signedIn: Boolean(userId),
+    isAdmin: readIsAdmin(),
+    gameForm,
+    isAddGameOpen,
+    ownedBoardgameIds,
+    openAddGame: () => setIsAddGameOpen(true),
+    closeAddGame: () => setIsAddGameOpen(false),
+    /** Jogo da Wiki adicionado: a modal fica aberta para adicionar outros; a estante recarrega */
+    handleWikiGameAdded: (game: Boardgame) => {
+      showToast(`"${game.name}" adicionado à sua estante.`)
+      setAttempt((n) => n + 1)
+    },
+    /** "Não achou seu jogo?": troca a busca da Wiki pelo cadastro de um jogo novo */
+    openCreateGame: () => {
+      setIsAddGameOpen(false)
+      setGameForm('create')
+    },
+    /** Fecha a modal do jogo antes de abrir a edição, para não empilhar duas modais */
+    openEditGame: (game: Boardgame) => {
+      setSelectedId(null)
+      setGameForm(game)
+    },
+    closeGameForm: () => setGameForm(null),
+    handleGameSaved,
     games,
     filteredGames,
     podiumGames,
@@ -488,9 +566,12 @@ export function useShelfController() {
     selectedGame,
     openGame: (game: ShelfGame) => setSelectedId(game.userBoardgameId),
     closeGame: () => setSelectedId(null),
-    registerMatchForSelected,
-    registeringMatch,
-    toggleSaleForSelected,
+    removeSaleForSelected,
+    openSaleForSelected,
+    saleGame,
+    saleError,
+    confirmSale,
+    closeSale: () => setSaleGameId(null),
     togglingSale,
     removeSelectedFromShelf,
     removingGame,

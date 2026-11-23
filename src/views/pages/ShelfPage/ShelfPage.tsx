@@ -5,9 +5,13 @@ import { Raven } from '../../components/Brand/Raven'
 import { Button } from '../../components/Button/Button'
 import { Container } from '../../components/Container/Container'
 import { EmptyState } from '../../components/EmptyState/EmptyState'
-import { CloseIcon, D20Icon, UsersIcon } from '../../components/Icons/Icons'
+import { CloseIcon, D20Icon, PlusIcon, UsersIcon } from '../../components/Icons/Icons'
+import { BoardgameFormModal } from '../../features/boardgames/BoardgameFormModal'
 import { FeedError } from '../../features/boardgames/FeedError'
 import { GameCardSkeleton } from '../../features/boardgames/GameCardSkeleton'
+import { cx } from '../../utils/classNames'
+import { AddGameModal } from '../../features/shelf/AddGameModal'
+import { SaleModal } from '../../features/shelf/SaleModal'
 import { ShelfGameCard } from '../../features/shelf/ShelfGameCard'
 import { ShelfGameModal } from '../../features/shelf/ShelfGameModal'
 import { ShelfPodium } from '../../features/shelf/ShelfPodium'
@@ -43,9 +47,12 @@ export function ShelfPage({ onGoToFeed, onSignIn }: ShelfPageProps) {
     selectedGame,
     openGame,
     closeGame,
-    registerMatchForSelected,
-    registeringMatch,
-    toggleSaleForSelected,
+    removeSaleForSelected,
+    openSaleForSelected,
+    saleGame,
+    saleError,
+    confirmSale,
+    closeSale,
     togglingSale,
     removeSelectedFromShelf,
     removingGame,
@@ -56,6 +63,17 @@ export function ShelfPage({ onGoToFeed, onSignIn }: ShelfPageProps) {
     startD20Roulette,
     clearRouletteWinner,
     toasts,
+    isAdmin,
+    gameForm,
+    openCreateGame,
+    isAddGameOpen,
+    ownedBoardgameIds,
+    openAddGame,
+    closeAddGame,
+    handleWikiGameAdded,
+    openEditGame,
+    closeGameForm,
+    handleGameSaved,
   } = useShelfController()
 
   const gridRef = useRef<HTMLDivElement>(null)
@@ -68,6 +86,29 @@ export function ShelfPage({ onGoToFeed, onSignIn }: ShelfPageProps) {
       card.scrollIntoView({ behavior: 'smooth', block: 'center' })
     }
   }, [winnerGameId])
+
+  // Deslogado: a estante não tem dados para mostrar, então a página é só o convite para entrar.
+  if (!signedIn) {
+    return (
+      <main className="shelf-page">
+        <Container>
+          <EmptyState
+            icon={<Raven variant="noite" />}
+            title="Entre para ver sua estante"
+            action={
+              <div className="shelf-empty-action">
+                <Button type="button" variant="primary" onClick={onSignIn}>
+                  Cadastrar / Entrar
+                </Button>
+              </div>
+            }
+          >
+            Faça login ou crie sua conta para montar sua coleção, registrar partidas e anunciar jogos.
+          </EmptyState>
+        </Container>
+      </main>
+    )
+  }
 
   return (
     <>
@@ -88,7 +129,9 @@ export function ShelfPage({ onGoToFeed, onSignIn }: ShelfPageProps) {
               <div className="shelf-stat" title="Total de jogos adquiridos">
                 <span className="shelf-stat__label">Jogos:</span>
                 <span className="shelf-stat__value">{summary.totalGames}</span>
-                <span className="shelf-stat__extra">({summary.totalPlays} partidas)</span>
+                <span className="shelf-stat__extra">
+                  ({summary.totalPlays} {summary.totalPlays === 1 ? 'partida' : 'partidas'})
+                </span>
               </div>
 
               <div className="shelf-stat" title="Horas estimadas jogadas na mesa">
@@ -131,16 +174,31 @@ export function ShelfPage({ onGoToFeed, onSignIn }: ShelfPageProps) {
                 </p>
               </div>
 
-              <button
-                type="button"
-                onClick={startD20Roulette}
-                disabled={isRollingD20 || filteredGames.length === 0}
-                title="Sortear jogo com D20"
-                aria-label="Sortear jogo com D20"
-                className={`shelf-d20-btn ${isRollingD20 ? 'shelf-d20-btn--rolling' : ''}`}
-              >
-                <D20Icon className="shelf-d20-btn__icon" />
-              </button>
+              <div className="shelf-controls__header-actions">
+                <Button type="button" variant="secondary" className="shelf-add-game-btn" onClick={openAddGame}>
+                  <PlusIcon />
+                  <span>Adicionar jogo</span>
+                </Button>
+
+                <button
+                  type="button"
+                  onClick={startD20Roulette}
+                  disabled={isRollingD20 || filteredGames.length === 0}
+                  title="Sortear jogo com D20"
+                  aria-label="Sortear jogo com D20"
+                  className={cx(
+                    'shelf-d20-btn',
+                    isRollingD20 && 'shelf-d20-btn--rolling',
+                    // Quique de "parada" quando o sorteio termina
+                    !isRollingD20 && winnerGameId && 'shelf-d20-btn--landed',
+                  )}
+                >
+                  <span className="shelf-d20-btn__die" aria-hidden="true">
+                    <D20Icon className="shelf-d20-btn__icon" />
+                  </span>
+                  <span>{isRollingD20 ? 'Rolando…' : 'Sortear'}</span>
+                </button>
+              </div>
             </div>
 
             <div className="shelf-controls__toolbar">
@@ -271,32 +329,36 @@ export function ShelfPage({ onGoToFeed, onSignIn }: ShelfPageProps) {
             </div>
           ) : error ? (
             <FeedError error={error} onRetry={retry} />
-          ) : !signedIn ? (
-            <EmptyState icon={<Raven variant="noite" />} title="Entre para ver sua estante">
-              Faça login ou crie sua conta para montar sua coleção, registrar partidas e anunciar jogos.
-              <div className="shelf-empty-action">
-                <Button type="button" variant="primary" onClick={onSignIn}>
-                  Cadastrar / Entrar
-                </Button>
-              </div>
-            </EmptyState>
           ) : games.length === 0 ? (
-            <EmptyState icon={<Raven variant="noite" />} title="Sua estante está vazia">
-              Explore o catálogo de boardgames e adicione seus primeiros jogos à coleção.
-              <div className="shelf-empty-action">
-                <Button type="button" variant="primary" onClick={onGoToFeed}>
-                  Explorar catálogo
-                </Button>
-              </div>
+            <EmptyState
+              icon={<Raven variant="noite" />}
+              title="Sua estante está vazia"
+              action={
+                <div className="shelf-empty-action">
+                  <Button type="button" variant="primary" onClick={openAddGame}>
+                    Adicionar jogo
+                  </Button>
+                  <Button type="button" variant="secondary" onClick={onGoToFeed}>
+                    Explorar a Wiki
+                  </Button>
+                </div>
+              }
+            >
+              Escolha jogos da Wiki para montar sua coleção. Não achou o seu? Dá para cadastrá-lo.
             </EmptyState>
           ) : filteredGames.length === 0 ? (
-            <EmptyState icon={<Raven variant="noite" />} title="Nenhum jogo encontrado">
+            <EmptyState
+              icon={<Raven variant="noite" />}
+              title="Nenhum jogo encontrado"
+              action={
+                <div className="shelf-empty-action">
+                  <Button type="button" variant="primary" onClick={resetFilters}>
+                    Limpar filtros e pesquisa
+                  </Button>
+                </div>
+              }
+            >
               Não encontramos títulos na sua estante com os filtros ou termos pesquisados.
-              <div className="shelf-empty-action">
-                <Button type="button" variant="primary" onClick={resetFilters}>
-                  Limpar filtros e pesquisa
-                </Button>
-              </div>
             </EmptyState>
           ) : (
             <div ref={gridRef} className="shelf-grid">
@@ -319,13 +381,43 @@ export function ShelfPage({ onGoToFeed, onSignIn }: ShelfPageProps) {
         <ShelfGameModal
           key={selectedGame.userBoardgameId}
           game={selectedGame}
-          registeringMatch={registeringMatch}
           togglingSale={togglingSale}
           removingGame={removingGame}
           onClose={closeGame}
-          onRegisterMatch={registerMatchForSelected}
-          onToggleSale={toggleSaleForSelected}
+          onAnnounceSale={openSaleForSelected}
+          onRemoveSale={removeSaleForSelected}
           onRemoveFromShelf={removeSelectedFromShelf}
+          onEditGame={openEditGame}
+        />
+      )}
+
+      {saleGame && (
+        <SaleModal
+          key={saleGame.userBoardgameId}
+          game={saleGame}
+          saving={togglingSale}
+          error={saleError}
+          onConfirm={confirmSale}
+          onClose={closeSale}
+        />
+      )}
+
+      {isAddGameOpen && (
+        <AddGameModal
+          ownedIds={ownedBoardgameIds}
+          onAdded={handleWikiGameAdded}
+          onCreateNew={openCreateGame}
+          onClose={closeAddGame}
+        />
+      )}
+
+      {gameForm && (
+        <BoardgameFormModal
+          key={gameForm === 'create' ? 'create' : gameForm.id}
+          game={gameForm === 'create' ? null : gameForm}
+          isAdmin={isAdmin}
+          onSaved={handleGameSaved}
+          onClose={closeGameForm}
         />
       )}
 
