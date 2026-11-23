@@ -57,6 +57,11 @@ export function useBoardgameFeed(query: string) {
     loadingMore: loading && page > 0,
     loadMore: () => setCursor({ query, page: page + 1 }),
     retry: () => setAttempt((n) => n + 1),
+    /** Volta à primeira página e busca de novo (depois de cadastrar ou editar um jogo) */
+    refresh: () => {
+      setCursor({ query, page: 0 })
+      setAttempt((n) => n + 1)
+    },
   }
 }
 

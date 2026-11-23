@@ -1,5 +1,8 @@
 import type { ApprovalStatus, Boardgame, BoardgameInput, Category, ListBoardgamesParams } from '../boardgame'
 import { apiDeleteJson, apiGet, apiPost, apiPostForm, apiPut, apiUrl } from './apiClient'
+import { forgetGame } from './shelfService'
+
+export type { BoardgameInput }
 
 export function listBoardgames(params: ListBoardgamesParams, signal?: AbortSignal) {
   return apiGet<Boardgame[]>('/boardgames', params, signal)
@@ -23,8 +26,11 @@ export function createBoardgame(input: BoardgameInput) {
 }
 
 /** Autor corrige o próprio jogo não aprovado (um recusado volta para a fila); admin edita qualquer um */
-export function updateBoardgame(id: string, input: BoardgameInput) {
-  return apiPut<Boardgame>(`/boardgames/${encodeURIComponent(id)}`, input)
+export async function updateBoardgame(id: string, input: BoardgameInput) {
+  const saved = await apiPut<Boardgame>(`/boardgames/${encodeURIComponent(id)}`, input)
+  // A estante guarda os jogos já carregados: descarta a versão antiga
+  forgetGame(id)
+  return saved
 }
 
 /** Envia a foto de capa (JPEG, PNG ou WebP até 2 MB) */

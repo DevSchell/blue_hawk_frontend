@@ -1,17 +1,18 @@
 import { useState, type ReactNode } from 'react'
-import type { Boardgame } from '../../../models/boardgame'
-import { addToShelf } from '../../../models/services/shelfService'
-import { readUserId } from '../../../models/session'
-import { Button } from '../../components/Button/Button'
 import { useGameMarket } from '../../../controllers/useGameMarket'
+import type { Boardgame } from '../../../models/boardgame'
+import { coverOf } from '../../../models/services/boardgameService'
+import { addToShelf } from '../../../models/services/shelfService'
+import { readIsAdmin, readUserId } from '../../../models/session'
+import { Button } from '../../components/Button/Button'
 import { CalendarIcon, CheckIcon, ClockIcon, UsersIcon } from '../../components/Icons/Icons'
 import { Modal } from '../../components/Modal/Modal'
 import { GameMarket } from '../market/GameMarket'
+import { BoardgameFormModal } from './BoardgameFormModal'
 import { CategoryTag } from './CategoryTag'
 import { GameCover } from './GameCover'
 import { LikeButton } from './LikeButton'
 import './BoardgameModal.css'
-import { coverOf } from '../../../models/services/boardgameService'
 
 type Fact = { icon: ReactNode; value: string; label: string }
 
@@ -29,12 +30,17 @@ function facts(game: Boardgame): Fact[] {
 type BoardgameModalProps = {
   game: Boardgame
   onClose: () => void
+  /** Chamado depois de editar o jogo, para a lista de trás se atualizar */
+  onChanged?: () => void
 }
 
 /** Detalhes de um jogo do feed: capa, números principais e a descrição completa */
-export function BoardgameModal({ game, onClose }: BoardgameModalProps) {
+export function BoardgameModal({ game: initial, onClose, onChanged }: BoardgameModalProps) {
+  const [game, setGame] = useState(initial)
+  const [editing, setEditing] = useState(false)
   const items = facts(game)
   const userId = readUserId()
+  const isAdmin = readIsAdmin()
   const market = useGameMarket(game.id)
   const [shelfStatus, setShelfStatus] = useState<'idle' | 'saving' | 'error'>('idle')
   const [isCreatingOffer, setIsCreatingOffer] = useState(false)
@@ -50,6 +56,21 @@ export function BoardgameModal({ game, onClose }: BoardgameModalProps) {
     } catch {
       setShelfStatus('error')
     }
+  }
+
+  if (editing) {
+    return (
+      <BoardgameFormModal
+        game={game}
+        isAdmin={isAdmin}
+        onClose={() => setEditing(false)}
+        onSaved={(saved) => {
+          setGame(saved)
+          setEditing(false)
+          onChanged?.()
+        }}
+      />
+    )
   }
 
   return (
@@ -110,6 +131,13 @@ export function BoardgameModal({ game, onClose }: BoardgameModalProps) {
                 Anunciar venda
               </Button>
             ))}
+
+          {/* Jogo do catálogo: só admin edita (a API recusa os demais) */}
+          {isAdmin && (
+            <Button variant="link" className="boardgame-modal__edit" onClick={() => setEditing(true)}>
+              Editar jogo
+            </Button>
+          )}
         </div>
       )}
 

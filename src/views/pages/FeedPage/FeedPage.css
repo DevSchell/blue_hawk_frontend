@@ -9,3 +9,7 @@
   margin-bottom: clamp(24px, 3vw, 36px);
   overflow-wrap: anywhere;
 }
+
+.feed-page__actions {
+  margin: -12px 0 24px;
+}

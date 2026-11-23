@@ -118,3 +118,8 @@
 :root[data-theme='light'] .boardgame-modal__owned--sale {
   color: #8a5a00;
 }
+
+/* "Editar jogo" (só admin) fica no fim da barra */
+.boardgame-modal__edit {
+  margin-left: auto;
+}
