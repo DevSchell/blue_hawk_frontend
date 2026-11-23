@@ -8,9 +8,11 @@ import { Button } from '../../components/Button/Button'
 import { Container } from '../../components/Container/Container'
 import { EmptyState } from '../../components/EmptyState/EmptyState'
 import { CalendarIcon, ClockIcon, GridIcon, ListIcon, UsersIcon } from '../../components/Icons/Icons'
+import { LoadingIndicator, LoadingSpinner } from '../../components/LoadingIndicator/LoadingIndicator'
 import { SearchField } from '../../components/SearchField/SearchField'
 import { CategoryTag } from '../../features/boardgames/CategoryTag'
 import { formatMatchDate, formatMatchDuration } from '../../features/boardgames/format'
+import { GameCardSkeleton } from '../../features/boardgames/GameCardSkeleton'
 import { GameCover } from '../../features/boardgames/GameCover'
 import { cx } from '../../utils/classNames'
 import { MatchDetailModal } from './MatchDetailModal'
@@ -63,11 +65,11 @@ export function MatchesPage({ onSignIn }: MatchesPageProps) {
         <Container>
           <div className="matches-page__header-row">
             <div className="matches-page__title-group">
-              <span className="matches-page__accent" aria-hidden="true" />
-              <div>
-                <h1 className="feed-page__title">Minhas Partidas</h1>
-                <p className="matches-page__subtitle">Histórico de sessões e mesas de jogos</p>
+              <div className="matches-page__title-row">
+                <span className="matches-page__accent" aria-hidden="true" />
+                <h1 className="matches-page__title">Minhas Partidas</h1>
               </div>
+              <p className="matches-page__subtitle">Histórico de sessões e mesas de jogos</p>
             </div>
           </div>
           <EmptyState icon={<Raven variant="noite" />} title="Entre para ver o seu histórico de partidas">
@@ -86,13 +88,13 @@ export function MatchesPage({ onSignIn }: MatchesPageProps) {
       <Container>
         <div className="matches-page__header-row">
           <div className="matches-page__title-group">
-            <span className="matches-page__accent" aria-hidden="true" />
-            <div>
-              <h1 className="feed-page__title">Minhas Partidas</h1>
-              <p className="matches-page__subtitle">
-                Histórico de partidas • Mesas registradas e finalizadas
-              </p>
+            <div className="matches-page__title-row">
+              <span className="matches-page__accent" aria-hidden="true" />
+              <h1 className="matches-page__title">Minhas Partidas</h1>
             </div>
+            <p className="matches-page__subtitle">
+              Histórico de partidas • Mesas registradas e finalizadas
+            </p>
           </div>
 
           {ctrl.matches.length > 0 && (
@@ -126,6 +128,13 @@ export function MatchesPage({ onSignIn }: MatchesPageProps) {
           </div>
 
           <div className="matches-toolbar__actions">
+            {ctrl.loading && ctrl.matches.length > 0 && (
+              <span className="matches-toolbar__updating" role="status" aria-live="polite">
+                <LoadingSpinner size="sm" />
+                <span>Atualizando…</span>
+              </span>
+            )}
+
             <span className="matches-toolbar__count">
               {filteredMatches.length} {filteredMatches.length === 1 ? 'partida' : 'partidas'}
             </span>
@@ -170,9 +179,16 @@ export function MatchesPage({ onSignIn }: MatchesPageProps) {
             Verifique a conexão e tente outra vez.
           </Alert>
         ) : ctrl.loading && ctrl.matches.length === 0 ? (
-          <p className="shelf-status" aria-busy="true">
-            Carregando histórico de partidas…
-          </p>
+          <div className="matches-loading-wrapper" aria-busy="true">
+            <LoadingIndicator size="lg" label="Carregando histórico de partidas…" />
+            <ul className="matches-cards-grid" aria-hidden="true">
+              {Array.from({ length: 3 }, (_, i) => (
+                <li key={i} className="match-card-item">
+                  <GameCardSkeleton />
+                </li>
+              ))}
+            </ul>
+          </div>
         ) : ctrl.matches.length === 0 ? (
           <EmptyState icon={<Raven variant="noite" />} title="Você ainda não possui partidas registradas">
             Quando você registrar partidas pela sua estante ou participar de mesas na comunidade, elas serão listadas neste histórico.
