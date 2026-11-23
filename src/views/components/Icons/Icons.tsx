@@ -161,6 +161,26 @@ export const CheckIcon = () => (
   </Icon>
 )
 
+export const GridIcon = () => (
+  <Icon>
+    <rect x="3" y="3" width="7" height="7" />
+    <rect x="14" y="3" width="7" height="7" />
+    <rect x="14" y="14" width="7" height="7" />
+    <rect x="3" y="14" width="7" height="7" />
+  </Icon>
+)
+
+export const ListIcon = () => (
+  <Icon>
+    <line x1="8" y1="6" x2="21" y2="6" />
+    <line x1="8" y1="12" x2="21" y2="12" />
+    <line x1="8" y1="18" x2="21" y2="18" />
+    <line x1="3" y1="6" x2="3.01" y2="6" />
+    <line x1="3" y1="12" x2="3.01" y2="12" />
+    <line x1="3" y1="18" x2="3.01" y2="18" />
+  </Icon>
+)
+
 export const D20Icon = ({ className }: { className?: string }) => (
   <svg className={className} viewBox="0 0 48 48" fill="none" aria-hidden="true">
     <polygon points="24,2.5 43.5,13.75 43.5,34.25 24,45.5 4.5,34.25 4.5,13.75" fill="currentColor" />
