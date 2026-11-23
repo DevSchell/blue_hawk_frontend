@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { likesStore } from '../models/likesStore'
 import { getUser } from '../models/services/accountService'
 import { clearSession, readSession, readUserId, saveSession, updateStoredProfile, type Session } from '../models/session'
 
@@ -51,6 +52,8 @@ export function useAuthController() {
     closeRegister: () => setIsRegisterOpen(false),
     /** Chamado pelo login ou cadastro depois que a API aceita e-mail e senha */
     completeLogin: (email: string, token: string) => {
+      // Curtidas marcadas eram de quem estava antes (ou de ninguém): passam a vir da API de novo
+      likesStore.clear()
       setSession(saveSession(email, token))
       syncProfile(setSession)
       setIsLoginOpen(false)
@@ -62,6 +65,7 @@ export function useAuthController() {
       if (session) setSession(session)
     },
     logout: () => {
+      likesStore.clear()
       clearSession()
       setSession(null)
     },

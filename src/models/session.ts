@@ -2,9 +2,11 @@ export type Session = {
   /** Nome exibido no menu (a API não devolve o nome no login: usamos o início do e-mail) */
   name: string
   email: string
+  /** Papel ADMIN no token. Só decide o que mostrar: quem garante a permissão é a API. */
+  isAdmin: boolean
 }
 
-type StoredSession = Session & { token: string }
+type StoredSession = { name: string; email: string; token: string }
 
 const SESSION_KEY = 'bluehawk.session'
 
@@ -47,34 +49,50 @@ export function readSession(): Session | null {
     typeof window !== 'undefined' &&
     new URLSearchParams(window.location.search).get('sessao') === 'demo'
   ) {
-    return { name: 'Maho', email: 'maho@exemplo.com' }
+    return { name: 'Maho', email: 'maho@exemplo.com', isAdmin: false }
   }
   const stored = readStored()
-  return stored ? { name: stored.name, email: stored.email } : null
+  return stored ? { name: stored.name, email: stored.email, isAdmin: isAdminToken(stored.token) } : null
 }
 
 export function readToken(): string | null {
   return readStored()?.token ?? null
 }
 
-/** Id do usuário logado: a API o coloca no "sub" do JWT (JwtTokenService) */
-export function readUserId(): string | null {
-  const payload = readToken()?.split('.')[1]
+/** Claims do JWT (sem validar a assinatura: só para a interface; quem valida é a API) */
+function readClaim(token: string | null | undefined, claim: string): string | null {
+  const payload = token?.split('.')[1]
   if (!payload) return null
   try {
     const base64 = payload.replace(/-/g, '+').replace(/_/g, '/')
     const padded = base64.padEnd(base64.length + ((4 - (base64.length % 4)) % 4), '=')
     const json: unknown = JSON.parse(atob(padded))
-    return json && typeof json === 'object' && 'sub' in json && typeof json.sub === 'string' ? json.sub : null
+    if (!json || typeof json !== 'object' || !(claim in json)) return null
+    const value = (json as Record<string, unknown>)[claim]
+    return typeof value === 'string' ? value : null
   } catch {
     return null
   }
 }
 
+/** O papel vai no claim "scope" (JwtTokenService); a API o atualiza a cada token renovado */
+function isAdminToken(token: string | null | undefined) {
+  return readClaim(token, 'scope') === 'ADMIN'
+}
+
+/** Id do usuário logado: a API o coloca no "sub" do JWT (JwtTokenService) */
+export function readUserId(): string | null {
+  return readClaim(readToken(), 'sub')
+}
+
+export function readIsAdmin(): boolean {
+  return isAdminToken(readToken())
+}
+
 export function saveSession(email: string, token: string): Session {
-  const session = { name: email.split('@')[0], email }
-  writeStored({ ...session, token })
-  return session
+  const stored = { name: email.split('@')[0], email, token }
+  writeStored(stored)
+  return { name: stored.name, email, isAdmin: isAdminToken(token) }
 }
 
 /** A API devolve um token novo a cada chamada autenticada (JwtRotationFilter) */
@@ -88,7 +106,7 @@ export function updateStoredProfile(name: string, email: string): Session | null
   const stored = readStored()
   if (!stored) return null
   writeStored({ ...stored, name, email })
-  return { name, email }
+  return { name, email, isAdmin: isAdminToken(stored.token) }
 }
 
 export function clearSession() {

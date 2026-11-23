@@ -21,6 +21,7 @@ test('Navegação - normalização de caminho (currentPath)', () => {
 test('Navegação - item ativo da navegação principal', () => {
   assert.deepStrictEqual(currentNavItem('/'), NAV_ITEMS[0]) // Wiki
   assert.deepStrictEqual(currentNavItem('/loja'), NAV_ITEMS[1]) // Loja
-  assert.deepStrictEqual(currentNavItem('/estante'), NAV_ITEMS[2]) // Estante
+  assert.deepStrictEqual(currentNavItem('/jogue'), NAV_ITEMS[2]) // Jogue
+  assert.strictEqual(currentNavItem('/estante'), undefined) // Estante saiu da topbar: fica em "Meus Jogos"
   assert.strictEqual(currentNavItem('/perfil'), undefined) // Perfil não é item da barra superior principal
 })

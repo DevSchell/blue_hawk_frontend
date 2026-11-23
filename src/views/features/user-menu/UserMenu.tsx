@@ -14,11 +14,12 @@ import {
   MatchesIcon,
   MoonIcon,
   SettingsIcon,
+  ShieldCheckIcon,
   SunIcon,
   UserIcon,
 } from '../../components/Icons/Icons'
 import { MenuItem, MenuList } from '../../components/MenuList/MenuList'
-import { ACCOUNT_ROUTES } from '../../layout/navigation'
+import { ACCOUNT_ROUTES, MY_MATCHES_PATH, REVIEW_PATH } from '../../layout/navigation'
 import { Switch } from '../../components/Switch/Switch'
 import './UserMenu.css'
 
@@ -82,7 +83,11 @@ export function UserMenu({ session, onSignIn, onSignOut }: UserMenuProps) {
                 onClick={closeMenu}
               />
               <MenuItem icon={<GamesIcon />} label="Meus Jogos" href={ACCOUNT_ROUTES.shelf} onClick={closeMenu} />
-              <MenuItem icon={<MatchesIcon />} label="Minhas Partidas" href={ACCOUNT_ROUTES.matches} onClick={closeMenu} />
+              {/* "Minhas Partidas" é a aba do Jogue */}
+              <MenuItem icon={<MatchesIcon />} label="Minhas Partidas" href={MY_MATCHES_PATH} onClick={closeMenu} />
+              {session.isAdmin && (
+                <MenuItem icon={<ShieldCheckIcon />} label="Aprovar jogos" href={REVIEW_PATH} onClick={closeMenu} />
+              )}
               <MenuItem icon={<SettingsIcon />} label="Configurações" href={ACCOUNT_ROUTES.settings} onClick={closeMenu} />
               <MenuItem icon={<LogoutIcon />} label="Sair" onClick={signOut} />
             </MenuList>

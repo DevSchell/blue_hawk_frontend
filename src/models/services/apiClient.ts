@@ -2,6 +2,11 @@ import { clearSession, readToken, updateToken } from '../session'
 
 const API_BASE = (import.meta.env.VITE_API_URL || '/api').replace(/\/$/, '')
 
+/** URL completa de um caminho da API (ex.: a foto de capa, usada direto num <img>) */
+export function apiUrl(path: string) {
+  return `${API_BASE}${path}`
+}
+
 export class ApiError extends Error {
   readonly status: number
 
@@ -55,10 +60,12 @@ async function request<T>(method: string, path: string, label: string, payload?:
     if (signal?.aborted) throw new DOMException('Aborted', 'AbortError')
     // Login e cadastro são públicos: um token velho faria a API recusar a chamada
     const authenticated = readToken() !== null && !(method === 'POST' && PUBLIC_POSTS.includes(path))
+    // FormData (upload) vai cru: o navegador define o Content-Type com o boundary
+    const isForm = payload instanceof FormData
     const response = await fetch(`${API_BASE}${path}`, {
       method,
-      headers: headers(payload === undefined ? {} : { 'Content-Type': 'application/json' }, authenticated),
-      body: payload === undefined ? undefined : JSON.stringify(payload),
+      headers: headers(payload === undefined || isForm ? {} : { 'Content-Type': 'application/json' }, authenticated),
+      body: payload === undefined ? undefined : isForm ? payload : JSON.stringify(payload),
       signal: authenticated ? undefined : signal,
     })
     // Em respostas de erro o token novo só vem no cabeçalho
@@ -97,3 +104,11 @@ export const apiPut = <T>(path: string, payload: unknown) => request<T>('PUT', p
 export const apiPatch = <T>(path: string, payload: unknown) => request<T>('PATCH', path, `PATCH ${path}`, payload)
 export const apiDelete = (path: string, signal?: AbortSignal) =>
   request<unknown>('DELETE', path, `DELETE ${path}`, undefined, signal)
+
+/** DELETE que devolve um corpo (ex.: o jogo atualizado depois de remover a capa) */
+export const apiDeleteJson = <T>(path: string, signal?: AbortSignal) =>
+  request<T>('DELETE', path, `DELETE ${path}`, undefined, signal)
+
+/** POST multipart (upload de arquivo), pela mesma fila das chamadas autenticadas */
+export const apiPostForm = <T>(path: string, form: FormData, signal?: AbortSignal) =>
+  request<T>('POST', path, `POST ${path}`, form, signal)

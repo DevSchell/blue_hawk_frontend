@@ -126,3 +126,18 @@
   align-items: center;
   gap: 20px;
 }
+
+/* Link para o Jogue (as partidas e os pedidos de vaga ficam lá) */
+.market__link {
+  flex: none;
+  font-size: 14px;
+  font-weight: 800;
+  color: var(--text);
+  text-decoration: underline;
+  text-decoration-color: var(--acafrao);
+  text-underline-offset: 3px;
+}
+
+.market__link:hover {
+  color: var(--acafrao);
+}

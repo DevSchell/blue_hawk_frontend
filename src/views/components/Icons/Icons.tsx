@@ -108,6 +108,50 @@ export const CalendarIcon = () => (
   </Icon>
 )
 
+/** Coração de curtir; {@code filled} quando curtido */
+export const HeartIcon = ({ filled = false }: { filled?: boolean }) => (
+  <svg
+    className="icon"
+    viewBox="0 0 24 24"
+    width="24"
+    height="24"
+    fill={filled ? 'currentColor' : 'none'}
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinejoin="round"
+    aria-hidden="true"
+  >
+    <path d="M12 20.5s-7.5-4.4-9.2-9.3C1.6 7.6 4 4.5 7.3 4.5c2 0 3.6 1.1 4.7 2.7 1.1-1.6 2.7-2.7 4.7-2.7 3.3 0 5.7 3.1 4.5 6.7-1.7 4.9-9.2 9.3-9.2 9.3z" />
+  </svg>
+)
+
+export const MapPinIcon = () => (
+  <Icon>
+    <path d="M12 21s-6.5-6.2-6.5-11a6.5 6.5 0 0 1 13 0c0 4.8-6.5 11-6.5 11z" />
+    <circle cx="12" cy="10" r="2.4" />
+  </Icon>
+)
+
+export const CheckIcon = () => (
+  <Icon>
+    <path d="M5 12.5l4.5 4.5L19 7.5" />
+  </Icon>
+)
+
+export const PlusIcon = () => (
+  <Icon>
+    <path d="M12 5v14M5 12h14" />
+  </Icon>
+)
+
+/** Escudo com check: área de aprovação do admin */
+export const ShieldCheckIcon = () => (
+  <Icon>
+    <path d="M12 3l7 3v5c0 4.4-3 8.3-7 10-4-1.7-7-5.6-7-10V6l7-3z" />
+    <path d="M9 12l2 2 4-4" />
+  </Icon>
+)
+
 export const LogoutIcon = () => (
   <Icon>
     <path d="M14 4h4a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-4" />
@@ -155,36 +199,22 @@ export const SparklesIcon = () => (
   </Icon>
 )
 
-export const CheckIcon = () => (
-  <Icon>
-    <polyline points="20 6 9 17 4 12" />
-  </Icon>
-)
-
+/** Dado de 20 faces no mesmo traço dos outros ícones (hexágono + faces internas) */
 export const D20Icon = ({ className }: { className?: string }) => (
-  <svg className={className} viewBox="0 0 48 48" fill="none" aria-hidden="true">
-    <polygon points="24,2.5 43.5,13.75 43.5,34.25 24,45.5 4.5,34.25 4.5,13.75" fill="currentColor" />
-    <polygon points="24,10.5 37.5,32.5 10.5,32.5" fill="none" stroke="var(--noite)" strokeWidth="2" strokeLinejoin="round" />
-    <line x1="24" y1="2.5" x2="24" y2="10.5" stroke="var(--noite)" strokeWidth="2" strokeLinecap="round" />
-    <line x1="43.5" y1="13.75" x2="37.5" y2="32.5" stroke="var(--noite)" strokeWidth="2" strokeLinecap="round" />
-    <line x1="4.5" y1="13.75" x2="10.5" y2="32.5" stroke="var(--noite)" strokeWidth="2" strokeLinecap="round" />
-    <line x1="43.5" y1="13.75" x2="24" y2="10.5" stroke="var(--noite)" strokeWidth="1.8" strokeLinecap="round" />
-    <line x1="4.5" y1="13.75" x2="24" y2="10.5" stroke="var(--noite)" strokeWidth="1.8" strokeLinecap="round" />
-    <line x1="24" y1="45.5" x2="37.5" y2="32.5" stroke="var(--noite)" strokeWidth="1.8" strokeLinecap="round" />
-    <line x1="24" y1="45.5" x2="10.5" y2="32.5" stroke="var(--noite)" strokeWidth="1.8" strokeLinecap="round" />
-    <line x1="43.5" y1="34.25" x2="37.5" y2="32.5" stroke="var(--noite)" strokeWidth="1.8" strokeLinecap="round" />
-    <line x1="4.5" y1="34.25" x2="10.5" y2="32.5" stroke="var(--noite)" strokeWidth="1.8" strokeLinecap="round" />
-    <text
-      x="24"
-      y="28"
-      textAnchor="middle"
-      fill="var(--noite)"
-      fontFamily="var(--texto)"
-      fontWeight="800"
-      fontSize="11"
-      letterSpacing="-0.5"
-    >
-      20
-    </text>
+  <svg
+    className={className ? `icon ${className}` : 'icon'}
+    viewBox="0 0 24 24"
+    width="24"
+    height="24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="1.8"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    aria-hidden="true"
+  >
+    <path d="M12 2.5l8.5 4.9v9.2L12 21.5l-8.5-4.9V7.4z" />
+    <path d="M12 6.8l4.6 8H7.4z" />
+    <path d="M12 2.5v4.3M20.5 7.4l-3.9 7.4M3.5 7.4l3.9 7.4M12 21.5l4.6-6.7M12 21.5l-4.6-6.7" />
   </svg>
 )

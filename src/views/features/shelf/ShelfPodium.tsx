@@ -3,6 +3,7 @@ import { Container } from '../../components/Container/Container'
 import { cx } from '../../utils/classNames'
 import { GameCover } from '../boardgames/GameCover'
 import './ShelfPodium.css'
+import { coverOf } from '../../../models/services/boardgameService'
 
 type ShelfPodiumProps = {
   games: ShelfGame[]
@@ -46,7 +47,7 @@ export function ShelfPodium({ games, onOpenGame }: ShelfPodiumProps) {
               className={cx('podium-step', `podium-step--${variant}`)}
             >
               <div className="podium-step__thumb">
-                <GameCover id={game.boardgame.id} name={game.boardgame.name} />
+                <GameCover id={game.boardgame.id} name={game.boardgame.name} {...coverOf(game.boardgame)} />
                 <span className={cx('podium-step__rank', `podium-step__rank--${variant}`)}>#{rank}</span>
               </div>
 

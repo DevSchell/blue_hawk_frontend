@@ -1,0 +1,69 @@
+.like-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  border: 0;
+  cursor: pointer;
+  font: 800 13px/1 var(--texto);
+  font-variant-numeric: tabular-nums;
+}
+
+.like-button .icon {
+  width: 18px;
+  height: 18px;
+}
+
+.like-button:disabled {
+  cursor: progress;
+}
+
+.like-button:focus-visible {
+  outline: 2px solid var(--acafrao);
+  outline-offset: 2px;
+}
+
+/* No canto da capa: acima do "clique no card todo" (::after do título) */
+.like-button--overlay {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  z-index: 2;
+  padding: 6px 10px 6px 8px;
+  background: rgb(11 17 71 / 0.78);
+  color: var(--giz);
+  box-shadow: 0 4px 12px rgb(4 7 36 / 0.35);
+  clip-path: polygon(0 0, 100% 0, 100% calc(100% - 7px), calc(100% - 7px) 100%, 0 100%);
+}
+
+.like-button--overlay:hover {
+  background: var(--noite);
+}
+
+.like-button--inline {
+  min-height: 39px;
+  padding: 0 14px 0 12px;
+  background: var(--bg);
+  color: var(--text);
+  box-shadow: inset 0 0 0 1px var(--line);
+}
+
+.like-button--inline:hover {
+  box-shadow: inset 0 0 0 2px var(--claro);
+}
+
+.like-button.is-liked .icon {
+  color: var(--acafrao);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  /* "Pulso" ao curtir */
+  .like-button.is-liked .icon {
+    animation: likePop 0.35s ease-out;
+  }
+}
+
+@keyframes likePop {
+  40% {
+    transform: scale(1.35);
+  }
+}

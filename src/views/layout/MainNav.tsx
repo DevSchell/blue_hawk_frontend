@@ -3,6 +3,7 @@ import { currentNavItem, NAV_ITEMS } from './navigation'
 
 /** Navegação principal da topbar, ao lado do logo */
 export function MainNav() {
+  // Estante e aprovações não são seções da topbar: nenhum item fica marcado nelas
   const current = currentNavItem()
 
   return (

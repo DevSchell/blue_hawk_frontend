@@ -1,45 +1,38 @@
 import { useEffect, useState } from 'react'
-import type { MatchWithPlayers, Offer, UserBoardgame } from '../models/market'
-import {
-  addCopy,
-  createOffer,
-  joinMatch,
-  listActiveOffers,
-  listCopies,
-  listMatches,
-} from '../models/services/marketService'
-import { createMatch, removeParticipant } from '../models/services/matchesService'
+import type { Offer, UserBoardgame } from '../models/market'
+import type { OpenMatch } from '../models/openMatch'
+import { createOffer, listActiveOffers, listCopies } from '../models/services/marketService'
+import { listOpenMatches } from '../models/services/openMatchService'
 import { readUserId } from '../models/session'
 
 type Data = {
   offers: Offer[]
-  matches: MatchWithPlayers[]
   copies: UserBoardgame[]
+  /** Próximas partidas do Jogue com este jogo */
+  matches: OpenMatch[]
 }
 
 type Result = { key: number; data: Data | null; error: unknown }
 
 /**
- * Ofertas e partidas de um jogo, para a modal de detalhes. Tudo isso exige login na API;
+ * Ofertas e próximas partidas de um jogo, para a modal de detalhes. Tudo isso exige login na API;
  * sem sessão, nada é buscado.
  */
 export function useGameMarket(boardgameId: string) {
   const userId = readUserId()
   const [attempt, setAttempt] = useState(0)
   const [result, setResult] = useState<Result>({ key: -1, data: null, error: null })
-  // Partida em que o pedido para entrar está indo, e as que deram erro
-  const [joining, setJoining] = useState<string | null>(null)
-  const [joinErrors, setJoinErrors] = useState<string[]>([])
 
   useEffect(() => {
     if (!userId) return
     const controller = new AbortController()
 
-    Promise.all([listActiveOffers(boardgameId, controller.signal), listCopies(boardgameId, controller.signal)])
-      .then(async ([offers, copies]) => {
-        const matches = await listMatches(copies, controller.signal)
-        setResult({ key: attempt, data: { offers, copies, matches }, error: null })
-      })
+    Promise.all([
+      listActiveOffers(boardgameId, controller.signal),
+      listCopies(boardgameId, controller.signal),
+      listOpenMatches({ boardgameId }, controller.signal),
+    ])
+      .then(([offers, copies, matches]) => setResult({ key: attempt, data: { offers, copies, matches }, error: null }))
       .catch((error: unknown) => {
         if (controller.signal.aborted) return
         setResult({ key: attempt, data: null, error })
@@ -54,77 +47,29 @@ export function useGameMarket(boardgameId: string) {
 
   const offers = (data?.offers ?? []).map((offer) => ({ ...offer, isMine: ownerOf(offer.userBoardgameId) === userId }))
 
-  const matches = (data?.matches ?? [])
-    .map((match) => ({
-      ...match,
-      isHost: ownerOf(match.userBoardgameId) === userId,
-      isIn: userId ? match.participantIds.includes(userId) : false,
-      isFull: match.maxUsers != null && match.participantIds.length >= match.maxUsers,
-    }))
-    // "Abertas": ainda cabe gente, ou o usuário já está nela
-    .filter((match) => !match.isFull || match.isIn)
-
   const reload = () => setAttempt((n) => n + 1)
 
-  async function requestToJoin(matchId: string) {
-    if (!userId) return
-    setJoining(matchId)
-    setJoinErrors((list) => list.filter((id) => id !== matchId))
-    try {
-      await joinMatch(matchId, userId)
-      reload()
-    } catch {
-      setJoinErrors((list) => [...list, matchId])
-    } finally {
-      setJoining(null)
-    }
-  }
+  const myCopy = data?.copies.find((c) => c.userId === userId) ?? null
 
-  /** Cria a oferta a partir da cópia do usuário; se o jogo não está na estante dele, põe antes */
+  /** Anuncia a cópia do usuário. Só quem tem o jogo na estante pode vender. */
   async function publishOffer(price: number, description: string) {
-    if (!userId) return
-    const copy =
-      data?.copies.find((c) => c.userId === userId) ?? (await addCopy(userId, boardgameId))
-    await createOffer(copy.id, price, description)
+    if (!userId || !myCopy) throw new Error('Adicione o jogo à sua estante antes de anunciar.')
+    await createOffer(myCopy.id, price, description)
     reload()
-  }
-
-  /** Cria a partida com a cópia do usuário (pondo o jogo na estante dele, se preciso) e já o coloca nela */
-  async function startMatch() {
-    if (!userId) return
-    const copy = data?.copies.find((c) => c.userId === userId) ?? (await addCopy(userId, boardgameId))
-    const match = await createMatch(copy.id)
-    await joinMatch(match.id, userId)
-    reload()
-  }
-
-  async function leaveMatch(matchId: string) {
-    const mine = data?.matches.find((m) => m.id === matchId)?.participants.find((p) => p.userId === userId)
-    if (!mine) return
-    setJoining(matchId)
-    setJoinErrors((list) => list.filter((id) => id !== matchId))
-    try {
-      await removeParticipant(mine.id)
-      reload()
-    } catch {
-      setJoinErrors((list) => [...list, matchId])
-    } finally {
-      setJoining(null)
-    }
   }
 
   return {
     signedIn: Boolean(userId),
+    /** O jogo está na estante do usuário (ele pode anunciar venda) */
+    ownsGame: Boolean(myCopy),
+    /** O usuário já tem um anúncio ativo deste jogo */
+    hasMyOffer: offers.some((offer) => offer.isMine),
+    reload,
     loading,
     error: loading ? null : result.error,
     offers,
-    matches,
-    joining,
-    joinErrors,
+    matches: data?.matches ?? [],
     retry: reload,
-    requestToJoin,
     publishOffer,
-    startMatch,
-    leaveMatch,
   }
 }

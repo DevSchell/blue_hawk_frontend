@@ -260,3 +260,26 @@
   box-shadow: 0 0 0 4px var(--acafrao), 0 0 36px rgb(255 176 0 / 0.95);
   z-index: 20;
 }
+
+/* Jogo cadastrado pelo usuário que ainda não está no catálogo */
+.shelf-card__status {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  padding: 4px 10px;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.shelf-card__status--pending {
+  background: var(--claro);
+  color: var(--noite);
+}
+
+.shelf-card__status--rejected {
+  background: var(--noite);
+  color: var(--acafrao);
+  box-shadow: inset 0 0 0 1.5px var(--acafrao);
+}
