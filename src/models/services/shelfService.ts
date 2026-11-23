@@ -1,5 +1,5 @@
 import { readToken, updateToken } from '../session'
-import type { Match, Offer, UserBoardgame } from '../shelf'
+import type { Match, MatchParticipant, Offer, UserBoardgame } from '../shelf'
 import { ApiError, apiGet, apiPost } from './apiClient'
 
 const API_BASE = (import.meta.env.VITE_API_URL || '/api').replace(/\/$/, '')
@@ -60,8 +60,16 @@ export function registerMatch(userBoardgameId: string) {
   return apiPost<Match>('/matches', { userBoardgameId })
 }
 
-export function deleteMatch(matchId: string, signal?: AbortSignal) {
-  return shelfDelete(`/matches/${encodeURIComponent(matchId)}`, signal)
+export async function deleteMatch(matchId: string, signal?: AbortSignal) {
+  const participants = await apiGet<MatchParticipant[]>(
+    '/match-participants',
+    { matchId, page: 0, size: 100 },
+    signal,
+  ).catch(() => [])
+  for (const participant of participants) {
+    await shelfDelete(`/match-participants/${encodeURIComponent(participant.id)}`, signal)
+  }
+  await shelfDelete(`/matches/${encodeURIComponent(matchId)}`, signal)
 }
 
 export function listUserOffers(userId: string, signal?: AbortSignal) {

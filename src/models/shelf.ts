@@ -1,7 +1,7 @@
 import type { Boardgame } from './boardgame'
-import type { Match, Offer, UserBoardgame } from './market'
+import type { Match, MatchParticipant, Offer, UserBoardgame } from './market'
 
-export type { Match, Offer, UserBoardgame }
+export type { Match, MatchParticipant, Offer, UserBoardgame }
 
 export type ShelfGame = {
   userBoardgameId: string
