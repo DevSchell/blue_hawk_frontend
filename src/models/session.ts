@@ -62,7 +62,9 @@ export function readUserId(): string | null {
   const payload = readToken()?.split('.')[1]
   if (!payload) return null
   try {
-    const json: unknown = JSON.parse(atob(payload.replace(/-/g, '+').replace(/_/g, '/')))
+    const base64 = payload.replace(/-/g, '+').replace(/_/g, '/')
+    const padded = base64.padEnd(base64.length + ((4 - (base64.length % 4)) % 4), '=')
+    const json: unknown = JSON.parse(atob(padded))
     return json && typeof json === 'object' && 'sub' in json && typeof json.sub === 'string' ? json.sub : null
   } catch {
     return null

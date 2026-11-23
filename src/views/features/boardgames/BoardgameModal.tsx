@@ -1,5 +1,6 @@
 import { useState, type ReactNode } from 'react'
 import type { Boardgame } from '../../../models/boardgame'
+import { addToShelf } from '../../../models/services/shelfService'
 import { readUserId } from '../../../models/session'
 import { Button } from '../../components/Button/Button'
 import { CalendarIcon, ClockIcon, UsersIcon } from '../../components/Icons/Icons'
@@ -35,6 +36,19 @@ export function BoardgameModal({ game: initial, onClose, onChanged }: BoardgameM
   const [game, setGame] = useState(initial)
   const [editing, setEditing] = useState(false)
   const items = facts(game)
+  const userId = readUserId()
+  const [shelfStatus, setShelfStatus] = useState<'idle' | 'saving' | 'added' | 'error'>('idle')
+
+  const handleAddToShelf = async () => {
+    if (!userId || shelfStatus === 'saving' || shelfStatus === 'added') return
+    setShelfStatus('saving')
+    try {
+      await addToShelf(userId, game.id)
+      setShelfStatus('added')
+    } catch {
+      setShelfStatus('error')
+    }
+  }
 
   if (editing) {
     return (
@@ -75,10 +89,26 @@ export function BoardgameModal({ game: initial, onClose, onChanged }: BoardgameM
         </p>
       </section>
 
-      {readUserId() && (
-        <Button variant="link" onClick={() => setEditing(true)}>
-          Editar jogo
-        </Button>
+      {userId && (
+        <div className="boardgame-modal__actions">
+          <Button variant="link" onClick={() => setEditing(true)}>
+            Editar jogo
+          </Button>
+          <Button
+            type="button"
+            variant={shelfStatus === 'added' ? 'secondary' : 'primary'}
+            disabled={shelfStatus === 'saving' || shelfStatus === 'added'}
+            onClick={handleAddToShelf}
+          >
+            {shelfStatus === 'saving'
+              ? 'Adicionando...'
+              : shelfStatus === 'added'
+                ? 'Adicionado à estante!'
+                : shelfStatus === 'error'
+                  ? 'Erro ao adicionar — tentar de novo'
+                  : 'Adicionar à estante'}
+          </Button>
+        </div>
       )}
 
       <GameMarket boardgameId={game.id} />

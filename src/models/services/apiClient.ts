@@ -95,4 +95,5 @@ export function apiPost<T>(path: string, payload: unknown, signal?: AbortSignal)
 
 export const apiPut = <T>(path: string, payload: unknown) => request<T>('PUT', path, `PUT ${path}`, payload)
 export const apiPatch = <T>(path: string, payload: unknown) => request<T>('PATCH', path, `PATCH ${path}`, payload)
-export const apiDelete = (path: string) => request<unknown>('DELETE', path, `DELETE ${path}`)
+export const apiDelete = (path: string, signal?: AbortSignal) =>
+  request<unknown>('DELETE', path, `DELETE ${path}`, undefined, signal)

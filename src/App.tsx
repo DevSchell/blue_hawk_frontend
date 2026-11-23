@@ -32,7 +32,13 @@ function App() {
       {path === '/loja' ? (
         <StorePage key={pageKey} signedIn={Boolean(session)} onSignIn={openLogin} />
       ) : path === ACCOUNT_ROUTES.shelf ? (
-        <ShelfPage key={pageKey} onSignIn={openLogin} />
+        <ShelfPage
+          key={pageKey}
+          onSignIn={openLogin}
+          onGoToFeed={() => {
+            window.location.href = '/'
+          }}
+        />
       ) : path === ACCOUNT_ROUTES.matches ? (
         <MatchesPage key={pageKey} onSignIn={openLogin} />
       ) : path === ACCOUNT_ROUTES.profile ? (

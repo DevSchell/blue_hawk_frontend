@@ -24,3 +24,7 @@ export async function updateBoardgame(id: string, input: BoardgameInput) {
   forgetGame(id)
   return saved
 }
+
+export function getBoardgameById(id: string, signal?: AbortSignal) {
+  return apiGet<Boardgame>(`/boardgames/${encodeURIComponent(id)}`, {}, signal)
+}

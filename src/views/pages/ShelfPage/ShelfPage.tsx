@@ -1,227 +1,342 @@
-import { useState, type FormEvent } from 'react'
+import { useEffect, useRef } from 'react'
 import { useShelfController } from '../../../controllers/useShelfController'
-import { useDebouncedValue } from '../../../controllers/useDebouncedValue'
-import type { Boardgame } from '../../../models/boardgame'
-import type { Offer } from '../../../models/market'
-import { listBoardgames } from '../../../models/services/boardgameService'
-import type { ShelfItem } from '../../../models/services/shelfService'
-import { Alert } from '../../components/Alert/Alert'
+import { SHELF_CATEGORIES, type PlayersFilterOption, type ShelfSortOption } from '../../../models/shelf'
 import { Raven } from '../../components/Brand/Raven'
 import { Button } from '../../components/Button/Button'
 import { Container } from '../../components/Container/Container'
 import { EmptyState } from '../../components/EmptyState/EmptyState'
-import { Modal } from '../../components/Modal/Modal'
-import { SearchField } from '../../components/SearchField/SearchField'
-import { TextField } from '../../components/TextField/TextField'
-import { BoardgameModal } from '../../features/boardgames/BoardgameModal'
-import { GameCover } from '../../features/boardgames/GameCover'
-import { brl } from '../../features/boardgames/format'
-import '../FeedPage/FeedPage.css'
+import { CloseIcon, D20Icon, UsersIcon } from '../../components/Icons/Icons'
+import { FeedError } from '../../features/boardgames/FeedError'
+import { GameCardSkeleton } from '../../features/boardgames/GameCardSkeleton'
+import { ShelfGameCard } from '../../features/shelf/ShelfGameCard'
+import { ShelfGameModal } from '../../features/shelf/ShelfGameModal'
+import { ShelfPodium } from '../../features/shelf/ShelfPodium'
 import './ShelfPage.css'
 
-type Shelf = ReturnType<typeof useShelfController>
+type ShelfPageProps = {
+  onGoToFeed: () => void
+  onSignIn: () => void
+}
 
-/** Estante: a coleção pessoal do usuário, com venda de cada jogo */
-export function ShelfPage({ onSignIn }: { onSignIn: () => void }) {
-  const shelf = useShelfController()
-  const [adding, setAdding] = useState(false)
-  const [detail, setDetail] = useState<Boardgame | null>(null)
-  const [selling, setSelling] = useState<{ item: ShelfItem; offer: Offer | null } | null>(null)
+export function ShelfPage({ onGoToFeed, onSignIn }: ShelfPageProps) {
+  const {
+    signedIn,
+    games,
+    filteredGames,
+    podiumGames,
+    summary,
+    categoryCounts,
+    loading,
+    error,
+    retry,
+    searchQuery,
+    setSearchQuery,
+    selectedCategory,
+    selectCategory,
+    onlyForSale,
+    toggleForSale,
+    playersFilter,
+    setPlayersFilter,
+    sortBy,
+    setSortBy,
+    resetFilters,
+    selectedGame,
+    openGame,
+    closeGame,
+    registerMatchForSelected,
+    registeringMatch,
+    toggleSaleForSelected,
+    togglingSale,
+    removeSelectedFromShelf,
+    removingGame,
+    isRollingD20,
+    litGameId,
+    altLitGameId,
+    winnerGameId,
+    startD20Roulette,
+    clearRouletteWinner,
+    toasts,
+  } = useShelfController()
 
-  if (!shelf.signedIn) {
-    return (
-      <main className="feed-page">
+  const gridRef = useRef<HTMLDivElement>(null)
+  const winnerGame = winnerGameId ? games.find((g) => g.userBoardgameId === winnerGameId) ?? null : null
+
+  useEffect(() => {
+    if (!winnerGameId || !gridRef.current) return
+    const card = gridRef.current.querySelector(`[data-game-id="${winnerGameId}"]`)
+    if (card instanceof HTMLElement) {
+      card.scrollIntoView({ behavior: 'smooth', block: 'center' })
+    }
+  }, [winnerGameId])
+
+  return (
+    <>
+      <section aria-labelledby="estante-bar-heading" className="shelf-bar">
         <Container>
-          <h1 className="feed-page__title">Estante</h1>
-          <EmptyState icon={<Raven variant="noite" />} title="Entre para ver a sua estante">
-            Sua coleção de jogos fica salva na sua conta.
-            <div className="shelf-empty__action">
-              <Button onClick={onSignIn}>Entrar</Button>
+          <div className="shelf-bar__inner">
+            <div className="shelf-bar__title-group">
+              <span className="shelf-bar__accent" aria-hidden="true" />
+              <div>
+                <h1 id="estante-bar-heading" className="shelf-bar__title">
+                  Sua estante
+                </h1>
+                <p className="shelf-bar__subtitle">Biblioteca pessoal • Coleção verificada</p>
+              </div>
             </div>
-          </EmptyState>
+
+            <div className="shelf-bar__stats">
+              <div className="shelf-stat" title="Total de jogos adquiridos">
+                <span className="shelf-stat__label">Jogos:</span>
+                <span className="shelf-stat__value">{summary.totalGames}</span>
+                <span className="shelf-stat__extra">({summary.totalPlays} partidas)</span>
+              </div>
+
+              <div className="shelf-stat" title="Horas estimadas jogadas na mesa">
+                <span className="shelf-stat__label">Horas:</span>
+                <span className="shelf-stat__value">{summary.totalHours}h</span>
+              </div>
+
+              <div className="shelf-stat" title="Categoria mais presente nas partidas">
+                <span className="shelf-stat__label">Top categoria:</span>
+                <span className="shelf-stat__value shelf-stat__value--text">{summary.topCategory}</span>
+              </div>
+
+              <button
+                type="button"
+                onClick={toggleForSale}
+                title="Clique para filtrar apenas os jogos à venda"
+                className="shelf-stat shelf-stat--sale"
+              >
+                <span className="shelf-stat__label shelf-stat__label--accent">À venda:</span>
+                <span className="shelf-stat__value">{summary.forSaleCount}</span>
+                {summary.forSaleCount > 0 && <span className="shelf-stat__extra">(R$ {summary.forSaleTotalValue})</span>}
+              </button>
+            </div>
+          </div>
+        </Container>
+      </section>
+
+      {!loading && !error && <ShelfPodium games={podiumGames} onOpenGame={openGame} />}
+
+      <main className="shelf-page">
+        <Container>
+          <section aria-label="Pesquisa, filtros e ordenação da estante" className="shelf-controls">
+            <div className="shelf-controls__header">
+              <div className="shelf-controls__heading-wrap">
+                <h2 className="shelf-controls__title">Jogos na estante</h2>
+                <p className="shelf-controls__counter">
+                  Exibindo {filteredGames.length} de {games.length} jogos adquiridos
+                  {onlyForSale ? ' • Apenas à venda' : ''}
+                  {selectedCategory !== 'Todas' ? ` • ${selectedCategory}` : ''}
+                </p>
+              </div>
+
+              <button
+                type="button"
+                onClick={startD20Roulette}
+                disabled={isRollingD20 || filteredGames.length === 0}
+                title="Sortear jogo com D20"
+                aria-label="Sortear jogo com D20"
+                className={`shelf-d20-btn ${isRollingD20 ? 'shelf-d20-btn--rolling' : ''}`}
+              >
+                <D20Icon className="shelf-d20-btn__icon" />
+              </button>
+            </div>
+
+            <div className="shelf-controls__toolbar">
+              <form className="shelf-search" role="search" onSubmit={(e) => e.preventDefault()}>
+                <label htmlFor="shelf-search-input" className="visually-hidden">
+                  Buscar jogo na estante pelo nome
+                </label>
+                <input
+                  id="shelf-search-input"
+                  type="search"
+                  autoComplete="off"
+                  placeholder="Buscar jogo..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                />
+                {searchQuery && (
+                  <button
+                    type="button"
+                    aria-label="Limpar pesquisa"
+                    className="shelf-search__clear"
+                    onClick={() => setSearchQuery('')}
+                  >
+                    <CloseIcon />
+                  </button>
+                )}
+              </form>
+
+              <button
+                type="button"
+                onClick={toggleForSale}
+                aria-pressed={onlyForSale}
+                className={`shelf-sale-toggle ${onlyForSale ? 'shelf-sale-toggle--active' : ''}`}
+              >
+                <span className="shelf-sale-toggle__dot" aria-hidden="true" />
+                <span>À venda ({summary.forSaleCount})</span>
+              </button>
+
+              <div role="tablist" aria-label="Filtrar por categoria" className="shelf-categories">
+                {SHELF_CATEGORIES.map((category) => {
+                  const isActive = selectedCategory === category
+                  const count = categoryCounts[category] ?? 0
+                  return (
+                    <button
+                      key={category}
+                      type="button"
+                      role="tab"
+                      aria-selected={isActive}
+                      onClick={() => selectCategory(category)}
+                      className={`shelf-category-pill ${isActive ? 'shelf-category-pill--active' : ''}`}
+                    >
+                      {category} <span className="shelf-category-pill__count">({count})</span>
+                    </button>
+                  )
+                })}
+              </div>
+
+              <div className="shelf-controls__selects">
+                <div className="shelf-select">
+                  <label htmlFor="shelf-players-select" className="visually-hidden">
+                    Filtrar por quantidade de jogadores
+                  </label>
+                  <span className="shelf-select__prefix" aria-hidden="true">
+                    <UsersIcon />
+                    <span>Mesa:</span>
+                  </span>
+                  <select
+                    id="shelf-players-select"
+                    value={playersFilter}
+                    onChange={(e) => setPlayersFilter(e.target.value as PlayersFilterOption)}
+                  >
+                    <option value="any">Todos</option>
+                    <option value="1">Solo (1)</option>
+                    <option value="2">2 jog.</option>
+                    <option value="3-4">3–4 jog.</option>
+                    <option value="5+">5+ jog.</option>
+                  </select>
+                </div>
+
+                <div className="shelf-select">
+                  <label htmlFor="shelf-sort-select" className="visually-hidden">
+                    Ordenar jogos por
+                  </label>
+                  <span className="shelf-select__prefix" aria-hidden="true">
+                    <span>Ordenar:</span>
+                  </span>
+                  <select
+                    id="shelf-sort-select"
+                    value={sortBy}
+                    onChange={(e) => setSortBy(e.target.value as ShelfSortOption)}
+                  >
+                    <option value="most-played">Mais jogadas</option>
+                    <option value="most-hours">Mais horas</option>
+                    <option value="az">A–Z</option>
+                    <option value="za">Z–A</option>
+                    <option value="duration-asc">Mais rápidas</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            {winnerGame && (
+              <div className="shelf-winner-banner" role="status">
+                <div className="shelf-winner-banner__text">
+                  <span className="shelf-winner-banner__badge">D20 Sorteou</span>
+                  <strong>“{winnerGame.boardgame.name}” foi o jogo sorteado para a mesa!</strong>
+                </div>
+                <div className="shelf-winner-banner__actions">
+                  <Button type="button" variant="primary" onClick={() => openGame(winnerGame)}>
+                    Ver detalhes do jogo
+                  </Button>
+                  <Button type="button" variant="secondary" onClick={clearRouletteWinner}>
+                    Limpar
+                  </Button>
+                </div>
+              </div>
+            )}
+          </section>
+
+          <p className="visually-hidden" aria-live="polite">
+            {loading ? 'Carregando sua estante' : `${filteredGames.length} jogos exibidos na estante`}
+          </p>
+
+          {loading ? (
+            <div className="shelf-grid" aria-busy="true">
+              {Array.from({ length: 4 }, (_, index) => (
+                <GameCardSkeleton key={index} />
+              ))}
+            </div>
+          ) : error ? (
+            <FeedError error={error} onRetry={retry} />
+          ) : !signedIn ? (
+            <EmptyState icon={<Raven variant="noite" />} title="Entre para ver sua estante">
+              Faça login ou crie sua conta para montar sua coleção, registrar partidas e anunciar jogos.
+              <div className="shelf-empty-action">
+                <Button type="button" variant="primary" onClick={onSignIn}>
+                  Cadastrar / Entrar
+                </Button>
+              </div>
+            </EmptyState>
+          ) : games.length === 0 ? (
+            <EmptyState icon={<Raven variant="noite" />} title="Sua estante está vazia">
+              Explore o catálogo de boardgames e adicione seus primeiros jogos à coleção.
+              <div className="shelf-empty-action">
+                <Button type="button" variant="primary" onClick={onGoToFeed}>
+                  Explorar catálogo
+                </Button>
+              </div>
+            </EmptyState>
+          ) : filteredGames.length === 0 ? (
+            <EmptyState icon={<Raven variant="noite" />} title="Nenhum jogo encontrado">
+              Não encontramos títulos na sua estante com os filtros ou termos pesquisados.
+              <div className="shelf-empty-action">
+                <Button type="button" variant="primary" onClick={resetFilters}>
+                  Limpar filtros e pesquisa
+                </Button>
+              </div>
+            </EmptyState>
+          ) : (
+            <div ref={gridRef} className="shelf-grid">
+              {filteredGames.map((game) => (
+                <ShelfGameCard
+                  key={game.userBoardgameId}
+                  game={game}
+                  isLit={litGameId === game.userBoardgameId}
+                  isAltLit={altLitGameId === game.userBoardgameId}
+                  isWinner={winnerGameId === game.userBoardgameId}
+                  onOpen={openGame}
+                />
+              ))}
+            </div>
+          )}
         </Container>
       </main>
-    )
-  }
 
-  return (
-    <main className="feed-page">
-      <Container>
-        <h1 className="feed-page__title">Estante</h1>
-        <div className="shelf-toolbar">
-          <SearchField id="busca-estante" label="Buscar na minha estante" placeholder="Ex.: Catan" value={shelf.search} onChange={shelf.setSearch} />
-          <Button onClick={() => setAdding(true)}>Adicionar jogo</Button>
-        </div>
-        {shelf.actionError && <Alert title="Ops" tone="warn" size="sm">{shelf.actionError}</Alert>}
-        {shelf.error ? (
-          <Alert title="Não deu para carregar" tone="warn" action={<Button variant="link" onClick={shelf.retry}>Tentar de novo</Button>}>
-            Verifique a conexão e tente outra vez.
-          </Alert>
-        ) : shelf.loading && shelf.items.length === 0 ? (
-          <p className="shelf-status" aria-busy="true">Carregando estante…</p>
-        ) : shelf.items.length === 0 ? (
-          <EmptyState icon={<Raven variant="noite" />} title={shelf.query ? 'Nenhum jogo com esse nome' : 'Sua estante está vazia'}>
-            {shelf.query ? 'Tente outra palavra ou limpe a busca.' : 'Adicione os jogos que você tem para organizar a coleção e vender.'}
-          </EmptyState>
-        ) : (
-          <ul className="shelf-grid">
-            {shelf.items.map((item) => (
-              <ShelfCard key={item.copy.id} item={item} shelf={shelf} onOpen={() => setDetail(item.game)} onSell={(offer) => setSelling({ item, offer })} />
-            ))}
-          </ul>
-        )}
-      </Container>
-      {adding && <AddGameModal owned={shelf.ownedGameIds} onAdd={shelf.addGame} onClose={() => setAdding(false)} />}
-      {selling && (
-        <SellModal
-          title={selling.item.game.name}
-          offer={selling.offer}
-          onClose={() => setSelling(null)}
-          onSubmit={async (price, description) => {
-            if (selling.offer) await shelf.editOffer(selling.offer.id, price, description)
-            else await shelf.sell(selling.item.copy.id, price, description)
-            setSelling(null)
-          }}
+      {selectedGame && (
+        <ShelfGameModal
+          key={selectedGame.userBoardgameId}
+          game={selectedGame}
+          registeringMatch={registeringMatch}
+          togglingSale={togglingSale}
+          removingGame={removingGame}
+          onClose={closeGame}
+          onRegisterMatch={registerMatchForSelected}
+          onToggleSale={toggleSaleForSelected}
+          onRemoveFromShelf={removeSelectedFromShelf}
         />
       )}
-      {detail && <BoardgameModal key={detail.id} game={detail} onClose={() => setDetail(null)} />}
-    </main>
-  )
-}
 
-function ShelfCard({ item, shelf, onOpen, onSell }: { item: ShelfItem; shelf: Shelf; onOpen: () => void; onSell: (offer: Offer | null) => void }) {
-  const { game, offer, copy } = item
-  const [busy, setBusy] = useState(false)
-
-  async function guard(action: () => Promise<unknown>) {
-    setBusy(true)
-    try {
-      await action()
-    } catch {
-      /* o aviso aparece no topo da lista */
-    } finally {
-      setBusy(false)
-    }
-  }
-
-  return (
-    <li className="shelf-card">
-      <GameCover id={game.id} name={game.name} />
-      <div className="shelf-card__body">
-        <h3 className="shelf-card__title">
-          <button type="button" className="shelf-card__link" onClick={onOpen}>{game.name}</button>
-        </h3>
-        {offer ? <b className="shelf-card__price">À venda por {brl.format(offer.price)}</b> : <span className="shelf-card__meta">Não está à venda</span>}
-        <div className="shelf-card__actions">
-          <Button variant="secondary" disabled={busy} onClick={() => onSell(offer)}>{offer ? 'Editar oferta' : 'Vender'}</Button>
-          {offer && <Button variant="link" disabled={busy} onClick={() => guard(() => shelf.withdrawOffer(offer.id))}>Tirar da venda</Button>}
-          <Button
-            variant="link"
-            disabled={busy}
-            onClick={() => {
-              if (window.confirm(`Remover “${game.name}” da sua estante? Ofertas e partidas desse jogo também serão apagadas.`)) void guard(() => shelf.removeGame(copy.id))
-            }}
-          >
-            Remover
-          </Button>
-        </div>
+      <div className="shelf-toasts" aria-live="polite">
+        {toasts.map((toast) => (
+          <div key={toast.id} className="shelf-toast">
+            <span className="shelf-toast__dot" aria-hidden="true" />
+            <span>{toast.text}</span>
+          </div>
+        ))}
       </div>
-    </li>
-  )
-}
-
-function SellModal({ title, offer, onSubmit, onClose }: { title: string; offer: Offer | null; onSubmit: (price: number, description: string) => Promise<void>; onClose: () => void }) {
-  const [price, setPrice] = useState(offer ? String(offer.price).replace('.', ',') : '')
-  const [description, setDescription] = useState(offer?.description ?? '')
-  const [sending, setSending] = useState(false)
-  const [error, setError] = useState<string | null>(null)
-
-  async function submit(e: FormEvent) {
-    e.preventDefault()
-    const value = Number(price.replace(/\./g, '').replace(',', '.'))
-    if (!Number.isFinite(value) || value <= 0) {
-      setError('Informe um preço maior que zero.')
-      return
-    }
-    setSending(true)
-    setError(null)
-    try {
-      await onSubmit(value, description.trim())
-    } catch {
-      setError('Não deu para salvar a oferta. Tente de novo.')
-      setSending(false)
-    }
-  }
-
-  return (
-    <Modal open onClose={onClose} title={offer ? 'Editar oferta' : 'Colocar à venda'} lead={title}>
-      <form className="auth-form" onSubmit={submit} noValidate>
-        {error && <Alert tone="warn" size="sm" title="Ops">{error}</Alert>}
-        <TextField label="Preço (R$)" value={price} onChange={setPrice} inputMode="decimal" placeholder="Ex.: 150,00" initialFocus />
-        <TextField label="Descrição" value={description} onChange={setDescription} placeholder="Estado da caixa, o que acompanha…" maxLength={280} />
-        <Button type="submit" fullWidth disabled={sending}>{sending ? 'Salvando…' : offer ? 'Salvar' : 'Publicar oferta'}</Button>
-      </form>
-    </Modal>
-  )
-}
-
-function AddGameModal({ owned, onAdd, onClose }: { owned: string[]; onAdd: (id: string) => Promise<unknown>; onClose: () => void }) {
-  const [search, setSearch] = useState('')
-  const query = useDebouncedValue(search.trim(), 300)
-  const [result, setResult] = useState<{ query: string; games: Boardgame[]; failed: boolean } | null>(null)
-  const [adding, setAdding] = useState<string | null>(null)
-
-  // Busca ao mudar o texto; a resposta guarda a busca que a gerou
-  const [lastQuery, setLastQuery] = useState<string | null>(null)
-  if (lastQuery !== query) {
-    setLastQuery(query)
-    listBoardgames({ name: query, size: 12 })
-      .then((games) => setResult({ query, games, failed: false }))
-      .catch(() => setResult({ query, games: [], failed: true }))
-  }
-  const loading = result?.query !== query
-
-  return (
-    <Modal open onClose={onClose} title="Adicionar jogo" lead="Escolha um jogo do catálogo para pôr na sua estante." size="lg">
-      <SearchField id="busca-adicionar" label="Buscar jogo pelo nome" placeholder="Ex.: Catan" value={search} onChange={setSearch} />
-      {result?.failed ? (
-        <Alert tone="warn" size="sm" title="Não deu para buscar">Tente de novo em instantes.</Alert>
-      ) : loading ? (
-        <p className="shelf-status">Buscando…</p>
-      ) : result && result.games.length === 0 ? (
-        <p className="shelf-status">Nenhum jogo encontrado.</p>
-      ) : (
-        <ul className="shelf-pick">
-          {result?.games.map((game) => {
-            const has = owned.includes(game.id)
-            return (
-              <li key={game.id} className="shelf-pick__row">
-                <span>{game.name}</span>
-                {has ? (
-                  <span className="shelf-card__meta">Na estante</span>
-                ) : (
-                  <Button
-                    variant="secondary"
-                    disabled={adding === game.id}
-                    onClick={async () => {
-                      setAdding(game.id)
-                      try {
-                        await onAdd(game.id)
-                      } catch {
-                        /* aviso na página */
-                      } finally {
-                        setAdding(null)
-                      }
-                    }}
-                  >
-                    {adding === game.id ? 'Adicionando…' : 'Adicionar'}
-                  </Button>
-                )}
-              </li>
-            )
-          })}
-        </ul>
-      )}
-    </Modal>
+    </>
   )
 }

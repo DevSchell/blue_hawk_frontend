@@ -1,6 +1,6 @@
 import type { Boardgame } from '../boardgame'
-import type { Offer, UserBoardgame } from '../market'
-import { apiDelete, apiGet, apiPatch } from './apiClient'
+import type { Match, MatchParticipant, Offer, UserBoardgame } from '../market'
+import { apiDelete, apiGet, apiPatch, apiPost } from './apiClient'
 
 const PAGE = 50
 
@@ -88,3 +88,80 @@ export function updateOffer(id: string, price: number, description: string) {
 
 export const deleteOffer = (id: string) => apiDelete(`/offers/${id}`)
 export const deleteCopy = (id: string) => apiDelete(`/user-boardgames/${id}`)
+
+/* ---- Estante (página /estante): cópias, partidas e ofertas do usuário ---- */
+
+export function listUserBoardgames(userId: string, signal?: AbortSignal) {
+  return apiGet<UserBoardgame[]>('/user-boardgames', { userId, page: 0, size: 100 }, signal)
+}
+
+export async function addToShelf(userId: string, boardgameId: string) {
+  const existing = await apiGet<UserBoardgame[]>('/user-boardgames', {
+    userId,
+    boardgameId,
+    page: 0,
+    size: 1,
+  })
+  if (existing.length > 0) {
+    return existing[0]
+  }
+  return apiPost<UserBoardgame>('/user-boardgames', { userId, boardgameId })
+}
+
+export function listMatchesByUserBoardgame(userBoardgameId: string, signal?: AbortSignal) {
+  return apiGet<Match[]>('/matches', { userBoardgameId, page: 0, size: 100 }, signal)
+}
+
+export function registerMatch(userBoardgameId: string) {
+  return apiPost<Match>('/matches', { userBoardgameId })
+}
+
+export async function deleteMatch(matchId: string, signal?: AbortSignal) {
+  const participants = await apiGet<MatchParticipant[]>(
+    '/match-participants',
+    { matchId, page: 0, size: 100 },
+    signal,
+  ).catch(() => [])
+  for (const participant of participants) {
+    await apiDelete(`/match-participants/${encodeURIComponent(participant.id)}`, signal)
+  }
+  await apiDelete(`/matches/${encodeURIComponent(matchId)}`, signal)
+}
+
+export function listUserOffers(userId: string, signal?: AbortSignal) {
+  return apiGet<Offer[]>('/offers', { userId, page: 0, size: 100 }, signal)
+}
+
+export function createShelfOffer(userBoardgameId: string, price: number, description?: string) {
+  return apiPost<Offer>('/offers', {
+    userBoardgameId,
+    price,
+    status: 'ACTIVE',
+    description: description || null,
+  })
+}
+
+export function deleteShelfOffer(offerId: string, signal?: AbortSignal) {
+  return apiDelete(`/offers/${encodeURIComponent(offerId)}`, signal)
+}
+
+export async function removeFromShelf(userBoardgameIds: string | string[], userId?: string | null) {
+  const ids = Array.isArray(userBoardgameIds) ? userBoardgameIds : [userBoardgameIds]
+  const idSet = new Set(ids)
+
+  if (userId) {
+    const offers = await listUserOffers(userId).catch(() => [])
+    const linkedOffers = offers.filter((o) => idSet.has(o.userBoardgameId))
+    for (const offer of linkedOffers) {
+      await deleteShelfOffer(offer.id)
+    }
+  }
+
+  for (const copyId of ids) {
+    const matches = await listMatchesByUserBoardgame(copyId).catch(() => [])
+    for (const match of matches) {
+      await deleteMatch(match.id)
+    }
+    await apiDelete(`/user-boardgames/${encodeURIComponent(copyId)}`)
+  }
+}
