@@ -115,6 +115,52 @@ export const LogoutIcon = () => (
   </Icon>
 )
 
+export const CameraIcon = () => (
+  <Icon>
+    <path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z" />
+    <circle cx="12" cy="13" r="3" />
+  </Icon>
+)
+
+export const UploadIcon = () => (
+  <Icon>
+    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+    <polyline points="17 8 12 3 7 8" />
+    <line x1="12" y1="3" x2="12" y2="15" />
+  </Icon>
+)
+
+export const TrashIcon = () => (
+  <Icon>
+    <polyline points="3 6 5 6 21 6" />
+    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+  </Icon>
+)
+
+export const TrophyIcon = () => (
+  <Icon>
+    <path d="M6 9H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h2" />
+    <path d="M18 9h2a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2h-2" />
+    <path d="M4 22h16" />
+    <path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22" />
+    <path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22" />
+    <path d="M18 2H6v7a6 6 0 0 0 12 0V2Z" />
+  </Icon>
+)
+
+export const SparklesIcon = () => (
+  <Icon>
+    <path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z" />
+    <path d="M5 3v4M3 5h4M19 17v4M17 19h4" />
+  </Icon>
+)
+
+export const CheckIcon = () => (
+  <Icon>
+    <polyline points="20 6 9 17 4 12" />
+  </Icon>
+)
+
 export const D20Icon = ({ className }: { className?: string }) => (
   <svg className={className} viewBox="0 0 48 48" fill="none" aria-hidden="true">
     <polygon points="24,2.5 43.5,13.75 43.5,34.25 24,45.5 4.5,34.25 4.5,13.75" fill="currentColor" />

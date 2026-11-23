@@ -1,4 +1,4 @@
-import { readToken, updateToken } from '../session'
+import { clearSession, readToken, updateToken } from '../session'
 
 const API_BASE = (import.meta.env.VITE_API_URL || '/api').replace(/\/$/, '')
 
@@ -14,8 +14,8 @@ export class ApiError extends Error {
 
 type Query = Record<string, string | number | undefined>
 
-function headers(extra: Record<string, string> = {}) {
-  const token = readToken()
+function headers(extra: Record<string, string> = {}, withToken = true) {
+  const token = withToken ? readToken() : null
   return {
     Accept: 'application/json',
     ...(token ? { Authorization: `Bearer ${token}` } : {}),
@@ -31,7 +31,9 @@ async function readBody<T>(response: Response, label: string): Promise<T> {
   if (!response.ok) {
     throw new ApiError(response.status, `${label} falhou com ${response.status}`)
   }
-  const body: unknown = await response.json()
+  const text = await response.text()
+  if (!text) return undefined as T
+  const body: unknown = JSON.parse(text)
   if (body !== null && typeof body === 'object' && !Array.isArray(body) && 'data' in body) {
     const wrapped = body as { data: T; accessToken?: unknown }
     if (typeof wrapped.accessToken === 'string') updateToken(wrapped.accessToken)
@@ -40,34 +42,58 @@ async function readBody<T>(response: Response, label: string): Promise<T> {
   return body as T
 }
 
+/**
+ * O token da API vale para uma única chamada (JwtRotationFilter troca a cada requisição,
+ * inclusive nas que dão erro). Por isso as chamadas autenticadas rodam uma de cada vez,
+ * sempre com o token mais recente, e não são abortadas no meio (perderiam o token novo).
+ */
+const PUBLIC_POSTS = ['/users', '/users/authenticate']
+let queue: Promise<unknown> = Promise.resolve()
+
+async function request<T>(method: string, path: string, label: string, payload?: unknown, signal?: AbortSignal) {
+  const run = async () => {
+    if (signal?.aborted) throw new DOMException('Aborted', 'AbortError')
+    // Login e cadastro são públicos: um token velho faria a API recusar a chamada
+    const authenticated = readToken() !== null && !(method === 'POST' && PUBLIC_POSTS.includes(path))
+    const response = await fetch(`${API_BASE}${path}`, {
+      method,
+      headers: headers(payload === undefined ? {} : { 'Content-Type': 'application/json' }, authenticated),
+      body: payload === undefined ? undefined : JSON.stringify(payload),
+      signal: authenticated ? undefined : signal,
+    })
+    // Em respostas de erro o token novo só vem no cabeçalho
+    const rotated = response.headers.get('X-New-Token')
+    if (rotated && authenticated) updateToken(rotated)
+    const result = await readBody<T>(response, label).catch((error: unknown) => {
+      if (error instanceof ApiError && error.status === 401 && authenticated) {
+        // Token recusado: a sessão acabou
+        clearSession()
+        window.dispatchEvent(new Event('bluehawk:session-expired'))
+      }
+      throw error
+    })
+    if (signal?.aborted) throw new DOMException('Aborted', 'AbortError')
+    return result
+  }
+  const next = queue.then(run, run)
+  queue = next.catch(() => undefined)
+  return next
+}
+
 export async function apiGet<T>(path: string, query: Query = {}, signal?: AbortSignal): Promise<T> {
   const params = new URLSearchParams()
   for (const [key, value] of Object.entries(query)) {
     if (value !== undefined && value !== '') params.set(key, String(value))
   }
   const qs = params.toString()
-
-  const response = await fetch(`${API_BASE}${path}${qs ? `?${qs}` : ''}`, { headers: headers(), signal })
-  return readBody<T>(response, `GET ${path}`)
+  return request<T>('GET', `${path}${qs ? `?${qs}` : ''}`, `GET ${path}`, undefined, signal)
 }
 
-export async function apiPost<T>(path: string, payload: unknown, signal?: AbortSignal): Promise<T> {
-  const response = await fetch(`${API_BASE}${path}`, {
-    method: 'POST',
-    headers: headers({ 'Content-Type': 'application/json' }),
-    body: JSON.stringify(payload),
-    signal,
-  })
-  return readBody<T>(response, `POST ${path}`)
+export function apiPost<T>(path: string, payload: unknown, signal?: AbortSignal): Promise<T> {
+  return request<T>('POST', path, `POST ${path}`, payload, signal)
 }
 
-export async function apiDelete(path: string, signal?: AbortSignal): Promise<void> {
-  const response = await fetch(`${API_BASE}${path}`, {
-    method: 'DELETE',
-    headers: headers(),
-    signal,
-  })
-  if (!response.ok) {
-    throw new ApiError(response.status, `DELETE ${path} falhou com ${response.status}`)
-  }
-}
+export const apiPut = <T>(path: string, payload: unknown) => request<T>('PUT', path, `PUT ${path}`, payload)
+export const apiPatch = <T>(path: string, payload: unknown) => request<T>('PATCH', path, `PATCH ${path}`, payload)
+export const apiDelete = (path: string, signal?: AbortSignal) =>
+  request<unknown>('DELETE', path, `DELETE ${path}`, undefined, signal)

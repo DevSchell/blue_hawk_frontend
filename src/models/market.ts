@@ -34,4 +34,5 @@ export type MatchParticipant = {
 /** Partida com quem já está nela; a API não lista partidas por jogo, então isso é montado no front */
 export type MatchWithPlayers = Match & {
   participantIds: string[]
+  participants: MatchParticipant[]
 }

@@ -66,5 +66,8 @@
 .boardgame-modal__actions {
   margin-top: 20px;
   display: flex;
-  justify-content: flex-end;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px 20px;
+  flex-wrap: wrap;
 }

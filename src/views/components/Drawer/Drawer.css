@@ -12,6 +12,7 @@
   /* Quem rola é o painel. O <dialog> não pode rolar nem pelo foco: ao abrir, o botão Fechar recebe foco
      ainda fora da tela (painel entrando pela direita) e, com hidden/auto, o navegador rolaria o <dialog> até ele */
   overflow: clip;
+  overscroll-behavior: contain;
 }
 
 .drawer::backdrop {

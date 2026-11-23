@@ -13,6 +13,20 @@ const shortDate = new Intl.DateTimeFormat('pt-BR', { day: '2-digit', month: 'sho
 export function GameMarket({ boardgameId }: { boardgameId: string }) {
   const market = useGameMarket(boardgameId)
   const [isCreating, setIsCreating] = useState(false)
+  const [startingMatch, setStartingMatch] = useState(false)
+  const [matchError, setMatchError] = useState(false)
+
+  async function startMatch() {
+    setStartingMatch(true)
+    setMatchError(false)
+    try {
+      await market.startMatch()
+    } catch {
+      setMatchError(true)
+    } finally {
+      setStartingMatch(false)
+    }
+  }
 
   // Mesmo aviso nas duas seções enquanto não há sessão, carregamento ou erro
   const status = !market.signedIn ? (
@@ -72,7 +86,21 @@ export function GameMarket({ boardgameId }: { boardgameId: string }) {
           ))}
       </MarketSection>
 
-      <MarketSection title="Matches abertas">
+      <MarketSection
+        title="Matches abertas"
+        action={
+          market.signedIn && (
+            <Button className="market__new" onClick={startMatch} disabled={startingMatch}>
+              {startingMatch ? 'Criando…' : 'Nova partida'}
+            </Button>
+          )
+        }
+      >
+        {matchError && (
+          <Alert title="Ops" tone="warn" size="sm">
+            Não deu para criar a partida. Tente de novo.
+          </Alert>
+        )}
         {status ??
           (market.matches.length === 0 ? (
             <p className="market__empty">Nenhuma partida aberta para este jogo.</p>
@@ -97,7 +125,14 @@ export function GameMarket({ boardgameId }: { boardgameId: string }) {
                     )}
                   </div>
                   {match.isIn ? (
-                    <span className="market-card__tag">Você está nesta</span>
+                    <>
+                      <span className="market-card__tag">{match.isHost ? 'Você é o anfitrião' : 'Você está nesta'}</span>
+                      {!match.isHost && (
+                        <Button variant="link" disabled={market.joining === match.id} onClick={() => market.leaveMatch(match.id)}>
+                          {market.joining === match.id ? 'Saindo…' : 'Sair'}
+                        </Button>
+                      )}
+                    </>
                   ) : (
                     <Button
                       variant="secondary"

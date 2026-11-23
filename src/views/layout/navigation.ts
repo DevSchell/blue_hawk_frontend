@@ -5,8 +5,22 @@ export const NAV_ITEMS = [
   { label: 'Estante', href: '/estante' },
 ]
 
-/** Item da navegação para o endereço atual; qualquer endereço desconhecido cai na Wiki */
+/** Páginas da conta, abertas pelo menu do usuário */
+export const ACCOUNT_ROUTES = {
+  profile: '/perfil',
+  profilePhoto: '/perfil?aba=foto',
+  shelf: '/estante',
+  matches: '/partidas',
+  settings: '/configuracoes',
+} as const
+
+/** Endereço atual, sem a barra final */
+export function currentPath(pathname = window.location.pathname) {
+  return pathname.replace(/\/+$/, '') || '/'
+}
+
+/** Item da navegação principal para o endereço atual (as páginas da conta não são um item) */
 export function currentNavItem(pathname = window.location.pathname) {
-  const path = pathname.replace(/\/+$/, '') || '/'
-  return NAV_ITEMS.find((item) => item.href === path) ?? NAV_ITEMS[0]
+  const path = currentPath(pathname)
+  return NAV_ITEMS.find((item) => item.href === path)
 }

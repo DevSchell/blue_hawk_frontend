@@ -6,6 +6,7 @@ import { Button } from '../../components/Button/Button'
 import { CalendarIcon, ClockIcon, UsersIcon } from '../../components/Icons/Icons'
 import { Modal } from '../../components/Modal/Modal'
 import { GameMarket } from '../market/GameMarket'
+import { BoardgameForm } from './BoardgameForm'
 import { CategoryTag } from './CategoryTag'
 import { GameCover } from './GameCover'
 import './BoardgameModal.css'
@@ -26,10 +27,14 @@ function facts(game: Boardgame): Fact[] {
 type BoardgameModalProps = {
   game: Boardgame
   onClose: () => void
+  /** Chamado depois de editar o jogo, para a lista de trás se atualizar */
+  onChanged?: () => void
 }
 
 /** Detalhes de um jogo do feed: capa, números principais e a descrição completa */
-export function BoardgameModal({ game, onClose }: BoardgameModalProps) {
+export function BoardgameModal({ game: initial, onClose, onChanged }: BoardgameModalProps) {
+  const [game, setGame] = useState(initial)
+  const [editing, setEditing] = useState(false)
   const items = facts(game)
   const userId = readUserId()
   const [shelfStatus, setShelfStatus] = useState<'idle' | 'saving' | 'added' | 'error'>('idle')
@@ -43,6 +48,22 @@ export function BoardgameModal({ game, onClose }: BoardgameModalProps) {
     } catch {
       setShelfStatus('error')
     }
+  }
+
+  if (editing) {
+    return (
+      <Modal open onClose={() => setEditing(false)} title="Editar jogo" lead={game.name}>
+        <BoardgameForm
+          game={game}
+          onCancel={() => setEditing(false)}
+          onSaved={(saved) => {
+            setGame(saved)
+            setEditing(false)
+            onChanged?.()
+          }}
+        />
+      </Modal>
+    )
   }
 
   return (
@@ -70,6 +91,9 @@ export function BoardgameModal({ game, onClose }: BoardgameModalProps) {
 
       {userId && (
         <div className="boardgame-modal__actions">
+          <Button variant="link" onClick={() => setEditing(true)}>
+            Editar jogo
+          </Button>
           <Button
             type="button"
             variant={shelfStatus === 'added' ? 'secondary' : 'primary'}
