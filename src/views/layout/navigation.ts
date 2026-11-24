@@ -31,6 +31,23 @@ export const REVIEW_PATH = '/aprovacoes'
 export const TERMS_PATH = '/termos'
 export const PRIVACY_PATH = '/privacidade'
 
+/**
+ * O endereço é de uma tela só para quem entrou na conta? (anúncio da Loja, estante, perfil, aprovações)
+ * Visitante que clica num link desses recebe a modal de login no lugar, sem trocar de tela.
+ */
+export function requiresSignIn(to: string) {
+  const path = currentPath(to.split(/[?#]/)[0])
+  if (path.startsWith(STORE_OFFER_PATH_PREFIX)) return true
+  const accountOnly: string[] = [
+    ACCOUNT_ROUTES.profile,
+    ACCOUNT_ROUTES.shelf,
+    ACCOUNT_ROUTES.matches,
+    ACCOUNT_ROUTES.legacySettings,
+    REVIEW_PATH,
+  ]
+  return accountOnly.includes(path)
+}
+
 /** Endereço atual, sem a barra final ("/" para a raiz) */
 export function currentPath(pathname = window.location.pathname) {
   return pathname.replace(/\/+$/, '') || '/'
