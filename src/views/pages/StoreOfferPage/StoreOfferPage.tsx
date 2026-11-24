@@ -29,6 +29,43 @@ type Loaded = { offer: StoreOffer; related: StoreOffer[] }
  * a faixa de compra com o contato e, embaixo, o exemplar, o jogo e outras ofertas.
  */
 export function StoreOfferPage({ offerId }: { offerId: string }) {
+  // A vitrine é pública; o anúncio (detalhes e contato) é só para quem entrou na conta
+  if (!readUserId()) return <OfferLoginGate />
+  return <OfferDetails offerId={offerId} />
+}
+
+/** Visitante abriu um anúncio: pede login (a modal abre sozinha) e oferece voltar para a Loja */
+function OfferLoginGate() {
+  useEffect(() => {
+    requestLogin()
+  }, [])
+
+  return (
+    <main className="product-page">
+      <Container>
+        <BackButton fallback="/loja" />
+        <EmptyState
+          icon={<Raven variant="noite" />}
+          title="Entre para ver o anúncio"
+          action={
+            <div className="product-page__state">
+              <Button type="button" onClick={requestLogin}>
+                Entrar
+              </Button>
+              <a className="button button--secondary" href="/loja">
+                Voltar à Loja
+              </a>
+            </div>
+          }
+        >
+          Os detalhes do exemplar e o contato com quem vende ficam disponíveis para quem tem conta no Blue Hawk.
+        </EmptyState>
+      </Container>
+    </main>
+  )
+}
+
+function OfferDetails({ offerId }: { offerId: string }) {
   const [state, setState] = useState<{ data: Loaded | null; error: unknown }>({ data: null, error: null })
 
   useEffect(() => {
