@@ -1,3 +1,4 @@
+import { useRealtimeSession } from './controllers/useRealtime'
 import { useEffect } from 'react'
 import { useAuthController } from './controllers/useAuthController'
 import { registerLoginPrompt } from './models/loginPrompt'
@@ -79,6 +80,9 @@ function App() {
 
   // Remonta a página ao entrar/sair (busca de novo com ou sem o token) e a cada endereço novo
   // (as páginas leem ?aba=, ?categoria= etc. ao montar)
+  // Tempo real (WebSocket) enquanto há sessão
+  useRealtimeSession(session?.email ?? null)
+
   const pageKey = `${session?.email ?? 'visitante'}\u0000${locationKey}`
 
   function renderPage() {

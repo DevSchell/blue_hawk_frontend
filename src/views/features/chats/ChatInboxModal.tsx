@@ -4,7 +4,7 @@ import { filterInbox, type ChatInboxFilter, type ChatInboxItem } from '../../../
 import { Raven } from '../../components/Brand/Raven'
 import { Button } from '../../components/Button/Button'
 import { EmptyState } from '../../components/EmptyState/EmptyState'
-import { D20Icon, UsersIcon } from '../../components/Icons/Icons'
+import { ChatIcon, D20Icon, UsersIcon } from '../../components/Icons/Icons'
 import { LoadingCard } from '../../components/LoadingCard/LoadingCard'
 import { UserLink } from '../../components/UserLink/UserLink'
 import { Modal } from '../../components/Modal/Modal'
@@ -19,6 +19,7 @@ const FILTERS: { id: ChatInboxFilter; label: string }[] = [
   { id: 'todas', label: 'Todas' },
   { id: 'mesas', label: 'Mesas' },
   { id: 'negociacoes', label: 'Negociações' },
+  { id: 'diretas', label: 'Diretas' },
 ]
 
 const STATUS_LABEL: Partial<Record<ChatInboxItem['status'], string>> = {
@@ -59,7 +60,7 @@ export function ChatInboxModal({ initialKey, initialFilter = 'todas', onClose }:
       onClose={onClose}
       size="lg"
       title={openItem ? openItem.title || 'Conversa' : 'Conversas'}
-      lead={openItem ? openItem.subtitle : 'Mesas do Jogue e negociações da Loja.'}
+      lead={openItem ? openItem.subtitle : 'Mesas do Jogue, negociações da Loja e conversas diretas.'}
     >
       {openItem ? (
         <div className="inbox-thread">
@@ -81,7 +82,16 @@ export function ChatInboxModal({ initialKey, initialFilter = 'todas', onClose }:
               </a>
             )}
           </div>
-          {openItem.negotiationId ? (
+          {openItem.directConversationId ? (
+            <ChatThreadView
+              key={openItem.key}
+              conversationId={openItem.directConversationId}
+              label={openItem.title}
+              showSenderNames={false}
+              readOnly={false}
+              emptyText="Nenhuma mensagem ainda. Diga um oi!"
+            />
+          ) : openItem.negotiationId ? (
             <NegotiationThreadView key={openItem.key} negotiationId={openItem.negotiationId} />
           ) : openItem.matchId ? (
             <ChatThreadView
@@ -117,7 +127,9 @@ export function ChatInboxModal({ initialKey, initialFilter = 'todas', onClose }:
             <EmptyState icon={<Raven variant="noite" />} title="Nenhuma conversa por aqui">
               {filter === 'negociacoes'
                 ? 'Abra um anúncio na Loja e mande uma proposta ao vendedor.'
-                : 'Peça vaga numa partida do Jogue ou hospede a sua para conversar com a mesa.'}
+                : filter === 'diretas'
+                  ? 'Abra o perfil de alguém e toque em “Iniciar conversa”.'
+                  : 'Peça vaga numa partida do Jogue ou hospede a sua para conversar com a mesa.'}
             </EmptyState>
           ) : (
             <ul className="inbox__list">
@@ -132,7 +144,13 @@ export function ChatInboxModal({ initialKey, initialFilter = 'todas', onClose }:
                       className={cx('inbox-item__icon', item.kind === 'NEGOTIATION' && 'is-deal')}
                       aria-hidden="true"
                     >
-                      {item.kind === 'NEGOTIATION' ? <D20Icon /> : <UsersIcon />}
+                      {item.kind === 'NEGOTIATION' ? (
+                        <D20Icon />
+                      ) : item.kind === 'DIRECT' ? (
+                        <ChatIcon />
+                      ) : (
+                        <UsersIcon />
+                      )}
                     </span>
                     <span className="inbox-item__main">
                       <span className="inbox-item__head">
@@ -170,6 +188,18 @@ export function ChatInboxModal({ initialKey, initialFilter = 'todas', onClose }:
 /** Monta um item mínimo a partir da chave, para abrir uma conversa que ainda não veio na lista */
 function itemFromKey(key: string): ChatInboxItem | null {
   const base = { title: '', subtitle: '', unread: 0, lastActivityAt: new Date().toISOString(), lastMessage: null }
+  if (key.startsWith('dm:')) {
+    return {
+      ...base,
+      key,
+      kind: 'DIRECT',
+      matchId: null,
+      withUserId: null,
+      negotiationId: null,
+      directConversationId: key.slice(3),
+      status: 'OPEN',
+    }
+  }
   if (key.startsWith('neg:')) {
     return {
       ...base,

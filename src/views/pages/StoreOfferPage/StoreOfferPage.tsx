@@ -18,6 +18,8 @@ import { StoreCover } from '../../features/store/StoreCard'
 import { ACCOUNT_ROUTES, gamePath, storeCategoryPath, storeOfferPath } from '../../layout/navigation'
 import { BackButton } from '../../components/BackButton/BackButton'
 import '../../features/boardgames/CategoryTag.css'
+import { requestLogin } from '../../../models/loginPrompt'
+import { readUserId } from '../../../models/session'
 import '../ProductPage.css'
 
 type Loaded = { offer: StoreOffer; related: StoreOffer[] }
@@ -170,6 +172,11 @@ function OfferContent({ offer, related }: Loaded) {
             {offer.isMine ? (
               <Button type="button" variant="secondary" onClick={() => openChatInbox({ filter: 'negociacoes' })}>
                 Ver negociações
+              </Button>
+            ) : !readUserId() ? (
+              // Visitante: entrar em contato pede login primeiro
+              <Button type="button" onClick={requestLogin}>
+                Entrar em contato
               </Button>
             ) : (
               <a className="button button--primary" href="#falar-com-quem-vende">

@@ -101,6 +101,7 @@
 
 /* Nome de quem mandou (abre o perfil), no topo do balão */
 .user-name-link.chat-bubble__sender {
+  font: 800 12px/1.4 var(--texto);
   justify-self: start;
   margin-bottom: 2px;
 }

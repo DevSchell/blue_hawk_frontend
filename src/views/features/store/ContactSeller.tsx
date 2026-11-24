@@ -56,7 +56,10 @@ export function ContactSeller({ offer }: { offer: StoreOffer }) {
   return (
     <form id="falar-com-quem-vende" className="contact-seller" onSubmit={submit} noValidate>
       <h3>
-        Falar com <UserLink userId={offer.sellerId}>{offer.sellerName}</UserLink>
+        Falar com{' '}
+        <UserLink userId={offer.sellerId} variant="plain">
+          {offer.sellerName}
+        </UserLink>
       </h3>
       <p className="contact-seller__lead">
         Conheça o exemplar e a história dele antes de falar em preço. As propostas ficam para a conversa.

@@ -78,6 +78,8 @@ function open() {
     if (event.type === 'ready') {
       attempts = 0
       setConnected(true)
+      // Ao (re)conectar, eventos perdidos enquanto estava fora não chegam: os contadores buscam de novo
+      listeners.forEach((listener) => listener({ type: 'notifications.changed' }))
       window.clearInterval(pingTimer)
       pingTimer = window.setInterval(() => {
         if (ws.readyState === WebSocket.OPEN) ws.send(JSON.stringify({ type: 'ping' }))

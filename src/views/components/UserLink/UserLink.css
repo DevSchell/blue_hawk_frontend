@@ -60,7 +60,7 @@
   border: 0;
   background: none;
   color: inherit;
-  font: 800 12px/1.4 var(--texto);
+  font: inherit;
   text-align: left;
   text-decoration: underline transparent;
   text-underline-offset: 3px;

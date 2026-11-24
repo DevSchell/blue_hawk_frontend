@@ -201,3 +201,10 @@
     align-items: flex-start;
   }
 }
+
+.public-profile__error {
+  margin: 8px 0 0;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--perigo);
+}
