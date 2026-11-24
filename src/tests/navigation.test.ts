@@ -10,6 +10,7 @@ import {
   gamePath,
   idFromPath,
   NAV_ITEMS,
+  requiresSignIn,
   STORE_OFFER_PATH_PREFIX,
   storeOfferPath,
   CATEGORY_PATH_PREFIX,
@@ -68,4 +69,19 @@ test('Partida - página própria, com a conversa certa e no item Jogue da topbar
   assert.strictEqual(matchPath('m1', 'mesa'), '/jogue/partida/m1?chat=mesa')
   assert.strictEqual(idFromPath(MATCH_PATH_PREFIX, '/jogue/partida/m%201'), 'm 1')
   assert.deepStrictEqual(currentNavItem('/jogue/partida/m1'), NAV_ITEMS[2])
+})
+
+test('Telas só para quem tem conta - visitante recebe a modal de login no lugar', () => {
+  assert.ok(requiresSignIn('/estante'))
+  assert.ok(requiresSignIn('/estante/'))
+  assert.ok(requiresSignIn('/perfil?aba=foto'))
+  assert.ok(requiresSignIn('/loja/anuncio/o1'))
+  assert.ok(requiresSignIn('/aprovacoes'))
+  // Vitrines públicas: navegam normalmente
+  assert.ok(!requiresSignIn('/'))
+  assert.ok(!requiresSignIn('/loja'))
+  assert.ok(!requiresSignIn('/loja/categoria/Cartas'))
+  assert.ok(!requiresSignIn('/jogue'))
+  assert.ok(!requiresSignIn('/jogo/g1'))
+  assert.ok(!requiresSignIn('/termos'))
 })
