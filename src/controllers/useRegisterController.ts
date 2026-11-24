@@ -4,13 +4,14 @@ import { authenticate, NAME_MAX, PASSWORD_MAX, PASSWORD_MIN, register } from '..
 
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 
-function validate(name: string, email: string, password: string, confirmPassword: string) {
+function validate(name: string, email: string, password: string, confirmPassword: string, acceptedTerms: boolean) {
   if (!name) return 'Informe o seu nome.'
   if (name.length > NAME_MAX) return `O nome pode ter até ${NAME_MAX} caracteres.`
   if (!EMAIL_PATTERN.test(email)) return 'Informe um e-mail válido.'
   if (password.length < PASSWORD_MIN) return `A senha precisa de pelo menos ${PASSWORD_MIN} caracteres.`
   if (password.length > PASSWORD_MAX) return `A senha pode ter até ${PASSWORD_MAX} caracteres.`
   if (password !== confirmPassword) return 'As senhas não coincidem.'
+  if (!acceptedTerms) return 'Para criar a conta, aceite os Termos de Uso e a Política de Privacidade.'
   return null
 }
 
@@ -32,6 +33,8 @@ export function useRegisterController(onRegister: (email: string, token: string)
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
+  // Aceite dos Termos de Uso e da Política de Privacidade: obrigatório para criar a conta
+  const [acceptedTerms, setAcceptedTerms] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState('')
 
@@ -41,7 +44,7 @@ export function useRegisterController(onRegister: (email: string, token: string)
 
     const cleanName = name.trim()
     const cleanEmail = email.trim()
-    const invalid = validate(cleanName, cleanEmail, password, confirmPassword)
+    const invalid = validate(cleanName, cleanEmail, password, confirmPassword, acceptedTerms)
     if (invalid) {
       setError(invalid)
       return
@@ -76,6 +79,8 @@ export function useRegisterController(onRegister: (email: string, token: string)
     setPassword,
     confirmPassword,
     setConfirmPassword,
+    acceptedTerms,
+    setAcceptedTerms,
     isLoading,
     error,
     submit,
