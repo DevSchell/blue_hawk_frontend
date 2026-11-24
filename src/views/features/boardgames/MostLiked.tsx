@@ -1,20 +1,16 @@
 import { useMostLiked } from '../../../controllers/useMostLiked'
-import type { Boardgame } from '../../../models/boardgame'
 import { coverOf } from '../../../models/services/boardgameService'
 import { cx } from '../../utils/classNames'
 import { GameCover } from './GameCover'
 import { LikeButton } from './LikeButton'
 import './MostLiked.css'
-
-type MostLikedProps = {
-  onOpenGame: (game: Boardgame) => void
-}
+import { gamePath } from '../../layout/navigation'
 
 /**
  * Ranking "Mais curtidos" no topo da Wiki: o 1º lugar em destaque (horizontal) e os seguintes como mini-cards,
  * com o número e o coração sobre a capa, para o nome ter a largura toda.
  */
-export function MostLiked({ onOpenGame }: MostLikedProps) {
+export function MostLiked() {
   const ranking = useMostLiked()
 
   if (ranking.loading || ranking.failed) return null
@@ -46,10 +42,10 @@ export function MostLiked({ onOpenGame }: MostLikedProps) {
                   {!first && <LikeButton game={game} variant="overlay" />}
                 </div>
                 <div className="most-liked__info">
-                  <button type="button" className="most-liked__open" onClick={() => onOpenGame(game)}>
+                  <a className="most-liked__open" href={gamePath(game.id)}>
                     <span className="visually-hidden">{index + 1}º lugar: </span>
                     {game.name}
-                  </button>
+                  </a>
                   {game.category && <span className="most-liked__category">{game.category}</span>}
                 </div>
                 {first && <LikeButton game={game} variant="inline" className="most-liked__like" />}

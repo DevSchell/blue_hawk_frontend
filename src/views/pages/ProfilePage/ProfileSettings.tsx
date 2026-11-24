@@ -3,60 +3,45 @@ import { useTheme } from '../../../controllers/useTheme'
 import { PASSWORD_MAX, PASSWORD_MIN } from '../../../models/services/authService'
 import { ApiError } from '../../../models/services/apiClient'
 import { changePassword, deleteAccount } from '../../../models/services/accountService'
-import { readUserId } from '../../../models/session'
 import { Alert } from '../../components/Alert/Alert'
-import { Raven } from '../../components/Brand/Raven'
 import { Button } from '../../components/Button/Button'
-import { Container } from '../../components/Container/Container'
-import { EmptyState } from '../../components/EmptyState/EmptyState'
+import { MoonIcon, SunIcon } from '../../components/Icons/Icons'
 import { Modal } from '../../components/Modal/Modal'
 import { PasswordField } from '../../components/TextField/PasswordField'
 import { Switch } from '../../components/Switch/Switch'
-import '../FeedPage/FeedPage.css'
-import '../AccountPages.css'
+import { FormActions } from '../../components/FormActions/FormActions'
 
-type SettingsPageProps = {
-  onSignIn: () => void
-  /** Encerra a sessão (depois de excluir a conta) */
-  onSignOut: () => void
-}
+/* Configurações da conta, dentro do Meu Perfil (antes ficavam em /configuracoes) */
 
-/** Configurações: aparência, senha e exclusão da conta */
-export function SettingsPage({ onSignIn, onSignOut }: SettingsPageProps) {
+export function AppearanceSection() {
   const { theme, toggleTheme } = useTheme()
-  const userId = readUserId()
+  const dark = theme === 'dark'
 
   return (
-    <main className="feed-page">
-      <Container>
-        <h1 className="feed-page__title">Configurações</h1>
-        <div className="account">
-          <section className="account__section" aria-labelledby="cfg-aparencia">
-            <h2 id="cfg-aparencia">Aparência</h2>
-            <div className="account__row">
-              <span id="cfg-tema">Modo escuro</span>
-              <Switch checked={theme === 'dark'} onChange={toggleTheme} labelledBy="cfg-tema" />
-            </div>
-          </section>
-          {userId ? (
-            <>
-              <PasswordSection userId={userId} />
-              <DeleteSection userId={userId} onDeleted={onSignOut} />
-            </>
-          ) : (
-            <EmptyState icon={<Raven variant="noite" />} title="Entre para mudar a senha ou gerenciar a conta">
-              <span className="shelf-empty__action">
-                <Button onClick={onSignIn}>Entrar</Button>
-              </span>
-            </EmptyState>
-          )}
-        </div>
-      </Container>
-    </main>
+    <section className="account__section" aria-labelledby="cfg-aparencia">
+      <div>
+        <h2 id="cfg-aparencia">Aparência</h2>
+        <p>Escolha como o Blue Hawk aparece neste aparelho.</p>
+      </div>
+      <div className="profile-theme-preview" aria-hidden="true">
+        <span className={dark ? 'profile-theme-swatch profile-theme-swatch--dark is-on' : 'profile-theme-swatch profile-theme-swatch--dark'}>
+          <MoonIcon />
+          Noite
+        </span>
+        <span className={dark ? 'profile-theme-swatch profile-theme-swatch--light' : 'profile-theme-swatch profile-theme-swatch--light is-on'}>
+          <SunIcon />
+          Giz
+        </span>
+      </div>
+      <div className="account__row">
+        <span id="cfg-tema">Modo escuro</span>
+        <Switch checked={dark} onChange={toggleTheme} labelledBy="cfg-tema" />
+      </div>
+    </section>
   )
 }
 
-function PasswordSection({ userId }: { userId: string }) {
+export function PasswordSection({ userId }: { userId: string }) {
   const [current, setCurrent] = useState('')
   const [next, setNext] = useState('')
   const [confirm, setConfirm] = useState('')
@@ -107,7 +92,7 @@ function PasswordSection({ userId }: { userId: string }) {
   )
 }
 
-function DeleteSection({ userId, onDeleted }: { userId: string; onDeleted: () => void }) {
+export function DeleteSection({ userId, onDeleted }: { userId: string; onDeleted: () => void }) {
   const [open, setOpen] = useState(false)
   const [deleting, setDeleting] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -136,8 +121,9 @@ function DeleteSection({ userId, onDeleted }: { userId: string; onDeleted: () =>
         <Modal open onClose={() => !deleting && setOpen(false)} title="Excluir a conta?" lead="Tudo o que é seu será apagado.">
           <div className="auth-form">
             {error && <Alert tone="warn" size="sm" title="Ops">{error}</Alert>}
-            <Button fullWidth onClick={confirm} disabled={deleting}>{deleting ? 'Excluindo…' : 'Sim, excluir tudo'}</Button>
-            <Button variant="link" onClick={() => setOpen(false)} disabled={deleting}>Cancelar</Button>
+            <FormActions onCancel={() => setOpen(false)} busy={deleting}>
+              <Button onClick={confirm} disabled={deleting}>{deleting ? 'Excluindo…' : 'Sim, excluir tudo'}</Button>
+            </FormActions>
           </div>
         </Modal>
       )}

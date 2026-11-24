@@ -1,5 +1,9 @@
+/* inline-flex: ícone e texto lado a lado (o svg global é display:block) */
 .button {
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
   padding: 13px 26px;
   font: 800 16px/1.2 var(--texto);
   border: 0;
@@ -28,6 +32,25 @@
 
 .button--secondary:hover {
   background: var(--gelo);
+}
+
+/* Ação destrutiva (desistir, cancelar): igual ao secundário e fica vermelha no hover */
+.button--danger {
+  background: var(--giz);
+}
+
+.button--danger:hover,
+.button--danger:focus-visible {
+  background: var(--perigo);
+  color: var(--giz);
+}
+
+/* Compacto: mesma altura em todas as ações de card, linha e ficha */
+.button--sm {
+  --corte: 10px;
+  min-height: 38px;
+  padding: 0 18px;
+  font-size: 14px;
 }
 
 .button--full {
@@ -69,4 +92,10 @@
   box-shadow: none;
   outline: 3px solid var(--acafrao);
   outline-offset: 2px;
+}
+
+.button > .icon {
+  flex: none;
+  width: 18px;
+  height: 18px;
 }

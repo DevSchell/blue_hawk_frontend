@@ -2,7 +2,8 @@ import { useState, type FormEvent } from 'react'
 import type { User } from '../../../models/services/accountService'
 import { updateUser } from '../../../models/services/accountService'
 import { ApiError } from '../../../models/services/apiClient'
-import { getUserProfileExtras, saveUserProfileExtras, type UserProfileExtras } from '../../../models/session'
+import type { MyProfileController } from '../../../controllers/useMyProfile'
+import { levelApi, levelLabel, type ExperienceLevelLabel } from '../../../models/userProfile'
 import { Alert } from '../../components/Alert/Alert'
 import { Button } from '../../components/Button/Button'
 import { TextField } from '../../components/TextField/TextField'
@@ -16,21 +17,23 @@ import {
 
 type ProfilePersonalDataProps = {
   user: User
+  /** Perfil na API (já carregado): bio, cidade, nível e estilos */
+  myProfile: MyProfileController
   onSaved: (name: string, email: string) => void
 }
 
-export function ProfilePersonalData({ user, onSaved }: ProfilePersonalDataProps) {
+export function ProfilePersonalData({ user, myProfile, onSaved }: ProfilePersonalDataProps) {
   const [current, setCurrent] = useState(user)
   const [name, setName] = useState(user.name)
   const [email, setEmail] = useState(user.email)
 
-  // Campos adicionais do perfil do jogador
-  const initialExtras = getUserProfileExtras(user.id)
-  const [bio, setBio] = useState(initialExtras.bio || '')
-  const [city, setCity] = useState(initialExtras.city || '')
-  const [favoriteGenres, setFavoriteGenres] = useState(initialExtras.favoriteGenres || '')
-  const [experienceLevel, setExperienceLevel] = useState<UserProfileExtras['experienceLevel']>(
-    initialExtras.experienceLevel || 'Intermediário'
+  // Campos do perfil do jogador, salvos na conta (o perfil público mostra conforme as preferências)
+  const initial = myProfile.profile
+  const [bio, setBio] = useState(initial?.bio ?? '')
+  const [city, setCity] = useState(initial?.city ?? '')
+  const [favoriteGenres, setFavoriteGenres] = useState(initial?.favoriteGenres ?? '')
+  const [experienceLevel, setExperienceLevel] = useState<ExperienceLevelLabel>(
+    levelLabel(initial?.experienceLevel ?? null) ?? 'Intermediário',
   )
 
   const [saving, setSaving] = useState(false)
@@ -62,16 +65,12 @@ export function ProfilePersonalData({ user, onSaved }: ProfilePersonalDataProps)
         onSaved(saved.name, saved.email)
       }
 
-      // Salva campos adicionais do perfil
-      saveUserProfileExtras(
-        {
-          bio: bio.trim(),
-          city: city.trim(),
-          favoriteGenres: favoriteGenres.trim(),
-          experienceLevel,
-        },
-        user.id
-      )
+      await myProfile.save({
+        bio: bio.trim() || null,
+        city: city.trim() || null,
+        favoriteGenres: favoriteGenres.trim() || null,
+        experienceLevel: levelApi(experienceLevel),
+      })
 
       setDone(true)
     } catch (err) {
@@ -122,12 +121,13 @@ export function ProfilePersonalData({ user, onSaved }: ProfilePersonalDataProps)
             maxLength={100}
           />
 
-          <div className="profile-select">
+          <div className="text-field">
             <label htmlFor="perfil-experiencia">Nível de Experiência</label>
             <select
               id="perfil-experiencia"
+              className="text-field__input profile-select"
               value={experienceLevel}
-              onChange={(e) => setExperienceLevel(e.target.value as UserProfileExtras['experienceLevel'])}
+              onChange={(e) => setExperienceLevel(e.target.value as ExperienceLevelLabel)}
             >
               <option value="Iniciante">Iniciante (começando no hobby)</option>
               <option value="Intermediário">Intermediário (joga regularmente)</option>
@@ -144,10 +144,11 @@ export function ProfilePersonalData({ user, onSaved }: ProfilePersonalDataProps)
           maxLength={200}
         />
 
-        <div className="profile-textarea">
+        <div className="text-field">
           <label htmlFor="perfil-bio">Sobre você (Bio)</label>
           <textarea
             id="perfil-bio"
+            className="text-field__input profile-textarea"
             rows={3}
             placeholder="Conte um pouco sobre suas preferências, histórico de jogatinas ou disponibilidade para mesas…"
             value={bio}

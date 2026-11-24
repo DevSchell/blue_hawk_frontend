@@ -138,6 +138,22 @@ export const CheckIcon = () => (
   </Icon>
 )
 
+/** Balão de conversa: caixa de chats (partidas e negociações) */
+export const ChatIcon = () => (
+  <Icon>
+    <path d="M4 5h16v11H9l-5 4Z" />
+    <path d="M8 9.5h8M8 12.5h5" />
+  </Icon>
+)
+
+/** Sininho das notificações */
+export const BellIcon = () => (
+  <Icon>
+    <path d="M6 16V11a6 6 0 0 1 12 0v5l1.5 2h-15Z" />
+    <path d="M10 20.5a2.2 2.2 0 0 0 4 0" />
+  </Icon>
+)
+
 export const PlusIcon = () => (
   <Icon>
     <path d="M12 5v14M5 12h14" />
@@ -217,4 +233,25 @@ export const D20Icon = ({ className }: { className?: string }) => (
     <path d="M12 6.8l4.6 8H7.4z" />
     <path d="M12 2.5v4.3M20.5 7.4l-3.9 7.4M3.5 7.4l3.9 7.4M12 21.5l4.6-6.7M12 21.5l-4.6-6.7" />
   </svg>
+)
+
+export const ChevronLeftIcon = () => (
+  <Icon>
+    <path d="M15 6l-6 6 6 6" />
+  </Icon>
+)
+
+export const ChevronRightIcon = () => (
+  <Icon>
+    <path d="M9 6l6 6-6 6" />
+  </Icon>
+)
+
+/** Caminhão: forma de entrega do anúncio */
+export const TruckIcon = () => (
+  <Icon>
+    <path d="M3 6h11v10H3zM14 9h4l3 3v4h-7" />
+    <circle cx="7" cy="17.5" r="1.5" />
+    <circle cx="17" cy="17.5" r="1.5" />
+  </Icon>
 )

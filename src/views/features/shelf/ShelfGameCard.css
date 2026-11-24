@@ -82,11 +82,6 @@
   left: 0;
   background: var(--acafrao);
   color: var(--noite);
-  padding: 4px 10px;
-  font-size: 10px;
-  font-weight: 800;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
 }
 
 .shelf-card__price-tag {
@@ -94,9 +89,10 @@
   top: 10px;
   right: 10px;
   background: var(--noite);
-  border: 1px solid var(--acafrao);
+  /* Borda por box-shadow: a diagonal do canto cortado é redesenhada em cutCorners.css */
+  box-shadow: inset 0 0 0 1px var(--acafrao);
   color: var(--acafrao);
-  padding: 4px 10px;
+  padding: 5px 11px;
   font-size: 12px;
   font-weight: 800;
   font-variant-numeric: tabular-nums;
@@ -266,11 +262,6 @@
   position: absolute;
   left: 0;
   bottom: 0;
-  padding: 4px 10px;
-  font-size: 10px;
-  font-weight: 800;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
 }
 
 .shelf-card__status--pending {

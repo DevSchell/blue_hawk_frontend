@@ -13,7 +13,8 @@
   width: 100%;
   padding: 14px 18px;
   font-size: 17px;
-  background: var(--giz);
+  background: var(--cut-edge-14), var(--giz);
+  box-shadow: inset 0 0 0 1px var(--surface-edge);
   color: var(--noite);
   border: 0;
   border-radius: 0;

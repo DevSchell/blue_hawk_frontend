@@ -1,3 +1,4 @@
+import { LoadingCard } from '../../components/LoadingCard/LoadingCard'
 import { useId } from 'react'
 import { useHostMatchController } from '../../../controllers/useHostMatchController'
 import type { OpenMatch } from '../../../models/openMatch'
@@ -5,6 +6,7 @@ import { Alert } from '../../components/Alert/Alert'
 import { Button } from '../../components/Button/Button'
 import { Modal } from '../../components/Modal/Modal'
 import { TextField } from '../../components/TextField/TextField'
+import { FormActions } from '../../components/FormActions/FormActions'
 import '../auth/AuthForm.css'
 import './PlayModals.css'
 
@@ -28,9 +30,7 @@ export function HostMatchModal({ onHosted, onClose }: HostMatchModalProps) {
       lead="Escolha um jogo da sua estante e diga onde e quando. Você aprova quem pedir para entrar."
     >
       {c.loading ? (
-        <p className="play-modal__muted" aria-busy="true">
-          Carregando seus jogos…
-        </p>
+        <LoadingCard compact message="Carregando seus jogos…" />
       ) : c.loadFailed ? (
         <Alert tone="warn" size="sm" title="Não deu para carregar">
           Não foi possível buscar os jogos da sua estante. Feche e tente de novo.
@@ -77,13 +77,7 @@ export function HostMatchModal({ onHosted, onClose }: HostMatchModalProps) {
           />
 
           <div className="play-modal__row">
-            <TextField
-              label="Quando"
-              type="datetime-local"
-              min={c.minWhen}
-              value={c.when}
-              onChange={c.setWhen}
-            />
+            <TextField label="Quando" type="datetime-local" min={c.minWhen} value={c.when} onChange={c.setWhen} />
             <div className="text-field">
               <label htmlFor={playersId}>Jogadores</label>
               <div className="text-field__control">
@@ -118,9 +112,11 @@ export function HostMatchModal({ onHosted, onClose }: HostMatchModalProps) {
             </div>
           </div>
 
-          <Button type="submit" fullWidth disabled={c.isSaving}>
-            {c.isSaving ? 'Abrindo…' : 'Abrir partida'}
-          </Button>
+          <FormActions onCancel={onClose} busy={c.isSaving}>
+            <Button type="submit" disabled={c.isSaving}>
+              {c.isSaving ? 'Abrindo…' : 'Abrir partida'}
+            </Button>
+          </FormActions>
         </form>
       )}
     </Modal>

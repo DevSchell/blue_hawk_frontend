@@ -7,29 +7,21 @@
 }
 
 .shelf-modal__publisher {
-  border: 1.5px dashed var(--acafrao);
+  outline: 1.5px dashed var(--acafrao);
+  outline-offset: -1.5px;
+  /* Tracejado: sem o canto cortado, senão o recorte abre a borda */
+  clip-path: none;
   color: var(--acafrao);
-  font-size: 11px;
-  font-weight: 800;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  padding: 3px 9px;
 }
 
 :root[data-theme='light'] .shelf-modal__publisher {
-  border-color: var(--ultramar);
+  outline-color: var(--ultramar);
   color: var(--ultramar);
 }
 
 .shelf-modal__sale-tag {
   background: var(--acafrao);
   color: var(--noite);
-  padding: 4px 10px;
-  font-size: 12px;
-  font-weight: 800;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  clip-path: polygon(0 0, 100% 0, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0 100%);
 }
 
 .shelf-modal__facts {

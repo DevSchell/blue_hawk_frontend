@@ -1,0 +1,338 @@
+/*
+ * Layout de página de produto (estilo Steam), usado pela página do anúncio (Loja) e do jogo (Wiki):
+ * trilha, título, mídia grande com o quadro de informações ao lado, faixa de ação e as colunas de baixo.
+ */
+.product-page {
+  flex: 1;
+  padding-block: clamp(20px, 3vw, 32px) clamp(40px, 6vw, 72px);
+  background:
+    radial-gradient(ellipse 90% 380px at 50% 0, rgb(36 56 232 / 0.32), transparent),
+    var(--bg);
+}
+
+.product-page__crumbs {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 8px;
+  margin: 0 0 8px;
+  padding: 0;
+  list-style: none;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-muted);
+}
+
+.product-page__crumbs li + li::before {
+  content: '›';
+  margin-right: 8px;
+  opacity: 0.6;
+}
+
+.product-page__crumbs a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.product-page__crumbs a:hover {
+  color: var(--text);
+  text-decoration: underline;
+}
+
+.product-page__title-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px 20px;
+  margin-bottom: 16px;
+}
+
+.product-page__title {
+  font-size: clamp(36px, 5vw, 58px);
+  line-height: 1;
+  overflow-wrap: anywhere;
+}
+
+/* Mídia grande + quadro de informações */
+.product-page__top {
+  display: grid;
+  grid-template-columns: minmax(0, 1.75fr) minmax(280px, 1fr);
+  gap: 16px;
+}
+
+.product-page__media {
+  overflow: hidden;
+  background: var(--noite);
+  box-shadow: 0 18px 40px rgb(4 7 36 / 0.4);
+}
+
+.product-page__media svg,
+.product-page__media img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+}
+
+.product-page__info {
+  display: grid;
+  align-content: start;
+  gap: 14px;
+  padding: 18px;
+  background: var(--surface);
+  box-shadow: inset 0 0 0 1px var(--surface-edge);
+}
+
+.product-page__capsule {
+  overflow: hidden;
+  aspect-ratio: 300 / 120;
+}
+
+.product-page__capsule svg,
+.product-page__capsule img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.product-page__summary {
+  font-size: 14px;
+  color: var(--text-muted);
+  display: -webkit-box;
+  -webkit-line-clamp: 5;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.product-page__details {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 6px 14px;
+  margin: 0;
+  font-size: 13px;
+}
+
+.product-page__details dt {
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  align-self: center;
+}
+
+.product-page__details dd {
+  margin: 0;
+  font-weight: 700;
+  min-width: 0;
+}
+
+.product-page__tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+/* Estado de conservação: mesmo selo claro do card da Loja */
+.product-page__condition {
+  background: var(--giz);
+  color: var(--noite);
+}
+
+/* Faixa de ação (comprar / estante), como a caixa de compra da Steam */
+.product-page__action {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px 24px;
+  margin-top: 22px;
+  padding: 18px 22px;
+  background: linear-gradient(100deg, var(--painel), var(--surface));
+  box-shadow: inset 0 0 0 1px var(--surface-edge), inset 4px 0 0 var(--acafrao);
+}
+
+/* Modo claro: o painel escuro (--painel) não muda de tema; o degradê sai de um açafrão bem leve */
+:root[data-theme='light'] .product-page__action {
+  background: linear-gradient(100deg, color-mix(in srgb, var(--acafrao) 14%, var(--surface)), var(--surface));
+}
+
+.product-page__action h2 {
+  font-size: clamp(22px, 2.6vw, 28px);
+  line-height: 1.1;
+}
+
+.product-page__action-sub {
+  margin-top: 4px;
+  font-size: 14px;
+  color: var(--text-muted);
+}
+
+.product-page__buy {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px 14px;
+}
+
+.product-page__price {
+  padding: 8px 16px 8px 14px;
+  background: var(--noite);
+  color: var(--acafrao);
+  font: 800 24px/1.1 var(--texto);
+  font-variant-numeric: tabular-nums;
+  clip-path: polygon(0 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%);
+}
+
+.product-page__price-was {
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+/* Colunas de baixo: conteúdo + lateral */
+.product-page__columns {
+  display: grid;
+  grid-template-columns: minmax(0, 1.75fr) minmax(280px, 1fr);
+  gap: 16px;
+  align-items: start;
+  margin-top: 22px;
+}
+
+.product-page__main,
+.product-page__aside {
+  display: grid;
+  gap: 16px;
+  min-width: 0;
+}
+
+.product-page__section {
+  display: grid;
+  gap: 10px;
+  padding: 18px;
+  background: var(--surface);
+  box-shadow: inset 0 0 0 1px var(--surface-edge);
+}
+
+.product-page__section h2,
+.product-page__section h3 {
+  font-size: 22px;
+  line-height: 1.1;
+}
+
+.product-page__section > p {
+  color: var(--text-muted);
+  white-space: pre-line;
+}
+
+.product-page__link {
+  justify-self: start;
+  font-size: 14px;
+  font-weight: 800;
+  color: var(--claro);
+}
+
+:root[data-theme='light'] .product-page__link {
+  color: var(--ultramar);
+}
+
+/* Listas da lateral (outras ofertas, mais do vendedor) */
+.product-page__list {
+  display: grid;
+  gap: 6px;
+  padding: 0;
+  margin: 0;
+  list-style: none;
+}
+
+.product-page__list a {
+  display: grid;
+  grid-template-columns: 64px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 10px;
+  padding: 6px;
+  background: var(--bg);
+  color: inherit;
+  text-decoration: none;
+  font-size: 13px;
+}
+
+.product-page__list a:hover {
+  background: var(--hover);
+}
+
+.product-page__list a:focus-visible {
+  outline: 2px solid var(--acafrao);
+  outline-offset: -2px;
+}
+
+.product-page__thumb {
+  width: 64px;
+  height: 36px;
+  overflow: hidden;
+}
+
+.product-page__thumb svg,
+.product-page__thumb img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.product-page__list b {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.product-page__list span {
+  color: var(--text-muted);
+}
+
+.product-page__list .product-page__list-price {
+  font-weight: 800;
+  color: var(--acafrao);
+}
+
+:root[data-theme='light'] .product-page__list .product-page__list-price {
+  color: var(--ultramar);
+}
+
+.product-page__state {
+  display: grid;
+  gap: 14px;
+  justify-items: start;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .product-page__top,
+  .product-page__action,
+  .product-page__columns {
+    animation: productIn 0.45s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+  }
+
+  .product-page__action {
+    animation-delay: 0.08s;
+  }
+
+  .product-page__columns {
+    animation-delay: 0.14s;
+  }
+}
+
+@keyframes productIn {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+}
+
+@media (max-width: 860px) {
+  .product-page__top,
+  .product-page__columns {
+    grid-template-columns: 1fr;
+  }
+}

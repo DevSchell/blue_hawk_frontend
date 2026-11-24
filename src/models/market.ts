@@ -1,3 +1,5 @@
+import type { DeliveryMethod, OfferCondition } from './offerDetails'
+
 /** OfferResponse da API (presentation/offer/dto/OfferResponse.java) */
 export type Offer = {
   id: string
@@ -6,6 +8,10 @@ export type Offer = {
   price: number
   status: 'ACTIVE' | 'INACTIVE' | 'SOLD' | 'CANCELLED'
   description: string | null
+  /** Estado de conservação (null em anúncios antigos) */
+  condition: OfferCondition | null
+  /** Forma de entrega (null em anúncios antigos) */
+  deliveryMethod: DeliveryMethod | null
   createdAt: string
   updatedAt: string
 }

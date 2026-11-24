@@ -1,0 +1,12 @@
+/* Confirmação simples: texto, erro (se houver) e o rodapé padrão */
+.confirm-modal {
+  display: grid;
+  gap: 16px;
+}
+
+.confirm-modal__text {
+  margin: 0;
+  font-size: 15px;
+  line-height: 1.5;
+  color: var(--text-muted);
+}

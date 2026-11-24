@@ -17,7 +17,8 @@
   padding-right: 52px;
 }
 
-.auth-form .button[type='submit'] {
+/* Só o submit solto do login/cadastro; no rodapé padrão (FormActions) os botões seguem o tamanho comum */
+.auth-form > .button[type='submit'] {
   margin-top: 4px;
   padding: 11px 22px;
   font-size: 15px;

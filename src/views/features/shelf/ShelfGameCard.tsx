@@ -34,12 +34,12 @@ export function ShelfGameCard({ game, isLit, isAltLit, isWinner, onOpen }: Shelf
         <GameCover id={boardgame.id} name={boardgame.name} {...coverOf(boardgame)} />
         {forSale && (
           <>
-            <span className="shelf-card__ribbon">À venda</span>
+            <span className="badge shelf-card__ribbon">À venda</span>
             <span className="shelf-card__price-tag">R$ {salePrice}</span>
           </>
         )}
         {status !== 'APPROVED' && (
-          <span className={cx('shelf-card__status', `shelf-card__status--${status.toLowerCase()}`)}>
+          <span className={cx('badge', 'shelf-card__status', `shelf-card__status--${status.toLowerCase()}`)}>
             {status === 'PENDING' ? 'Em aprovação' : 'Recusado'}
           </span>
         )}

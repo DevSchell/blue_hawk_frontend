@@ -6,6 +6,8 @@ import { Button } from '../../components/Button/Button'
 import { Container } from '../../components/Container/Container'
 import { EmptyState } from '../../components/EmptyState/EmptyState'
 import { CloseIcon, D20Icon, PlusIcon, UsersIcon } from '../../components/Icons/Icons'
+import { FilterSelect } from '../../components/FilterSelect/FilterSelect'
+import { MultiSelect } from '../../components/FilterSelect/MultiSelect'
 import { BoardgameFormModal } from '../../features/boardgames/BoardgameFormModal'
 import { FeedError } from '../../features/boardgames/FeedError'
 import { GameCardSkeleton } from '../../features/boardgames/GameCardSkeleton'
@@ -35,8 +37,9 @@ export function ShelfPage({ onGoToFeed, onSignIn }: ShelfPageProps) {
     retry,
     searchQuery,
     setSearchQuery,
-    selectedCategory,
-    selectCategory,
+    selectedCategories,
+    toggleCategory,
+    clearCategories,
     onlyForSale,
     toggleForSale,
     playersFilter,
@@ -170,7 +173,7 @@ export function ShelfPage({ onGoToFeed, onSignIn }: ShelfPageProps) {
                 <p className="shelf-controls__counter">
                   Exibindo {filteredGames.length} de {games.length} jogos adquiridos
                   {onlyForSale ? ' • Apenas à venda' : ''}
-                  {selectedCategory !== 'Todas' ? ` • ${selectedCategory}` : ''}
+                  {selectedCategories.length > 0 ? ` • ${selectedCategories.join(', ')}` : ''}
                 </p>
               </div>
 
@@ -236,66 +239,42 @@ export function ShelfPage({ onGoToFeed, onSignIn }: ShelfPageProps) {
                 <span>À venda ({summary.forSaleCount})</span>
               </button>
 
-              <div role="tablist" aria-label="Filtrar por categoria" className="shelf-categories">
-                {SHELF_CATEGORIES.map((category) => {
-                  const isActive = selectedCategory === category
-                  const count = categoryCounts[category] ?? 0
-                  return (
-                    <button
-                      key={category}
-                      type="button"
-                      role="tab"
-                      aria-selected={isActive}
-                      onClick={() => selectCategory(category)}
-                      className={`shelf-category-pill ${isActive ? 'shelf-category-pill--active' : ''}`}
-                    >
-                      {category} <span className="shelf-category-pill__count">({count})</span>
-                    </button>
-                  )
-                })}
-              </div>
-
               <div className="shelf-controls__selects">
-                <div className="shelf-select">
-                  <label htmlFor="shelf-players-select" className="visually-hidden">
-                    Filtrar por quantidade de jogadores
-                  </label>
-                  <span className="shelf-select__prefix" aria-hidden="true">
-                    <UsersIcon />
-                    <span>Mesa:</span>
-                  </span>
-                  <select
-                    id="shelf-players-select"
-                    value={playersFilter}
-                    onChange={(e) => setPlayersFilter(e.target.value as PlayersFilterOption)}
-                  >
-                    <option value="any">Todos</option>
-                    <option value="1">Solo (1)</option>
-                    <option value="2">2 jog.</option>
-                    <option value="3-4">3–4 jog.</option>
-                    <option value="5+">5+ jog.</option>
-                  </select>
-                </div>
-
-                <div className="shelf-select">
-                  <label htmlFor="shelf-sort-select" className="visually-hidden">
-                    Ordenar jogos por
-                  </label>
-                  <span className="shelf-select__prefix" aria-hidden="true">
-                    <span>Ordenar:</span>
-                  </span>
-                  <select
-                    id="shelf-sort-select"
-                    value={sortBy}
-                    onChange={(e) => setSortBy(e.target.value as ShelfSortOption)}
-                  >
-                    <option value="most-played">Mais jogadas</option>
-                    <option value="most-hours">Mais horas</option>
-                    <option value="az">A–Z</option>
-                    <option value="za">Z–A</option>
-                    <option value="duration-asc">Mais rápidas</option>
-                  </select>
-                </div>
+                <MultiSelect
+                  label="Categoria"
+                  options={SHELF_CATEGORIES.filter((category) => category !== 'Todas')}
+                  counts={categoryCounts}
+                  selected={selectedCategories}
+                  onToggle={toggleCategory}
+                  onClear={clearCategories}
+                />
+                <FilterSelect<PlayersFilterOption>
+                  label="Mesa"
+                  ariaLabel="Filtrar por quantidade de jogadores"
+                  icon={<UsersIcon />}
+                  value={playersFilter}
+                  onChange={setPlayersFilter}
+                  options={[
+                    { value: 'any', label: 'Todos' },
+                    { value: '1', label: 'Solo (1)' },
+                    { value: '2', label: '2 jog.' },
+                    { value: '3-4', label: '3–4 jog.' },
+                    { value: '5+', label: '5+ jog.' },
+                  ]}
+                />
+                <FilterSelect<ShelfSortOption>
+                  label="Ordenar"
+                  ariaLabel="Ordenar jogos por"
+                  value={sortBy}
+                  onChange={setSortBy}
+                  options={[
+                    { value: 'most-played', label: 'Mais jogadas' },
+                    { value: 'most-hours', label: 'Mais horas' },
+                    { value: 'az', label: 'A–Z' },
+                    { value: 'za', label: 'Z–A' },
+                    { value: 'duration-asc', label: 'Mais rápidas' },
+                  ]}
+                />
               </div>
             </div>
 

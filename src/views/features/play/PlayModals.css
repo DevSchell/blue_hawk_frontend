@@ -134,3 +134,8 @@
   padding: 9px 18px;
   font-size: 14px;
 }
+
+/* Motivo ainda curto */
+.text-field__hint.is-short {
+  color: var(--acafrao);
+}

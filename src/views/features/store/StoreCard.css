@@ -78,13 +78,8 @@
   position: absolute;
   top: 8px;
   left: 8px;
-  padding: 3px 8px;
   background: var(--claro);
   color: var(--noite);
-  font-size: 10px;
-  font-weight: 800;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
 }
 
 .store-card__body {
@@ -131,17 +126,10 @@
 }
 
 .store-card__category {
-  padding: 1px 6px;
-  border: 1px solid var(--claro);
   color: var(--claro);
-  font-size: 10px;
-  font-weight: 800;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
 }
 
 :root[data-theme='light'] .store-card__category {
-  border-color: var(--ultramar);
   color: var(--ultramar);
 }
 
@@ -158,4 +146,63 @@
 
 .store-card--price .store-card__price {
   font-size: 18px;
+}
+
+/* Cards sempre da mesma altura: categoria e vendedor numa linha só (o vendedor encurta com "…"),
+   o corpo ocupa o resto do card e o preço fica no rodapé */
+.store-card__body {
+  flex: 1;
+  grid-template-rows: auto auto auto 1fr;
+}
+
+.store-card__meta {
+  flex-wrap: nowrap;
+  min-width: 0;
+}
+
+.store-card__category {
+  flex: none;
+}
+
+.store-card__seller {
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.store-card__price {
+  align-self: end;
+}
+
+/* Agora é um link para a página: mesma aparência de antes */
+.store-card__open {
+  color: inherit;
+  text-decoration: none;
+}
+
+/* Estado de conservação sobre a capa */
+.store-card__condition {
+  position: absolute;
+  right: 8px;
+  bottom: 8px;
+  z-index: 1;
+  background: var(--giz);
+  color: var(--noite);
+}
+
+/* Forma de entrega, do ponto de vista de quem vê o card */
+.store-card__delivery {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.store-card__delivery .icon {
+  flex: none;
+  width: 14px;
+  height: 14px;
 }

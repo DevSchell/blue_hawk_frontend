@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import type { OfferDetailsInput } from '../models/offerDetails'
 import type { Offer, UserBoardgame } from '../models/market'
 import type { OpenMatch } from '../models/openMatch'
 import { createOffer, listActiveOffers, listCopies } from '../models/services/marketService'
@@ -52,9 +53,9 @@ export function useGameMarket(boardgameId: string) {
   const myCopy = data?.copies.find((c) => c.userId === userId) ?? null
 
   /** Anuncia a cópia do usuário. Só quem tem o jogo na estante pode vender. */
-  async function publishOffer(price: number, description: string) {
+  async function publishOffer(details: OfferDetailsInput) {
     if (!userId || !myCopy) throw new Error('Adicione o jogo à sua estante antes de anunciar.')
-    await createOffer(myCopy.id, price, description)
+    await createOffer(myCopy.id, details)
     reload()
   }
 

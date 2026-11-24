@@ -1,9 +1,11 @@
+import { LoadingCard } from '../../components/LoadingCard/LoadingCard'
 import { useEffect, useState } from 'react'
 import { MATCH_TEXT_MAX, type JoinRequest, type OpenMatch } from '../../../models/openMatch'
 import { ApiError } from '../../../models/services/apiClient'
 import { acceptJoinRequest, listJoinRequests, rejectJoinRequest } from '../../../models/services/openMatchService'
 import { Alert } from '../../components/Alert/Alert'
 import { Button } from '../../components/Button/Button'
+import { UserLink } from '../../components/UserLink/UserLink'
 import { Modal } from '../../components/Modal/Modal'
 import { cx } from '../../utils/classNames'
 import './PlayModals.css'
@@ -83,9 +85,7 @@ export function JoinRequestsModal({ match, onClose }: JoinRequestsModalProps) {
           Feche e abra de novo para tentar outra vez.
         </Alert>
       ) : requests === null ? (
-        <p className="play-modal__muted" aria-busy="true">
-          Carregando pedidos…
-        </p>
+        <LoadingCard compact message="Carregando pedidos…" />
       ) : requests.length === 0 ? (
         <p className="play-modal__muted">Ninguém pediu para entrar ainda.</p>
       ) : (
@@ -93,7 +93,7 @@ export function JoinRequestsModal({ match, onClose }: JoinRequestsModalProps) {
           {[...pending, ...answered].map((request) => (
             <li key={request.id} className={cx('join-request', `join-request--${request.status.toLowerCase()}`)}>
               <div className="join-request__head">
-                <b>{request.userName}</b>
+                <UserLink userId={request.userId}>{request.userName}</UserLink>
                 <span className="join-request__status">{STATUS_LABEL[request.status]}</span>
               </div>
               <p className="join-request__message">“{request.message}”</p>

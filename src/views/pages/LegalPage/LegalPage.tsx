@@ -1,4 +1,5 @@
 import { Container } from '../../components/Container/Container'
+import { PageHeader } from '../../components/PageHeader/PageHeader'
 import { PRIVACY_PATH, TERMS_PATH } from '../../layout/navigation'
 import type { LegalDocument } from './legalContent'
 import './LegalPage.css'
@@ -6,13 +7,12 @@ import './LegalPage.css'
 /** Página de texto legal (termos, privacidade): índice lateral e as seções */
 export function LegalPage({ document, path }: { document: LegalDocument; path: string }) {
   return (
-    <main className="legal-page">
+    <main className="page">
       <Container>
-        <header className="legal-page__header">
-          <h1 className="legal-page__title">{document.title}</h1>
+        <PageHeader title={document.title}>
           <p className="legal-page__updated">Última atualização: {document.updatedAt}</p>
           <p className="legal-page__intro">{document.intro}</p>
-        </header>
+        </PageHeader>
 
         <div className="legal-page__layout">
           <nav className="legal-page__toc" aria-label="Seções">

@@ -128,15 +128,6 @@ export function listUserOffers(userId: string, signal?: AbortSignal) {
   return apiGet<Offer[]>('/offers', { userId, page: 0, size: 100 }, signal)
 }
 
-export function createShelfOffer(userBoardgameId: string, price: number, description?: string) {
-  return apiPost<Offer>('/offers', {
-    userBoardgameId,
-    price,
-    status: 'ACTIVE',
-    description: description || null,
-  })
-}
-
 export function deleteShelfOffer(offerId: string, signal?: AbortSignal) {
   return apiDelete(`/offers/${encodeURIComponent(offerId)}`, signal)
 }

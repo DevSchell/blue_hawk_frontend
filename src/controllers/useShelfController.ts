@@ -1,4 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { createOffer } from '../models/services/marketService'
+import type { OfferDetailsInput } from '../models/offerDetails'
 import { approvalStatusOf, type Boardgame } from '../models/boardgame'
 import { readIsAdmin, readUserId } from '../models/session'
 import { ApiError } from '../models/services/apiClient'
@@ -6,7 +8,6 @@ import { getBoardgameById } from '../models/services/boardgameService'
 import { listPlayedByMe } from '../models/services/openMatchService'
 import {
   addToShelf,
-  createShelfOffer,
   deleteShelfOffer,
   listUserBoardgames,
   listUserOffers,
@@ -63,7 +64,8 @@ export function useShelfController() {
   const error = loading ? null : fetchState.error
 
   const [searchQuery, setSearchQuery] = useState('')
-  const [selectedCategory, setSelectedCategory] = useState<string>('Todas')
+  /** Categorias marcadas no filtro (vazio = todas) */
+  const [selectedCategories, setSelectedCategories] = useState<string[]>([])
   const [onlyForSale, setOnlyForSale] = useState(false)
   const [playersFilter, setPlayersFilter] = useState<PlayersFilterOption>('any')
   const [sortBy, setSortBy] = useState<ShelfSortOption>('most-played')
@@ -239,7 +241,7 @@ export function useShelfController() {
         item.boardgame.name.toLowerCase().includes(query) ||
         item.category.toLowerCase().includes(query) ||
         (item.boardgame.publisher?.toLowerCase().includes(query) ?? false)
-      const matchesCat = selectedCategory === 'Todas' || item.category === selectedCategory
+      const matchesCat = selectedCategories.length === 0 || selectedCategories.includes(item.category)
       const matchesSale = !onlyForSale || item.forSale
       const matchesPlayers = matchesPlayersFilter(item.boardgame.playerNumber, playersFilter)
       return matchesName && matchesCat && matchesSale && matchesPlayers
@@ -259,7 +261,7 @@ export function useShelfController() {
           return (a.boardgame.playTime ?? Number.MAX_SAFE_INTEGER) - (b.boardgame.playTime ?? Number.MAX_SAFE_INTEGER)
       }
     })
-  }, [games, searchQuery, selectedCategory, onlyForSale, playersFilter, sortBy])
+  }, [games, searchQuery, selectedCategories, onlyForSale, playersFilter, sortBy])
 
   const selectedGame = useMemo(
     () => games.find((g) => g.userBoardgameId === selectedId) ?? null,
@@ -286,14 +288,23 @@ export function useShelfController() {
     [isRollingD20, clearRouletteWinner],
   )
 
-  const selectCategory = useCallback(
+  /** Marca ou desmarca uma categoria no filtro de seleção múltipla */
+  const toggleCategory = useCallback(
     (category: string) => {
       if (isRollingD20) return
       clearRouletteWinner()
-      setSelectedCategory(category)
+      setSelectedCategories((current) =>
+        current.includes(category) ? current.filter((c) => c !== category) : [...current, category],
+      )
     },
     [isRollingD20, clearRouletteWinner],
   )
+
+  const clearCategories = useCallback(() => {
+    if (isRollingD20) return
+    clearRouletteWinner()
+    setSelectedCategories([])
+  }, [isRollingD20, clearRouletteWinner])
 
   const toggleForSale = useCallback(() => {
     if (isRollingD20) return
@@ -323,7 +334,7 @@ export function useShelfController() {
     if (isRollingD20) return
     clearRouletteWinner()
     setSearchQuery('')
-    setSelectedCategory('Todas')
+    setSelectedCategories([])
     setOnlyForSale(false)
     setPlayersFilter('any')
     setSortBy('most-played')
@@ -467,14 +478,14 @@ export function useShelfController() {
     setSelectedId(null)
   }, [selectedGame, showToast])
 
-  /** Confirma o anúncio com o preço (e a observação) da modal de venda */
+  /** Confirma o anúncio com os dados da modal de venda (preço, estado, entrega e descrição) */
   const confirmSale = useCallback(
-    async (price: number, description: string) => {
+    async (details: OfferDetailsInput) => {
       if (!saleGame || togglingSale) return
       setTogglingSale(true)
       setSaleError('')
       try {
-        const created = await createShelfOffer(saleGame.userBoardgameId, price, description.trim() || undefined)
+        const created = await createOffer(saleGame.userBoardgameId, details)
         setFetchState((prev) => ({
           ...prev,
           games: prev.games.map((item) =>
@@ -484,7 +495,7 @@ export function useShelfController() {
           ),
         }))
         setSaleGameId(null)
-        showToast(`"${saleGame.boardgame.name}" anunciado na loja por R$ ${price}!`)
+        showToast(`"${saleGame.boardgame.name}" anunciado na loja por R$ ${details.price}!`)
       } catch (err) {
         setSaleError(
           err instanceof ApiError && err.status === 409
@@ -554,8 +565,9 @@ export function useShelfController() {
     retry: () => setAttempt((n) => n + 1),
     searchQuery,
     setSearchQuery: updateSearchQuery,
-    selectedCategory,
-    selectCategory,
+    selectedCategories,
+    toggleCategory,
+    clearCategories,
     onlyForSale,
     toggleForSale,
     playersFilter,
