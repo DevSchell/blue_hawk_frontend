@@ -20,6 +20,7 @@ import { BackButton } from '../../components/BackButton/BackButton'
 import '../../features/boardgames/CategoryTag.css'
 import { requestLogin } from '../../../models/loginPrompt'
 import { readUserId } from '../../../models/session'
+import { StorePage } from '../StorePage/StorePage'
 import '../ProductPage.css'
 
 type Loaded = { offer: StoreOffer; related: StoreOffer[] }
@@ -29,6 +30,24 @@ type Loaded = { offer: StoreOffer; related: StoreOffer[] }
  * a faixa de compra com o contato e, embaixo, o exemplar, o jogo e outras ofertas.
  */
 export function StoreOfferPage({ offerId }: { offerId: string }) {
+  // A vitrine é pública; o anúncio (detalhes e contato) é só para quem entrou na conta
+  if (!readUserId()) return <OfferLoginGate />
+  return <OfferDetails offerId={offerId} />
+}
+
+/**
+ * Visitante abriu um anúncio: só abre a modal de login, com a vitrine da Loja ao fundo.
+ * O endereço continua o do anúncio, então ao entrar na conta a página dele aparece.
+ */
+function OfferLoginGate() {
+  useEffect(() => {
+    requestLogin()
+  }, [])
+
+  return <StorePage />
+}
+
+function OfferDetails({ offerId }: { offerId: string }) {
   const [state, setState] = useState<{ data: Loaded | null; error: unknown }>({ data: null, error: null })
 
   useEffect(() => {

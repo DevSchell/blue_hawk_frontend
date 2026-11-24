@@ -1,13 +1,15 @@
+import { requestLogin } from '../../../models/loginPrompt'
 import { ApiError } from '../../../models/services/apiClient'
 import { Alert } from '../../components/Alert/Alert'
 import { Button } from '../../components/Button/Button'
 
-function describe(error: unknown) {
+function describe(error: unknown): { title: string; text: string; login?: boolean } {
   if (error instanceof ApiError) {
     if (error.status === 401 || error.status === 403) {
       return {
-        title: 'Feed fechado',
-        text: 'A API ainda não liberou a lista de jogos para visitantes.',
+        title: 'Entre na sua conta',
+        text: 'Faça login para ver esta parte do Blue Hawk.',
+        login: true,
       }
     }
     if (error.status >= 500) {
@@ -19,16 +21,22 @@ function describe(error: unknown) {
 }
 
 export function FeedError({ error, onRetry }: { error: unknown; onRetry: () => void }) {
-  const { title, text } = describe(error)
+  const { title, text, login } = describe(error)
 
   return (
     <Alert
       tone="warn"
       title={title}
       action={
-        <Button variant="secondary" onClick={onRetry}>
-          Tentar de novo
-        </Button>
+        login ? (
+          <Button variant="secondary" onClick={requestLogin}>
+            Entrar
+          </Button>
+        ) : (
+          <Button variant="secondary" onClick={onRetry}>
+            Tentar de novo
+          </Button>
+        )
       }
     >
       {text}
