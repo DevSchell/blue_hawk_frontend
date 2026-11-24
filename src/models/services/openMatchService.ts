@@ -15,8 +15,9 @@ export function hostMatch(input: HostMatchInput) {
 }
 
 /** O host cancela */
-export function cancelMatch(id: string) {
-  return apiDeleteJson<OpenMatch>(`/open-matches/${encodeURIComponent(id)}`)
+/** O host cancela a partida; o motivo vai na notificação de quem pediu vaga */
+export function cancelMatch(id: string, reason: string) {
+  return apiDeleteJson<OpenMatch>(`/open-matches/${encodeURIComponent(id)}`, undefined, { reason })
 }
 
 /** Pedido de entrada com mensagem para o host */
@@ -47,4 +48,9 @@ export function acceptJoinRequest(requestId: string, reply: string) {
 
 export function rejectJoinRequest(requestId: string, reply: string) {
   return apiPost<JoinRequest>(`/open-match-requests/${encodeURIComponent(requestId)}/reject`, { reply: reply || null })
+}
+
+/** Uma partida (ex.: aberta por uma notificação) */
+export function getOpenMatch(id: string, signal?: AbortSignal) {
+  return apiGet<OpenMatch>(`/open-matches/${encodeURIComponent(id)}`, {}, signal)
 }

@@ -1,10 +1,19 @@
-import { useState, type FormEvent, type ReactNode } from 'react'
+import { LoadingCard } from '../../components/LoadingCard/LoadingCard'
+import { useState, type ReactNode } from 'react'
+import {
+  conditionLabel,
+  deliveryLabel,
+  type DeliveryMethod,
+  type OfferCondition,
+  type OfferDetailsInput,
+} from '../../../models/offerDetails'
+import { OfferForm } from '../store/OfferForm'
+import { storeOfferHref } from '../../../models/store'
 import { useGameMarket } from '../../../controllers/useGameMarket'
 import { Alert } from '../../components/Alert/Alert'
 import { Button } from '../../components/Button/Button'
 import { UsersIcon } from '../../components/Icons/Icons'
-import { TextField } from '../../components/TextField/TextField'
-import { PLAY_PATH } from '../../layout/navigation'
+import { matchPath, PLAY_PATH } from '../../layout/navigation'
 import { formatMatchDate } from '../play/format'
 import './GameMarket.css'
 
@@ -27,9 +36,7 @@ export function GameMarket({ market, isCreating, onCloseCreate }: GameMarketProp
       Ofertas e partidas aparecem para quem está logado.
     </Alert>
   ) : market.loading ? (
-    <div className="market__loading" aria-busy="true">
-      Carregando…
-    </div>
+    <LoadingCard compact message="Carregando ofertas…" />
   ) : market.error ? (
     <Alert
       title="Não deu para carregar"
@@ -50,8 +57,8 @@ export function GameMarket({ market, isCreating, onCloseCreate }: GameMarketProp
       <MarketSection title="Ofertas disponíveis">
         {isCreating && market.ownsGame && (
           <NewOfferForm
-            onSubmit={async (price, description) => {
-              await market.publishOffer(price, description)
+            onSubmit={async (details) => {
+              await market.publishOffer(details)
               onCloseCreate()
             }}
             onCancel={onCloseCreate}
@@ -98,8 +105,8 @@ export function GameMarket({ market, isCreating, onCloseCreate }: GameMarketProp
                           }`}
                     </span>
                   </div>
-                  <a className="market__link" href={`${PLAY_PATH}?cidade=${encodeURIComponent(match.city)}`}>
-                    Ver no Jogue
+                  <a className="market__link" href={matchPath(match.id)}>
+                    Ver partida
                   </a>
                 </li>
               ))}
@@ -124,61 +131,53 @@ function MarketSection({ title, action, children }: { title: string; action?: Re
 }
 
 type OfferCardProps = {
+  id: string
   price: number
   description: string | null
+  condition: OfferCondition | null
+  deliveryMethod: DeliveryMethod | null
   createdAt: string
   isMine: boolean
 }
 
-function OfferCard({ price, description, createdAt, isMine }: OfferCardProps) {
-  // A API ainda não recebe propostas sobre uma oferta: o botão só avisa
-  const [asked, setAsked] = useState(false)
-
+/** Oferta do jogo: leva ao anúncio na Loja, onde estão os detalhes e o contato com quem vende */
+function OfferCard({ id, price, description, condition, deliveryMethod, createdAt, isMine }: OfferCardProps) {
+  const state = conditionLabel(condition)
   return (
     <li className="market-card">
       <div className="market-card__main">
         <b className="market-card__price">{brl.format(price)}</b>
+        {state && <span className="badge market-card__condition">{state}</span>}
         {description && <p className="market-card__text">{description}</p>}
-        <span className="market-card__meta">Publicada em {shortDate.format(new Date(createdAt))}</span>
-        {asked && (
-          <span className="market-card__note" role="status">
-            Em breve: propostas ainda não estão disponíveis.
-          </span>
-        )}
+        <span className="market-card__meta">
+          Entrega: {deliveryLabel(deliveryMethod, isMine ? 'seller' : 'buyer').toLowerCase()} · publicada em {shortDate.format(new Date(createdAt))}
+        </span>
       </div>
-      {isMine ? (
-        <span className="market-card__tag">Sua oferta</span>
-      ) : (
-        <Button variant="secondary" onClick={() => setAsked(true)}>
-          Fazer oferta
-        </Button>
-      )}
+      <div className="market-card__actions">
+        {isMine && <span className="market-card__tag">Sua oferta</span>}
+        <a className="button button--secondary market-card__open" href={storeOfferHref(id)}>
+          Ver anúncio
+        </a>
+      </div>
     </li>
   )
 }
 
 type NewOfferFormProps = {
-  onSubmit: (price: number, description: string) => Promise<void>
+  onSubmit: (details: OfferDetailsInput) => Promise<void>
   onCancel: () => void
 }
 
+/** "Anunciar venda" na página do jogo: o mesmo formulário da estante */
 function NewOfferForm({ onSubmit, onCancel }: NewOfferFormProps) {
-  const [price, setPrice] = useState('')
-  const [description, setDescription] = useState('')
   const [sending, setSending] = useState(false)
-  const [error, setError] = useState<string | null>(null)
+  const [error, setError] = useState('')
 
-  async function submit(e: FormEvent) {
-    e.preventDefault()
-    const value = Number(price.replace(/\./g, '').replace(',', '.'))
-    if (!Number.isFinite(value) || value <= 0) {
-      setError('Informe um preço maior que zero.')
-      return
-    }
+  async function submit(details: OfferDetailsInput) {
     setSending(true)
-    setError(null)
+    setError('')
     try {
-      await onSubmit(value, description.trim())
+      await onSubmit(details)
     } catch {
       setError('Não deu para publicar a oferta. Tente de novo.')
       setSending(false)
@@ -186,36 +185,8 @@ function NewOfferForm({ onSubmit, onCancel }: NewOfferFormProps) {
   }
 
   return (
-    <form className="market-form" onSubmit={submit} noValidate>
-      <TextField
-        label="Preço (R$)"
-        value={price}
-        onChange={setPrice}
-        inputMode="decimal"
-        placeholder="Ex.: 150,00"
-        required
-        autoFocus
-      />
-      <TextField
-        label="Descrição"
-        value={description}
-        onChange={setDescription}
-        placeholder="Estado da caixa, o que acompanha…"
-        maxLength={280}
-      />
-      {error && (
-        <Alert title="Ops" tone="warn" size="sm">
-          {error}
-        </Alert>
-      )}
-      <div className="market-form__actions">
-        <Button type="submit" disabled={sending}>
-          {sending ? 'Publicando…' : 'Publicar oferta'}
-        </Button>
-        <Button variant="link" onClick={onCancel} disabled={sending}>
-          Cancelar
-        </Button>
-      </div>
-    </form>
+    <div className="market-form">
+      <OfferForm saving={sending} error={error} onSubmit={submit} onCancel={onCancel} />
+    </div>
   )
 }

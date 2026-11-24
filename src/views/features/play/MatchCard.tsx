@@ -1,34 +1,20 @@
 import type { OpenMatch } from '../../../models/openMatch'
 import { apiUrl } from '../../../models/services/apiClient'
-import { Button } from '../../components/Button/Button'
 import { ClockIcon, MapPinIcon } from '../../components/Icons/Icons'
 import { cx } from '../../utils/classNames'
 import { GameCover } from '../boardgames/GameCover'
 import { matchDateParts } from './format'
+import { MatchActions, type MatchActionHandlers } from './MatchActions'
 import './MatchCard.css'
 
-type MatchCardProps = {
+type MatchCardProps = MatchActionHandlers & {
   match: OpenMatch
-  signedIn: boolean
-  busy: boolean
-  onSignIn: () => void
-  onJoin: (match: OpenMatch) => void
-  onWithdraw: (match: OpenMatch) => void
-  onOpenRequests: (match: OpenMatch) => void
-  onCancel: (match: OpenMatch) => void
+  /** Abre a modal da partida (detalhes e chats) */
+  onOpen: (match: OpenMatch) => void
 }
 
 /** Uma partida do matchmaking, com a ação certa para quem está vendo (visitante, interessado ou host) */
-export function MatchCard({
-  match,
-  signedIn,
-  busy,
-  onSignIn,
-  onJoin,
-  onWithdraw,
-  onOpenRequests,
-  onCancel,
-}: MatchCardProps) {
+export function MatchCard({ match, onOpen, ...actions }: MatchCardProps) {
   const date = matchDateParts(match.scheduledAt)
   const cancelled = match.status === 'CANCELLED'
   const full = match.seatsLeft <= 0
@@ -36,7 +22,13 @@ export function MatchCard({
   const game = match.game
 
   return (
-    <article className={cx('match-card', cancelled && 'match-card--cancelled', match.isHost && 'match-card--host')}>
+    <article
+      className={cx(
+        'match-card',
+        cancelled && 'match-card--cancelled',
+        match.isHost && 'match-card--host',
+      )}
+    >
       <div className="match-card__media">
         {game && (
           <GameCover
@@ -51,12 +43,17 @@ export function MatchCard({
           <span className="match-card__day">{date.day}</span>
           <span className="match-card__month">{date.month}</span>
         </div>
-        {match.isHost && <span className="match-card__badge">Você hospeda</span>}
+        {match.isHost && <span className="badge match-card__badge">Você hospeda</span>}
       </div>
 
       <div className="match-card__body">
-        <h3 className="match-card__title">{game?.name ?? 'Jogo removido'}</h3>
-        {game?.category && <span className="match-card__category">{game.category}</span>}
+        <h3 className="match-card__title">
+          {/* O botão cobre o card inteiro (::after); as ações ficam por cima */}
+          <button type="button" className="match-card__open" onClick={() => onOpen(match)}>
+            {game?.name ?? 'Jogo removido'}
+          </button>
+        </h3>
+        {game?.category && <span className="badge badge--outline match-card__category">{game.category}</span>}
 
         <ul className="match-card__facts">
           <li>
@@ -99,46 +96,7 @@ export function MatchCard({
         )}
 
         <div className="match-card__actions">
-          {cancelled ? (
-            <span className="match-card__state match-card__state--muted">
-              {match.isHost ? 'Você cancelou' : 'Cancelada pelo host'}
-            </span>
-          ) : match.isHost ? (
-            <>
-              <Button type="button" onClick={() => onOpenRequests(match)}>
-                Pedidos{match.pendingRequests ? ` (${match.pendingRequests})` : ''}
-              </Button>
-              <Button type="button" variant="link" disabled={busy} onClick={() => onCancel(match)}>
-                Cancelar partida
-              </Button>
-            </>
-          ) : request?.status === 'PENDING' ? (
-            <>
-              <span className="match-card__state">Aguardando o host</span>
-              <Button type="button" variant="link" disabled={busy} onClick={() => onWithdraw(match)}>
-                Desistir
-              </Button>
-            </>
-          ) : request?.status === 'ACCEPTED' ? (
-            <>
-              <span className="match-card__state match-card__state--ok">Você está dentro!</span>
-              <Button type="button" variant="link" disabled={busy} onClick={() => onWithdraw(match)}>
-                Desistir
-              </Button>
-            </>
-          ) : request?.status === 'REJECTED' ? (
-            <span className="match-card__state match-card__state--muted">Pedido recusado</span>
-          ) : !signedIn ? (
-            <Button type="button" variant="secondary" onClick={onSignIn}>
-              Entre para pedir vaga
-            </Button>
-          ) : full ? (
-            <span className="match-card__state match-card__state--muted">Lotada</span>
-          ) : (
-            <Button type="button" onClick={() => onJoin(match)}>
-              Pedir para entrar
-            </Button>
-          )}
+          <MatchActions match={match} {...actions} />
         </div>
       </div>
     </article>

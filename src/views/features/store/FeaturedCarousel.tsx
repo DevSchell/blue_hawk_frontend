@@ -1,17 +1,16 @@
 import { useEffect, useState } from 'react'
 import type { StoreOffer } from '../../../models/store'
-import { Button } from '../../components/Button/Button'
 import { cx } from '../../utils/classNames'
 import { formatPlayers } from '../boardgames/format'
 import { formatPrice, formatSince } from './format'
 import { StoreCover } from './StoreCard'
 import './FeaturedCarousel.css'
+import { storeOfferPath } from '../../layout/navigation'
 
 const AUTOPLAY_MS = 5000
 
 type FeaturedCarouselProps = {
   offers: StoreOffer[]
-  onOpen: (offer: StoreOffer) => void
 }
 
 function prefersReducedMotion() {
@@ -22,7 +21,7 @@ function prefersReducedMotion() {
  * Destaques no topo da Loja: capa grande + painel de informações, miniaturas embaixo para pular.
  * Passa sozinho a cada 5s; pausa com o mouse em cima, com o foco dentro, ou se o sistema pede menos movimento.
  */
-export function FeaturedCarousel({ offers, onOpen }: FeaturedCarouselProps) {
+export function FeaturedCarousel({ offers }: FeaturedCarouselProps) {
   const [index, setIndex] = useState(0)
   const [paused, setPaused] = useState(false)
   const count = offers.length
@@ -64,16 +63,16 @@ export function FeaturedCarousel({ offers, onOpen }: FeaturedCarouselProps) {
           aria-roledescription="slide"
           aria-label={`${Math.min(index, count - 1) + 1} de ${count}: ${game.name}`}
         >
-          <button type="button" className="featured__media" onClick={() => onOpen(current)} tabIndex={-1}>
+          <a className="featured__media" href={storeOfferPath(current.id)} tabIndex={-1} aria-hidden="true">
             <StoreCover offer={current} />
-          </button>
+          </a>
           <div className="featured__info">
             <span className="featured__kicker">Novo na Loja • {formatSince(current.createdAt)}</span>
             <h3 className="featured__title">{game.name}</h3>
             <div className="featured__tags">
-              {game.category && <span className="featured__tag">{game.category}</span>}
+              {game.category && <span className="badge featured__tag">{game.category}</span>}
               {facts.map((fact) => (
-                <span key={fact} className="featured__fact">
+                <span key={fact} className="badge featured__fact">
                   {fact}
                 </span>
               ))}
@@ -85,9 +84,9 @@ export function FeaturedCarousel({ offers, onOpen }: FeaturedCarouselProps) {
                 vendido por <b>{current.isMine ? 'você' : current.sellerName}</b>
               </span>
             </div>
-            <Button type="button" onClick={() => onOpen(current)}>
+            <a className="button button--primary featured__cta" href={storeOfferPath(current.id)}>
               Ver anúncio
-            </Button>
+            </a>
           </div>
         </div>
 

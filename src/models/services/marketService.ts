@@ -1,4 +1,5 @@
 import type { Match, MatchParticipant, MatchWithPlayers, Offer, UserBoardgame } from '../market'
+import type { OfferDetailsInput } from '../offerDetails'
 import { apiGet, apiPost } from './apiClient'
 
 /** Tamanho de página usado nas listas da modal do jogo (a API pagina tudo, padrão 10) */
@@ -45,11 +46,14 @@ export function addCopy(userId: string, boardgameId: string) {
   return apiPost<UserBoardgame>('/user-boardgames', { userId, boardgameId })
 }
 
-export function createOffer(userBoardgameId: string, price: number, description: string) {
+/** Anuncia uma cópia da estante: preço, estado de conservação, formas de entrega e descrição */
+export function createOffer(userBoardgameId: string, details: OfferDetailsInput) {
   return apiPost<Offer>('/offers', {
     userBoardgameId,
-    price,
     status: 'ACTIVE',
-    description: description || null,
+    price: details.price,
+    condition: details.condition,
+    deliveryMethod: details.deliveryMethod,
+    description: details.description,
   })
 }

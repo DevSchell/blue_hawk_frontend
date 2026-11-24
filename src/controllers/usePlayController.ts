@@ -1,7 +1,9 @@
 import { useEffect, useState } from 'react'
 import type { OpenMatch } from '../models/openMatch'
 import { readUserId } from '../models/session'
-import { cancelMatch, cancelMyRequest, listOpenMatches } from '../models/services/openMatchService'
+import { cancelMyRequest, listOpenMatches } from '../models/services/openMatchService'
+import { matchPath } from '../views/layout/navigation'
+import { navigate } from '../views/layout/router'
 import { useDebouncedValue } from './useDebouncedValue'
 
 export type PlayTab = 'abertas' | 'minhas'
@@ -28,7 +30,10 @@ export function usePlayController() {
   const [joining, setJoining] = useState<OpenMatch | null>(null)
   const [managing, setManaging] = useState<OpenMatch | null>(null)
   const [isHosting, setIsHosting] = useState(false)
-  const [busyId, setBusyId] = useState<string | null>(null)
+  const [cancelling, setCancelling] = useState<OpenMatch | null>(null)
+  const [withdrawing, setWithdrawing] = useState<OpenMatch | null>(null)
+  // As ações de cancelar e desistir rodam nas modais de confirmação (que mostram o próprio "carregando")
+  const busyId: string | null = null
   const [toast, setToast] = useState<string | null>(null)
 
   const fetchKey = `${tab}\u0000${tab === 'minhas' ? '' : cityQuery}\u0000${attempt}`
@@ -53,19 +58,8 @@ export function usePlayController() {
   const reload = () => setAttempt((n) => n + 1)
 
   /** Troca uma partida da lista pela versão que a API devolveu */
-  const replace = (updated: OpenMatch) =>
+  const replace = (updated: OpenMatch) => {
     setState((prev) => ({ ...prev, matches: prev.matches.map((m) => (m.id === updated.id ? updated : m)) }))
-
-  async function run(match: OpenMatch, action: () => Promise<OpenMatch>, success: string) {
-    setBusyId(match.id)
-    try {
-      replace(await action())
-      setToast(success)
-    } catch {
-      setToast('Não deu para concluir. Tente de novo.')
-    } finally {
-      setBusyId(null)
-    }
   }
 
   return {
@@ -97,8 +91,16 @@ export function usePlayController() {
       setJoining(null)
       setToast(`Pedido enviado para ${updated.host.name}. Você recebe a resposta aqui.`)
     },
-    withdraw: (match: OpenMatch) =>
-      run(match, () => cancelMyRequest(match.id), 'Você desistiu da partida.'),
+    /** Desistir pede confirmação; a modal chama confirmWithdraw */
+    withdrawing,
+    withdraw: (match: OpenMatch) => setWithdrawing(match),
+    closeWithdraw: () => setWithdrawing(null),
+    confirmWithdraw: async () => {
+      if (!withdrawing) return
+      replace(await cancelMyRequest(withdrawing.id))
+      setWithdrawing(null)
+      setToast('Você desistiu da partida.')
+    },
 
     isHosting,
     openHost: () => setIsHosting(true),
@@ -108,7 +110,18 @@ export function usePlayController() {
       setToast(`Partida de ${created.game?.name ?? 'jogo'} aberta em ${created.city}!`)
       reload()
     },
-    cancel: (match: OpenMatch) => run(match, () => cancelMatch(match.id), 'Partida cancelada.'),
+    /** Abre a confirmação (com o motivo); o cancelamento é feito pela modal */
+    cancelling,
+    cancel: (match: OpenMatch) => setCancelling(match),
+    closeCancel: () => setCancelling(null),
+    cancelled: (updated: OpenMatch) => {
+      replace(updated)
+      setCancelling(null)
+      setToast('Partida cancelada. Os jogadores foram avisados.')
+    },
+
+    /** Abre a página da partida (ficha e chats) */
+    openMatch: (match: OpenMatch) => navigate(matchPath(match.id)),
 
     managing,
     openRequests: (match: OpenMatch) => setManaging(match),

@@ -3,9 +3,18 @@
  * Centraliza validações, cálculo de patches e resolução de abas para uso na UI e testes.
  */
 
-export type ProfileTabId = 'dados' | 'foto' | 'atividades' | 'preferencias'
+export type ProfileTabId = 'dados' | 'foto' | 'atividades' | 'preferencias' | 'aparencia' | 'senha' | 'conta'
 
-export const VALID_PROFILE_TABS: readonly ProfileTabId[] = ['dados', 'foto', 'atividades', 'preferencias'] as const
+/** Abas do perfil em dois grupos: o perfil em si e as configurações da conta */
+export const PROFILE_TAB_GROUPS: readonly { label: string; tabs: readonly ProfileTabId[] }[] = [
+  { label: 'Seu perfil', tabs: ['dados', 'foto', 'atividades'] },
+  { label: 'Configurações', tabs: ['preferencias', 'aparencia', 'senha', 'conta'] },
+]
+
+export const VALID_PROFILE_TABS: readonly ProfileTabId[] = PROFILE_TAB_GROUPS.flatMap((group) => group.tabs)
+
+/** Primeira aba de configurações: destino do antigo /configuracoes */
+export const FIRST_SETTINGS_TAB: ProfileTabId = 'preferencias'
 
 export const MAX_NAME_LENGTH = 150
 export const MAX_EMAIL_LENGTH = 150

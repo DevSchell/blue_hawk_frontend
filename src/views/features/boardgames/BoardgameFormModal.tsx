@@ -9,6 +9,7 @@ import { TextField } from '../../components/TextField/TextField'
 import { cx } from '../../utils/classNames'
 import { COVER_PRESETS } from './coverPresets'
 import { GameCover } from './GameCover'
+import { FormActions } from '../../components/FormActions/FormActions'
 import '../auth/AuthForm.css'
 import './BoardgameFormModal.css'
 
@@ -38,7 +39,7 @@ export function BoardgameFormModal({ game = null, isAdmin, onSaved, onClose }: B
       ? 'Corrija os dados e o jogo volta para a fila de aprovação.'
       : 'Ajuste os dados enquanto o jogo aguarda aprovação.'
     : isAdmin
-      ? 'Como admin, o jogo entra direto no catálogo da Wiki e na sua estante.'
+      ? 'Como admin, o jogo entra direto no catálogo da Wiki, já aprovado.'
       : 'Ele entra na sua estante na hora e aparece na Wiki depois que um admin aprovar.'
 
   return (
@@ -145,11 +146,7 @@ export function BoardgameFormModal({ game = null, isAdmin, onSaved, onClose }: B
               </CoverOption>
             )}
             {c.cover.kind !== 'upload' && currentImageUrl && (
-              <CoverOption
-                checked={c.cover.kind === 'current'}
-                label="Foto atual"
-                onSelect={c.chooseCurrent}
-              >
+              <CoverOption checked={c.cover.kind === 'current'} label="Foto atual" onSelect={c.chooseCurrent}>
                 <img src={currentImageUrl} alt={`Foto atual de ${previewName}`} />
               </CoverOption>
             )}
@@ -182,17 +179,19 @@ export function BoardgameFormModal({ game = null, isAdmin, onSaved, onClose }: B
           <small className="text-field__hint">JPEG, PNG ou WebP. A foto é ajustada ao formato da capa.</small>
         </fieldset>
 
-        <Button type="submit" fullWidth disabled={c.isSaving || c.processingImage}>
-          {c.isSaving
-            ? 'Salvando…'
-            : c.isEditing
-              ? game?.approvalStatus === 'REJECTED'
-                ? 'Salvar e reenviar'
-                : 'Salvar alterações'
-              : isAdmin
-                ? 'Cadastrar no catálogo'
-                : 'Cadastrar e enviar para aprovação'}
-        </Button>
+        <FormActions onCancel={onClose} busy={c.isSaving}>
+          <Button type="submit" disabled={c.isSaving || c.processingImage}>
+            {c.isSaving
+              ? 'Salvando…'
+              : c.isEditing
+                ? game?.approvalStatus === 'REJECTED'
+                  ? 'Salvar e reenviar'
+                  : 'Salvar alterações'
+                : isAdmin
+                  ? 'Cadastrar no catálogo'
+                  : 'Cadastrar e enviar para aprovação'}
+          </Button>
+        </FormActions>
       </form>
     </Modal>
   )

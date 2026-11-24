@@ -5,12 +5,16 @@ import { Alert } from '../../components/Alert/Alert'
 import { Raven } from '../../components/Brand/Raven'
 import { Button } from '../../components/Button/Button'
 import { Container } from '../../components/Container/Container'
+import { LoadingCard } from '../../components/LoadingCard/LoadingCard'
+import { PageHeader } from '../../components/PageHeader/PageHeader'
+import { PillTabs } from '../../components/PillTabs/PillTabs'
 import { EmptyState } from '../../components/EmptyState/EmptyState'
 import { FeedError } from '../../features/boardgames/FeedError'
 import { formatPlayers } from '../../features/boardgames/format'
 import { GameCover } from '../../features/boardgames/GameCover'
 import './ReviewPage.css'
 import { coverOf } from '../../../models/services/boardgameService'
+import { FormActions } from '../../components/FormActions/FormActions'
 
 const TABS: { id: ReviewTab; label: string }[] = [
   { id: 'PENDING', label: 'Pendentes' },
@@ -27,7 +31,7 @@ export function ReviewPage({ onSignIn }: ReviewPageProps) {
 
   if (!c.signedIn || !c.isAdmin) {
     return (
-      <main className="review-page">
+      <main className="page">
         <Container>
           <EmptyState
             icon={<Raven variant="noite" />}
@@ -52,30 +56,19 @@ export function ReviewPage({ onSignIn }: ReviewPageProps) {
   }
 
   return (
-    <main className="review-page">
+    <main className="page">
       <Container>
-        <header className="review-page__header">
-          <h1 className="review-page__title">Aprovação de jogos</h1>
-          <p className="review-page__lead">
-            Jogos cadastrados pelos usuários. Aprovados entram na Wiki; recusados ficam só na estante de quem enviou.
-          </p>
-        </header>
+        <PageHeader
+          title="Aprovação de jogos"
+          lead="Jogos cadastrados pelos usuários. Aprovados entram na Wiki; recusados ficam só na estante de quem enviou."
+        />
 
-        <div role="tablist" aria-label="Situação dos jogos" className="review-page__tabs">
-          {TABS.map((t) => (
-            <button
-              key={t.id}
-              type="button"
-              role="tab"
-              aria-selected={c.tab === t.id}
-              className="review-page__tab"
-              onClick={() => c.selectTab(t.id)}
-            >
-              {t.label}
-              {c.tab === t.id && !c.loading && <span className="review-page__count">{c.games.length}</span>}
-            </button>
-          ))}
-        </div>
+        <PillTabs
+          label="Situação dos jogos"
+          tabs={TABS.map((t) => ({ ...t, badge: c.tab === t.id && !c.loading ? c.games.length : undefined }))}
+          value={c.tab}
+          onChange={c.selectTab}
+        />
 
         <div aria-live="polite">
           {c.notice && (
@@ -88,9 +81,7 @@ export function ReviewPage({ onSignIn }: ReviewPageProps) {
         </div>
 
         {c.loading ? (
-          <p className="review-page__loading" aria-busy="true">
-            Carregando a fila…
-          </p>
+          <LoadingCard message="Carregando a fila…" />
         ) : c.error ? (
           <FeedError error={c.error} onRetry={c.retry} />
         ) : c.games.length === 0 ? (
@@ -148,14 +139,11 @@ function ReviewItem({ game, c }: { game: Boardgame; c: ReturnType<typeof useRevi
               onChange={(e) => c.setRejectReason(e.target.value)}
               autoFocus
             />
-            <div className="review-item__actions">
+            <FormActions onCancel={c.cancelReject} busy={busy}>
               <Button type="button" disabled={busy} onClick={() => c.confirmReject(game)}>
                 {busy ? 'Recusando…' : 'Confirmar recusa'}
               </Button>
-              <Button type="button" variant="secondary" disabled={busy} onClick={c.cancelReject}>
-                Cancelar
-              </Button>
-            </div>
+            </FormActions>
           </div>
         ) : (
           <div className="review-item__actions">

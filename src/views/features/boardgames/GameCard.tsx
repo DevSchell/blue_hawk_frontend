@@ -5,14 +5,14 @@ import { GameCover } from './GameCover'
 import { coverOf } from '../../../models/services/boardgameService'
 import { LikeButton } from './LikeButton'
 import './GameCard.css'
+import { gamePath } from '../../layout/navigation'
 
 type GameCardProps = {
   game: Boardgame
   /** Abre os detalhes do jogo; o card inteiro é clicável */
-  onOpen: (game: Boardgame) => void
 }
 
-export function GameCard({ game, onOpen }: GameCardProps) {
+export function GameCard({ game }: GameCardProps) {
   const details = [
     game.playerNumber ? formatPlayers(game.playerNumber) : null,
     game.playTime ? `${game.playTime} min` : null,
@@ -27,10 +27,10 @@ export function GameCard({ game, onOpen }: GameCardProps) {
       <div className="game-card__body">
         <CategoryTag game={game} className="game-card__category" />
         <h3 className="game-card__title">
-          {/* O botão fica no título (é o nome acessível) e se estende pelo card todo */}
-          <button type="button" className="game-card__open" aria-haspopup="dialog" onClick={() => onOpen(game)}>
+          {/* O link fica no título (é o nome acessível) e se estende pelo card todo: abre a página do jogo */}
+          <a className="game-card__open" href={gamePath(game.id)}>
             {game.name}
-          </button>
+          </a>
         </h3>
         {details.length > 0 && <p className="game-card__tags">{details.join(' · ')}</p>}
         {game.description && <p className="game-card__desc">{game.description}</p>}

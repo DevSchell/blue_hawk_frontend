@@ -1,0 +1,174 @@
+/* Lista de Minhas partidas: um bloco só, linhas separadas por fio */
+.match-list {
+  display: grid;
+  /* As linhas usam subgrid: vagas e ações ficam alinhadas em coluna */
+  grid-template-columns: 56px minmax(0, 1fr) auto auto;
+  column-gap: 18px;
+  padding: 0;
+  margin: 0;
+  list-style: none;
+  background: var(--surface);
+  box-shadow: inset 0 0 0 1px var(--surface-edge);
+  clip-path: polygon(0 0, 100% 0, 100% calc(100% - var(--corte)), calc(100% - var(--corte)) 100%, 0 100%);
+}
+
+.match-row {
+  display: grid;
+  grid-column: 1 / -1;
+  grid-template-columns: subgrid;
+  align-items: center;
+  row-gap: 10px;
+  padding: 14px 20px;
+}
+
+.match-row + .match-row {
+  border-top: 1px solid var(--line);
+}
+
+/* Fio açafrão à esquerda nas partidas que você hospeda */
+.match-row--host {
+  box-shadow: inset 4px 0 0 var(--acafrao);
+}
+
+.match-row--cancelled {
+  opacity: 0.6;
+}
+
+.match-row__date {
+  display: grid;
+  justify-items: center;
+  padding: 6px 0 7px;
+  background: var(--giz);
+  color: var(--noite);
+  line-height: 1;
+  clip-path: polygon(0 0, 100% 0, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0 100%);
+}
+
+.match-row__day {
+  font: 800 24px/1 var(--display);
+}
+
+.match-row__month {
+  margin-top: 2px;
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.match-row__title {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 10px;
+  font-size: 22px;
+  line-height: 1.1;
+  overflow-wrap: anywhere;
+}
+
+.match-row__host-badge {
+  align-self: center;
+  background: var(--acafrao);
+  color: var(--noite);
+}
+
+.match-row__meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px 14px;
+  margin-top: 4px;
+  font-size: 14px;
+  color: var(--text-muted);
+}
+
+.match-row__meta > span:first-child::first-letter {
+  text-transform: uppercase;
+}
+
+.match-row__meta-item,
+.match-row__seats {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.match-row__meta .icon,
+.match-row__seats .icon {
+  width: 15px;
+  height: 15px;
+  color: var(--claro);
+}
+
+:root[data-theme='light'] .match-row__meta .icon,
+:root[data-theme='light'] .match-row__seats .icon {
+  color: var(--ultramar);
+}
+
+.match-row__seats {
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+}
+
+.match-row__actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 6px 14px;
+}
+
+@media (max-width: 700px) {
+  .match-list {
+    grid-template-columns: 52px minmax(0, 1fr) auto;
+    column-gap: 14px;
+  }
+
+  .match-row {
+    padding: 14px 16px;
+  }
+
+  .match-row__actions {
+    grid-column: 2 / -1;
+    justify-content: flex-start;
+  }
+}
+
+/* A linha inteira abre a modal da partida; as ações ficam acima da camada clicável */
+.match-row {
+  position: relative;
+  cursor: pointer;
+}
+
+.match-row:hover {
+  background: var(--hover);
+}
+
+.match-row__open {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.match-row__open::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+}
+
+.match-row__open:focus-visible {
+  outline: 0;
+}
+
+.match-row:has(.match-row__open:focus-visible) {
+  outline: 3px solid var(--acafrao);
+  outline-offset: -3px;
+}
+
+.match-row__actions,
+.match-row__host-badge {
+  position: relative;
+  z-index: 1;
+}

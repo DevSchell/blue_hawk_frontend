@@ -31,10 +31,6 @@
 }
 
 .market__empty,
-.market__loading {
-  color: var(--text-muted);
-}
-
 /* Card no mesmo bloco dos números do jogo: fundo da página, canto cortado */
 .market-card {
   display: flex;
@@ -86,20 +82,6 @@
   color: var(--text-muted);
 }
 
-.market-card__note {
-  font-size: 14px;
-  font-weight: 600;
-  color: var(--claro);
-}
-
-:root[data-theme='light'] .market-card__note {
-  color: var(--ultramar);
-}
-
-.market-card__note--warn {
-  color: var(--acafrao);
-}
-
 .market-card .button {
   padding: 10px 18px;
   font-size: 15px;
@@ -110,6 +92,19 @@
   font-size: 14px;
   font-weight: 800;
   color: var(--text-muted);
+}
+
+.market-card__actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px 14px;
+}
+
+.market-card__open {
+  text-decoration: none;
+  white-space: nowrap;
 }
 
 .market-form {
@@ -140,4 +135,10 @@
 
 .market__link:hover {
   color: var(--acafrao);
+}
+
+.market-card__condition {
+  justify-self: start;
+  background: var(--claro);
+  color: var(--noite);
 }

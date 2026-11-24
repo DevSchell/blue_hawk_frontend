@@ -1,0 +1,203 @@
+/* Filtros em linha (Estante, Loja): select com prefixo e o dropdown de seleção múltipla */
+.filter-select {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 40px;
+  padding: 6px 10px;
+  border: 0;
+  background: var(--surface);
+  color: var(--text);
+  font: inherit;
+  box-shadow: inset 0 0 0 1px var(--line);
+  clip-path: polygon(0 0, 100% 0, 100% calc(100% - 9px), calc(100% - 9px) 100%, 0 100%);
+}
+
+.filter-select__prefix {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--claro);
+  white-space: nowrap;
+}
+
+:root[data-theme='light'] .filter-select__prefix {
+  color: var(--ultramar);
+}
+
+.filter-select__prefix .icon {
+  width: 14px;
+  height: 14px;
+  color: var(--acafrao);
+}
+
+:root[data-theme='light'] .filter-select__prefix .icon {
+  color: var(--ultramar);
+}
+
+.filter-select select {
+  border: 0;
+  background: transparent;
+  color: var(--text);
+  font-size: 13px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.filter-select select option {
+  background: var(--noite);
+  color: var(--giz);
+}
+
+.filter-select:has(select:focus-visible) {
+  outline: 2px solid var(--acafrao);
+  outline-offset: 2px;
+}
+
+.filter-select__chevron {
+  flex: none;
+  width: 16px;
+  height: 16px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2.4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* ---------- Seleção múltipla ---------- */
+.multi-select {
+  position: relative;
+}
+
+.multi-select__trigger {
+  cursor: pointer;
+}
+
+.multi-select__trigger:focus-visible {
+  outline: 2px solid var(--acafrao);
+  outline-offset: 2px;
+}
+
+/* Com opções marcadas: fio açafrão, como os filtros ativos */
+.multi-select__trigger.is-filtered {
+  box-shadow: inset 0 0 0 2px var(--acafrao);
+}
+
+.multi-select__trigger[aria-expanded='true'] .filter-select__chevron {
+  rotate: 180deg;
+}
+
+.multi-select__value {
+  max-width: 160px;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.multi-select__panel {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  z-index: 30;
+  display: grid;
+  gap: 6px;
+  min-width: 220px;
+  padding: 8px;
+  background: var(--surface);
+  box-shadow:
+    inset 0 0 0 1px var(--line),
+    0 14px 30px rgb(4 7 36 / 0.35);
+}
+
+.multi-select__list {
+  display: grid;
+  gap: 2px;
+  padding: 0;
+  margin: 0;
+  list-style: none;
+}
+
+.multi-select__option {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.multi-select__option:hover {
+  background: var(--hover);
+}
+
+.multi-select__option:has(input:focus-visible) {
+  outline: 2px solid var(--acafrao);
+  outline-offset: -2px;
+}
+
+/* O checkbox nativo fica para teclado e leitor de tela; o quadrado é o visual */
+.multi-select__option input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.multi-select__box {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 18px;
+  height: 18px;
+  box-shadow: inset 0 0 0 2px var(--claro);
+  color: var(--noite);
+}
+
+.multi-select__option.is-checked .multi-select__box {
+  background: var(--acafrao);
+  box-shadow: none;
+}
+
+.multi-select__box .icon {
+  width: 14px;
+  height: 14px;
+  stroke-width: 3;
+}
+
+.multi-select__name {
+  flex: 1;
+}
+
+.multi-select__count {
+  font-size: 12px;
+  color: var(--text-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.multi-select__clear {
+  justify-self: start;
+  padding: 6px 8px;
+  border: 0;
+  background: none;
+  color: var(--claro);
+  font: 800 12px/1 var(--texto);
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+:root[data-theme='light'] .multi-select__clear {
+  color: var(--ultramar);
+}
+
+.multi-select__clear:disabled {
+  opacity: 0.4;
+  cursor: default;
+}

@@ -25,40 +25,6 @@
   padding: 20px;
 }
 
-.user-menu__profile-link {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  padding: 20px;
-  text-decoration: none;
-  color: inherit;
-  transition: background 0.15s ease;
-}
-
-.user-menu__profile-link:hover {
-  background: rgba(126, 146, 255, 0.08);
-}
-
-.user-menu__profile-meta {
-  display: flex;
-  flex-direction: column;
-}
-
-.user-menu__edit-photo-hint {
-  font-size: 12px;
-  color: var(--acafrao);
-  margin-top: 4px;
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-  font-weight: 700;
-}
-
-.user-menu__edit-photo-hint svg {
-  width: 14px;
-  height: 14px;
-}
-
 .user-menu__profile small {
   display: block;
   font-size: 14px;
@@ -69,13 +35,21 @@
   font: 800 30px/1 var(--display);
 }
 
+/* Rodapé fixo no fim da gaveta: modo escuro e sair, juntos */
+.user-menu__footer {
+  margin-top: auto;
+  border-top: 1px solid var(--line);
+}
+
+.user-menu__footer .menu-list {
+  border-top: 0;
+}
+
 .user-menu__theme {
   display: flex;
   align-items: center;
   gap: 14px;
-  margin-top: auto;
-  padding: 16px 20px;
-  border-top: 1px solid var(--line);
+  padding: 14px 20px;
   font-weight: 600;
 }
 

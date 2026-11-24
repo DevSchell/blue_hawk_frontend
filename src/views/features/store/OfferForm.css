@@ -1,0 +1,81 @@
+/* Formulário de anúncio: preço, estado, entrega e descrição */
+.offer-form {
+  display: grid;
+  gap: 16px;
+}
+
+.offer-form__group {
+  display: grid;
+  gap: 8px;
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.offer-form__group legend {
+  margin-bottom: 8px;
+  padding: 0;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.offer-form__options {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 8px;
+}
+
+/* Cada opção é um cartão clicável (o input nativo fica para teclado e leitor de tela) */
+.offer-option {
+  position: relative;
+  display: grid;
+  align-content: start;
+  gap: 2px;
+  padding: 10px 12px;
+  background: var(--bg);
+  cursor: pointer;
+  box-shadow: inset 0 0 0 1px var(--line);
+  clip-path: polygon(0 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%);
+}
+
+.offer-option input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.offer-option:hover {
+  box-shadow: inset 0 0 0 1px var(--claro);
+}
+
+.offer-option.is-on {
+  box-shadow: inset 0 0 0 2px var(--acafrao);
+}
+
+.offer-option:has(input:focus-visible) {
+  outline: 2px solid var(--acafrao);
+  outline-offset: 2px;
+}
+
+.offer-option__title {
+  font-size: 14px;
+  font-weight: 800;
+}
+
+.offer-option__hint {
+  font-size: 12px;
+  line-height: 1.35;
+  color: var(--text-muted);
+}
+
+.offer-form__description {
+  min-height: 96px;
+  resize: vertical;
+  font: inherit;
+}
+
+.offer-form__count.is-short {
+  color: var(--acafrao);
+}
+

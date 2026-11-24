@@ -3,7 +3,7 @@
   flex-direction: column;
   min-width: 0;
   background: var(--surface);
-  box-shadow: 0 0 0 1px var(--surface-edge);
+  box-shadow: inset 0 0 0 1px var(--surface-edge);
   clip-path: polygon(0 0, 100% 0, 100% calc(100% - 18px), calc(100% - 18px) 100%, 0 100%);
 }
 
@@ -80,13 +80,8 @@
   position: absolute;
   top: 10px;
   right: 10px;
-  padding: 4px 10px;
   background: var(--acafrao);
   color: var(--noite);
-  font-size: 10px;
-  font-weight: 800;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
 }
 
 .match-card__body {
@@ -104,18 +99,10 @@
 }
 
 .match-card__category {
-  align-self: flex-start;
-  border: 1.5px solid var(--acafrao);
   color: var(--acafrao);
-  padding: 2px 8px;
-  font-size: 11px;
-  font-weight: 800;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
 }
 
 :root[data-theme='light'] .match-card__category {
-  border-color: var(--ultramar);
   color: var(--ultramar);
 }
 
@@ -212,11 +199,6 @@
   padding-top: 10px;
 }
 
-.match-card__actions .button:not(.button--link) {
-  padding: 10px 20px;
-  font-size: 14px;
-}
-
 .match-card__state {
   font-size: 13px;
   font-weight: 800;
@@ -235,6 +217,59 @@
   color: #8a5a00;
 }
 
+/* Situação do meu pedido, em badge padrão: dentro (açafrão) ou aguardando (contorno) */
+.match-state {
+  display: inline-flex;
+  align-items: center;
+  align-self: center;
+  min-height: 38px;
+  padding: 0 14px;
+  font-size: 12px;
+  --cut: 10px;
+  clip-path: polygon(0 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%);
+}
+
+.match-state--in {
+  background: var(--acafrao);
+  color: var(--noite);
+}
+
 .match-card__state--muted {
   color: var(--text-muted);
+}
+
+
+/* O card inteiro abre a modal da partida; ações e links ficam acima da camada clicável */
+.match-card {
+  position: relative;
+}
+
+.match-card__open {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.match-card__open::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+}
+
+.match-card__open:focus-visible {
+  outline: 0;
+}
+
+.match-card:has(.match-card__open:focus-visible) {
+  outline: 3px solid var(--acafrao);
+  outline-offset: 2px;
+}
+
+.match-card__actions {
+  position: relative;
+  z-index: 1;
 }

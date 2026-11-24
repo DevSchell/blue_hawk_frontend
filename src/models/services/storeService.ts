@@ -8,3 +8,8 @@ export function listStoreOffers(
 ) {
   return apiGet<StoreOffer[]>('/store/offers', params, signal)
 }
+
+/** Um anúncio (página do produto). 404 quando não está mais à venda. */
+export function getStoreOffer(offerId: string, signal?: AbortSignal) {
+  return apiGet<StoreOffer>(`/store/offers/${encodeURIComponent(offerId)}`, {}, signal)
+}

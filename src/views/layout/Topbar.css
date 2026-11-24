@@ -11,6 +11,9 @@
 
 /* Menu do usuário fica na ponta direita */
 .topbar__end {
+  display: flex;
+  align-items: center;
+  gap: 6px;
   margin-left: auto;
   flex-shrink: 0;
 }

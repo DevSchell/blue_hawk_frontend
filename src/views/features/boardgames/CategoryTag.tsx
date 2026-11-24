@@ -17,7 +17,7 @@ export function CategoryTag({ game, className }: { game: Boardgame; className?: 
 
   return (
     <span
-      className={cx('category-tag', isPreview && 'category-tag--preview', className)}
+      className={cx('badge', 'category-tag', isPreview && 'category-tag--preview', className)}
       title={isPreview ? 'Prévia: a API ainda não envia a categoria do jogo' : undefined}
     >
       {game.category || previewCategory(game.id)}

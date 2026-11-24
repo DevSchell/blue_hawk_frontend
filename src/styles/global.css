@@ -8,6 +8,8 @@
   --giz: #f3f4fc;
   --acafrao: #ffb000;
   --acafrao-hover: #ffc53d;
+  /* Ações destrutivas (desistir, cancelar): só no hover/foco */
+  --perigo: #e5484d;
 
   --marca: 'Grenze Gotisch', 'Times New Roman', serif;
   --display: 'Grenze', 'Times New Roman', serif;
@@ -28,6 +30,14 @@
   --overlay: rgb(11 17 71 / 0.72);
 
   color-scheme: dark;
+
+  /* Borda na diagonal do canto cortado: clip-path corta a box-shadow da borda no canto,
+     então este gradiente redesenha o fio na diagonal. Uso: background: var(--cut-edge-10), <cor>; */
+  --cut-edge-line: linear-gradient(to bottom right, transparent calc(50% - 1.2px), var(--surface-edge) calc(50% - 1.2px) 50%, transparent 50%);
+  --cut-edge-8: var(--cut-edge-line) right bottom / 8px 8px no-repeat;
+  --cut-edge-9: var(--cut-edge-line) right bottom / 9px 9px no-repeat;
+  --cut-edge-10: var(--cut-edge-line) right bottom / 10px 10px no-repeat;
+  --cut-edge-14: var(--cut-edge-line) right bottom / 14px 14px no-repeat;
 }
 
 :root[data-theme='light'] {
@@ -106,6 +116,37 @@ input {
   padding-right: max(20px, env(safe-area-inset-right, 0px));
 }
 
+/* Badge padrão (categoria, à venda, status...): mesmo texto, tamanho e canto cortado.
+   Cada badge define só as cores (fundo sólido ou contorno). */
+.badge {
+  display: inline-block;
+  align-self: flex-start;
+  justify-self: start;
+  padding: 3px 10px;
+  font: 800 11px/1.4 var(--texto);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  clip-path: polygon(0 0, 100% 0, 100% calc(100% - 6px), calc(100% - 6px) 100%, 0 100%);
+}
+
+/* Badge de contorno: o fundo é a cor da borda e uma camada interna (cor da superfície, mesmo recorte)
+   deixa só 1.5px de borda, que acompanha o canto cortado. O texto usa a mesma cor da borda. */
+.badge--outline {
+  position: relative;
+  isolation: isolate;
+  background: currentColor;
+}
+
+.badge--outline::before {
+  content: '';
+  position: absolute;
+  inset: 1.5px;
+  z-index: -1;
+  background: var(--badge-surface, var(--surface));
+  clip-path: polygon(0 0, 100% 0, 100% calc(100% - 5px), calc(100% - 5px) 100%, 0 100%);
+}
+
 .visually-hidden {
   position: absolute;
   width: 1px;
@@ -113,4 +154,53 @@ input {
   overflow: hidden;
   clip-path: inset(50%);
   white-space: nowrap;
+}
+
+/*
+ * Troca de tela: os links internos navegam sem recarregar (router.ts) dentro de uma View Transition.
+ * A topbar fica parada, a marca açafrão do menu desliza de um item para o outro (MainNav.css)
+ * e o conteúdo sai com um fade curto e entra subindo de leve. Recarregar a página (F5, link externo)
+ * usa a mesma animação entre documentos. Sem suporte no navegador, a troca é direta.
+ */
+@media (prefers-reduced-motion: no-preference) {
+  @view-transition {
+    navigation: auto;
+  }
+}
+
+.topbar {
+  view-transition-name: topbar;
+}
+
+/* A topbar não anima: só troca (o item ativo e a marca do menu cuidam do movimento) */
+::view-transition-old(topbar),
+::view-transition-new(topbar) {
+  animation: none;
+}
+
+::view-transition-old(root) {
+  animation: 0.2s cubic-bezier(0.4, 0, 1, 1) both pageOut;
+}
+
+::view-transition-new(root) {
+  animation: 0.38s cubic-bezier(0.16, 1, 0.3, 1) 0.06s both pageIn;
+}
+
+::view-transition-group(main-nav-indicator) {
+  animation-duration: 0.4s;
+  animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes pageOut {
+  to {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+}
+
+@keyframes pageIn {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
 }

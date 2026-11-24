@@ -1,0 +1,22 @@
+/* Mesmas medidas do título da Wiki, para todas as páginas falarem a mesma língua */
+.page-header {
+  margin-bottom: clamp(24px, 3vw, 36px);
+}
+
+.page-header__title {
+  font-size: clamp(40px, 5.5vw, 64px);
+  line-height: 1;
+  overflow-wrap: anywhere;
+}
+
+.page-header__lead {
+  margin-top: 10px;
+  max-width: 62ch;
+  color: var(--text-muted);
+}
+
+/* Página padrão: ocupa a altura livre e tem o mesmo respiro em cima e embaixo */
+.page {
+  flex: 1;
+  padding-block: clamp(40px, 6vw, 72px);
+}

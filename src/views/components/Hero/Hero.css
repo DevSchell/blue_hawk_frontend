@@ -51,3 +51,73 @@
     display: none;
   }
 }
+
+/* Título que surge: as palavras sobem uma a uma, e o texto e a busca chegam logo depois */
+.hero__word {
+  display: inline-block;
+  white-space: pre;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .hero__word {
+    animation: heroWordIn 0.7s cubic-bezier(0.2, 0.9, 0.25, 1) both;
+    animation-delay: calc(var(--i, 0) * 90ms + 80ms);
+  }
+
+  .hero__lead,
+  .hero__content > :not(.hero__title):not(.hero__lead) {
+    animation: heroFadeUp 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+    animation-delay: 0.55s;
+  }
+
+  .hero__content > :not(.hero__title):not(.hero__lead) {
+    animation-delay: 0.7s;
+  }
+
+  .hero__art {
+    animation: heroFadeUp 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+    animation-delay: 0.3s;
+  }
+}
+
+@keyframes heroWordIn {
+  from {
+    opacity: 0;
+    transform: translateY(0.55em) rotate(4deg);
+    filter: blur(4px);
+  }
+}
+
+@keyframes heroFadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+}
+
+/* Busca do hero com a ação principal ao lado (Wiki: cadastrar jogo; Jogue: hospedar partida) */
+.hero__search-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 12px;
+}
+
+.hero__search-row .search-field {
+  flex: 1 1 280px;
+}
+
+.hero__search-action {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  /* Mesma altura do campo de busca ao lado (padding 14px + linha de 17px × 1.6) */
+  min-height: calc(28px + 17px * 1.6);
+  padding: 0 22px 0 16px;
+  white-space: nowrap;
+}
+
+.hero__search-action .icon {
+  width: 18px;
+  height: 18px;
+}

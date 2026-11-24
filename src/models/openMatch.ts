@@ -27,6 +27,8 @@ export type OpenMatch = {
   seatsLeft: number
   /** Só vem para o host */
   pendingRequests: number | null
+  /** Motivo informado pelo host ao cancelar (null se não foi cancelada) */
+  cancelReason?: string | null
   notes: string | null
   host: { id: string; name: string }
   game: OpenMatchGame | null
@@ -56,4 +58,7 @@ export type HostMatchInput = {
 }
 
 export const MATCH_TEXT_MAX = 500
+/** Motivo do cancelamento: vai na notificação de quem pediu vaga */
+export const CANCEL_REASON_MIN = 10
+export const CANCEL_REASON_MAX = 300
 export const CITY_MAX = 100

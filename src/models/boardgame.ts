@@ -40,6 +40,8 @@ export type Category = {
 /** Query de GET /boardgames */
 export type ListBoardgamesParams = {
   name?: string
+  /** Nome da categoria (opcional) */
+  category?: string
   /** Padrão da API: APPROVED. PENDING/REJECTED só para admin. */
   status?: ApprovalStatus
   page?: number

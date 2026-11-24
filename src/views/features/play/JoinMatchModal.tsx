@@ -6,6 +6,7 @@ import { Alert } from '../../components/Alert/Alert'
 import { Button } from '../../components/Button/Button'
 import { Modal } from '../../components/Modal/Modal'
 import { formatMatchDate } from './format'
+import { FormActions } from '../../components/FormActions/FormActions'
 import '../auth/AuthForm.css'
 import './PlayModals.css'
 
@@ -17,7 +18,8 @@ type JoinMatchModalProps = {
 
 function errorMessage(error: unknown) {
   if (error instanceof ApiError) {
-    if (error.status === 409) return 'Essa partida não aceita mais pedidos (lotou, foi cancelada ou o host já respondeu).'
+    if (error.status === 409)
+      return 'Essa partida não aceita mais pedidos (lotou, foi cancelada ou o host já respondeu).'
     if (error.status === 401) return 'Sua sessão expirou. Entre de novo para continuar.'
     return `O servidor respondeu com erro (${error.status}). Tente de novo.`
   }
@@ -79,9 +81,11 @@ export function JoinMatchModal({ match, onJoined, onClose }: JoinMatchModalProps
             {match.host.name} vê sua mensagem e decide. A resposta aparece em “Minhas partidas”.
           </small>
         </div>
-        <Button type="submit" fullWidth disabled={sending}>
-          {sending ? 'Enviando…' : 'Enviar pedido'}
-        </Button>
+        <FormActions onCancel={onClose} busy={sending}>
+          <Button type="submit" disabled={sending}>
+            {sending ? 'Enviando…' : 'Enviar pedido'}
+          </Button>
+        </FormActions>
       </form>
     </Modal>
   )

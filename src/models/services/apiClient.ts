@@ -106,8 +106,8 @@ export const apiDelete = (path: string, signal?: AbortSignal) =>
   request<unknown>('DELETE', path, `DELETE ${path}`, undefined, signal)
 
 /** DELETE que devolve um corpo (ex.: o jogo atualizado depois de remover a capa) */
-export const apiDeleteJson = <T>(path: string, signal?: AbortSignal) =>
-  request<T>('DELETE', path, `DELETE ${path}`, undefined, signal)
+export const apiDeleteJson = <T>(path: string, signal?: AbortSignal, payload?: unknown) =>
+  request<T>('DELETE', path, `DELETE ${path}`, payload, signal)
 
 /** POST multipart (upload de arquivo), pela mesma fila das chamadas autenticadas */
 export const apiPostForm = <T>(path: string, form: FormData, signal?: AbortSignal) =>

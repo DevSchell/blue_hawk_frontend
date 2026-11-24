@@ -6,7 +6,7 @@ import {
   VALID_PROFILE_TABS,
   validatePhotoFile,
 } from '../views/pages/ProfilePage/profileUtils.ts'
-import { AVATAR_PRESETS } from '../views/pages/ProfilePage/avatarPresets.ts'
+import { AVATAR_PRESETS } from '../models/avatarPresets.ts'
 
 test('Foto de Perfil - validação de arquivo para upload via validatePhotoFile', () => {
   // Arquivos que não são imagem
@@ -57,7 +57,7 @@ test('Foto de Perfil - resolução de aba ativa via resolveProfileTab', () => {
 })
 
 test('Foto de Perfil - lista de abas válidas contém todas as seções esperadas', () => {
-  assert.deepStrictEqual([...VALID_PROFILE_TABS], ['dados', 'foto', 'atividades', 'preferencias'])
+  assert.deepStrictEqual([...VALID_PROFILE_TABS], ['dados', 'foto', 'atividades', 'preferencias', 'aparencia', 'senha', 'conta'])
 })
 
 test('Foto de Perfil - integridade dos presets temáticos do Blue Hawk', () => {

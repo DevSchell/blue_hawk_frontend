@@ -1,119 +1,69 @@
-import { useEffect, useState } from 'react'
-import type { User } from '../../../models/services/accountService'
-import { fetchAll } from '../../../models/services/shelfService'
-import type { MatchParticipant, Offer, UserBoardgame } from '../../../models/market'
+import type { ReactNode } from 'react'
+import type { ProfileStats } from '../../../controllers/useProfileStats'
 import { Button } from '../../components/Button/Button'
-import { ACCOUNT_ROUTES } from '../../layout/navigation'
 import { GamesIcon, MatchesIcon, TrophyIcon } from '../../components/Icons/Icons'
+import { ACCOUNT_ROUTES, MY_MATCHES_PATH, MY_OFFERS_PATH } from '../../layout/navigation'
+import { navigate } from '../../layout/router'
 
-type ProfileActivitiesProps = {
-  user: User
+type ActivityCard = {
+  value: number
+  label: string
+  text: string
+  action: string
+  href: string
+  icon: ReactNode
 }
 
-type Stats = {
-  gamesCount: number
-  offersCount: number
-  matchesCount: number
-  loading: boolean
-}
-
-export function ProfileActivities({ user }: ProfileActivitiesProps) {
-  const [stats, setStats] = useState<Stats>({
-    gamesCount: 0,
-    offersCount: 0,
-    matchesCount: 0,
-    loading: true,
-  })
-
-  useEffect(() => {
-    let cancelled = false
-    const abortController = new AbortController()
-
-    async function loadStats() {
-      try {
-        const [copies, offers, matches] = await Promise.all([
-          fetchAll<UserBoardgame>('/user-boardgames', { userId: user.id }, abortController.signal).catch(() => []),
-          fetchAll<Offer>('/offers', { userId: user.id }, abortController.signal).catch(() => []),
-          fetchAll<MatchParticipant>('/match-participants', { userId: user.id }, abortController.signal).catch(() => []),
-        ])
-
-        if (!cancelled) {
-          setStats({
-            gamesCount: copies.length,
-            offersCount: offers.length,
-            matchesCount: matches.length,
-            loading: false,
-          })
-        }
-      } catch {
-        if (!cancelled) {
-          setStats((prev) => ({ ...prev, loading: false }))
-        }
-      }
-    }
-
-    loadStats()
-    return () => {
-      cancelled = true
-      abortController.abort()
-    }
-  }, [user.id])
+/** Atividades: os números do topo, com o contexto e o atalho de cada um */
+export function ProfileActivities({ stats }: { stats: ProfileStats }) {
+  const cards: ActivityCard[] = [
+    {
+      value: stats.games,
+      label: 'Jogos na estante',
+      text: 'Títulos da sua coleção pessoal.',
+      action: 'Ver estante',
+      href: ACCOUNT_ROUTES.shelf,
+      icon: <GamesIcon />,
+    },
+    {
+      value: stats.matches,
+      label: 'Partidas no Jogue',
+      text: 'Mesas que você hospeda ou em que pediu para entrar.',
+      action: 'Ver partidas',
+      href: MY_MATCHES_PATH,
+      icon: <MatchesIcon />,
+    },
+    {
+      value: stats.forSale,
+      label: 'Anúncios na Loja',
+      text: 'Jogos da sua estante à venda agora.',
+      action: 'Ver meus anúncios',
+      href: MY_OFFERS_PATH,
+      icon: <TrophyIcon />,
+    },
+  ]
 
   return (
     <section className="account__section" aria-labelledby="perfil-atividades-title">
       <div>
-        <h2 id="perfil-atividades-title">Atividades & Estatísticas</h2>
-        <p>Acompanhe o seu engajamento, jogos na coleção e partidas no Blue Hawk.</p>
+        <h2 id="perfil-atividades-title">Atividades</h2>
+        <p>O seu movimento no Blue Hawk: coleção, mesas e anúncios.</p>
       </div>
 
       <div className="profile-stats-grid">
-        <div className="profile-stat-card">
-          <span className="profile-stat-card__number">
-            {stats.loading ? '…' : stats.gamesCount}
-          </span>
-          <span className="profile-stat-card__label">Jogos na Estante</span>
-          <p style={{ color: 'var(--text-muted)', fontSize: '13px' }}>
-            Títulos cadastrados em sua coleção pessoal de jogos de tabuleiro.
-          </p>
-          <div className="profile-stat-card__action">
-            <Button variant="secondary" onClick={() => { window.location.assign(ACCOUNT_ROUTES.shelf) }}>
-              <GamesIcon />
-              Ver Estante
-            </Button>
+        {cards.map((card) => (
+          <div key={card.label} className="profile-stat-card">
+            <span className="profile-stat-card__number">{stats.loading ? '…' : card.value}</span>
+            <span className="profile-stat-card__label">{card.label}</span>
+            <p className="profile-stat-card__text">{card.text}</p>
+            <div className="profile-stat-card__action">
+              <Button variant="secondary" onClick={() => navigate(card.href)}>
+                {card.icon}
+                {card.action}
+              </Button>
+            </div>
           </div>
-        </div>
-
-        <div className="profile-stat-card">
-          <span className="profile-stat-card__number">
-            {stats.loading ? '…' : stats.matchesCount}
-          </span>
-          <span className="profile-stat-card__label">Mesas & Partidas</span>
-          <p style={{ color: 'var(--text-muted)', fontSize: '13px' }}>
-            Partidas registradas, criadas ou que você participou.
-          </p>
-          <div className="profile-stat-card__action">
-            <Button variant="secondary" onClick={() => { window.location.assign(ACCOUNT_ROUTES.matches) }}>
-              <MatchesIcon />
-              Ver Partidas
-            </Button>
-          </div>
-        </div>
-
-        <div className="profile-stat-card">
-          <span className="profile-stat-card__number">
-            {stats.loading ? '…' : stats.offersCount}
-          </span>
-          <span className="profile-stat-card__label">Ofertas no Mercado</span>
-          <p style={{ color: 'var(--text-muted)', fontSize: '13px' }}>
-            Jogos da sua estante atualmente anunciados na loja da comunidade.
-          </p>
-          <div className="profile-stat-card__action">
-            <Button variant="secondary" onClick={() => { window.location.assign('/loja') }}>
-              <TrophyIcon />
-              Ir para Loja
-            </Button>
-          </div>
-        </div>
+        ))}
       </div>
     </section>
   )

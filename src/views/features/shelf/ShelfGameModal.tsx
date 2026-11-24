@@ -73,8 +73,8 @@ export function ShelfGameModal({
     >
       <div className="shelf-modal__top-meta">
         <CategoryTag game={boardgame} />
-        {boardgame.publisher && <span className="shelf-modal__publisher">{boardgame.publisher}</span>}
-        {game.forSale && <span className="shelf-modal__sale-tag">À venda • R$ {game.salePrice}</span>}
+        {boardgame.publisher && <span className="badge shelf-modal__publisher">{boardgame.publisher}</span>}
+        {game.forSale && <span className="badge shelf-modal__sale-tag">À venda • R$ {game.salePrice}</span>}
       </div>
 
       {status === 'PENDING' && (
