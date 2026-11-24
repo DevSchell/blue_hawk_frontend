@@ -1,7 +1,8 @@
 import { useRealtimeSession } from './controllers/useRealtime'
 import { useEffect } from 'react'
 import { useAuthController } from './controllers/useAuthController'
-import { registerLoginPrompt } from './models/loginPrompt'
+import { registerLoginPrompt, requestLoginThen, takeLoginDestination } from './models/loginPrompt'
+import { readUserId } from './models/session'
 import { LoginModal } from './views/features/auth/LoginModal'
 import { RegisterModal } from './views/features/auth/RegisterModal'
 import { AppLayout } from './views/layout/AppLayout'
@@ -56,10 +57,27 @@ function App() {
   const locationKey = useLocationKey()
   const path = currentPath()
 
-  useEffect(() => interceptLinkClicks(), [])
+  useEffect(
+    () =>
+      // Visitante clicou num anúncio da Loja: abre a modal de login sem sair de onde está (nem rolar a tela)
+      interceptLinkClicks((to) => {
+        if (readUserId() || !to.startsWith(STORE_OFFER_PATH_PREFIX)) return false
+        requestLoginThen(to)
+        return true
+      }),
+    [],
+  )
 
   // Qualquer parte da interface pode pedir login (ex.: curtir sem estar logado)
   useEffect(() => registerLoginPrompt(openLogin), [openLogin])
+
+  // Entrou na conta depois de um pedido de login com destino: vai para lá (ex.: o anúncio clicado)
+  const signedIn = Boolean(session)
+  useEffect(() => {
+    if (!signedIn) return
+    const destination = takeLoginDestination()
+    if (destination) navigate(destination)
+  }, [signedIn])
 
   // "Minhas Partidas" agora é a aba do Jogue: o endereço antigo continua funcionando
   useEffect(() => {

@@ -96,8 +96,9 @@ export function onNavigation(onNavigate: () => void) {
 /**
  * Clique em link interno vira navegação do app. Ficam com o navegador: Ctrl/Cmd/Shift/Alt + clique,
  * botão do meio, target="_blank", download, outra origem e salto para âncora na mesma tela.
+ * {@code guard} recebe o endereço de destino e devolve true quando ele mesmo cuidou do clique.
  */
-export function interceptLinkClicks() {
+export function interceptLinkClicks(guard?: (path: string) => boolean) {
   const onClick = (e: MouseEvent) => {
     if (e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return
     const anchor = (e.target as Element | null)?.closest?.('a[href]') as HTMLAnchorElement | null
@@ -108,6 +109,8 @@ export function interceptLinkClicks() {
     const sameScreen = url.pathname === window.location.pathname && url.search === window.location.search
     if (sameScreen && url.hash) return
     e.preventDefault()
+    // O guarda resolveu o clique por conta própria (ex.: pediu login): a tela fica como está, sem rolar
+    if (guard?.(`${url.pathname}${url.search}${url.hash}`)) return
     // Link para a própria tela: só volta ao topo
     if (sameScreen) {
       window.scrollTo({ top: 0, behavior: prefersReducedMotion() ? 'auto' : 'smooth' })

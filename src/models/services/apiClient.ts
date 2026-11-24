@@ -63,7 +63,7 @@ const PUBLIC_POSTS = ['/users', '/users/authenticate']
 let queue: Promise<unknown> = Promise.resolve()
 
 async function request<T>(method: string, path: string, label: string, payload?: unknown, signal?: AbortSignal) {
-  const run = async () => {
+  const run = async (): Promise<T> => {
     if (signal?.aborted) throw new DOMException('Aborted', 'AbortError')
     // Login e cadastro são públicos: um token velho faria a API recusar a chamada
     const authenticated = readToken() !== null && !(method === 'POST' && PUBLIC_POSTS.includes(path))
@@ -78,14 +78,21 @@ async function request<T>(method: string, path: string, label: string, payload?:
     // Em respostas de erro o token novo só vem no cabeçalho
     const rotated = response.headers.get('X-New-Token')
     if (rotated && authenticated) rotateToken(rotated)
+    let retryAsVisitor = false
     const result = await readBody<T>(response, label).catch((error: unknown) => {
       if (error instanceof ApiError && error.status === 401 && authenticated) {
         // Token recusado: a sessão acabou
         clearSession()
         window.dispatchEvent(new Event('bluehawk:session-expired'))
+        // Leitura: repete como visitante; se a rota for pública, a página carrega em vez de mostrar erro
+        if (method === 'GET') {
+          retryAsVisitor = true
+          return undefined as T
+        }
       }
       throw error
     })
+    if (retryAsVisitor) return run()
     if (signal?.aborted) throw new DOMException('Aborted', 'AbortError')
     return result
   }
