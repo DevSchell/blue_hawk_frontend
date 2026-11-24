@@ -11,19 +11,13 @@
 
 .search-field input {
   width: 100%;
-  padding: 14px 18px;
-  font-size: 17px;
+  padding: 13px 16px;
+  font-size: 16px;
   background: var(--giz);
   color: var(--noite);
-  border: 0;
+  border: 1px solid var(--surface-edge);
   border-radius: 0;
-  clip-path: polygon(
-    0 0,
-    100% 0,
-    100% calc(100% - var(--corte)),
-    calc(100% - var(--corte)) 100%,
-    0 100%
-  );
+  clip-path: none;
 }
 
 .search-field input::placeholder {
