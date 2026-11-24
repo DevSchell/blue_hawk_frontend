@@ -1,0 +1,31 @@
+/*
+ * Rodapé de modais e confirmações: Cancelar e a confirmação, à direita e com a mesma largura.
+ * Grid do tamanho do conteúdo com colunas 1fr: as duas ficam do tamanho do botão de texto mais longo.
+ */
+.form-actions {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: 1fr;
+  gap: 10px;
+  width: fit-content;
+  max-width: 100%;
+  margin: 4px 0 0 auto;
+}
+
+.form-actions > .button {
+  min-width: 128px;
+  padding-inline: 20px;
+  white-space: nowrap;
+}
+
+/* No celular os dois dividem a linha toda */
+@media (max-width: 480px) {
+  .form-actions {
+    width: 100%;
+  }
+
+  .form-actions > .button {
+    min-width: 0;
+    white-space: normal;
+  }
+}

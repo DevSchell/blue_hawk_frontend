@@ -35,13 +35,21 @@
   font: 800 30px/1 var(--display);
 }
 
+/* Rodapé fixo no fim da gaveta: modo escuro e sair, juntos */
+.user-menu__footer {
+  margin-top: auto;
+  border-top: 1px solid var(--line);
+}
+
+.user-menu__footer .menu-list {
+  border-top: 0;
+}
+
 .user-menu__theme {
   display: flex;
   align-items: center;
   gap: 14px;
-  margin-top: auto;
-  padding: 16px 20px;
-  border-top: 1px solid var(--line);
+  padding: 14px 20px;
   font-weight: 600;
 }
 

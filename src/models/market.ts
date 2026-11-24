@@ -1,3 +1,5 @@
+import type { DeliveryMethod, OfferCondition } from './offerDetails'
+
 /** OfferResponse da API (presentation/offer/dto/OfferResponse.java) */
 export type Offer = {
   id: string
@@ -6,6 +8,10 @@ export type Offer = {
   price: number
   status: 'ACTIVE' | 'INACTIVE' | 'SOLD' | 'CANCELLED'
   description: string | null
+  /** Estado de conservação (null em anúncios antigos) */
+  condition: OfferCondition | null
+  /** Forma de entrega (null em anúncios antigos) */
+  deliveryMethod: DeliveryMethod | null
   createdAt: string
   updatedAt: string
 }
@@ -22,6 +28,11 @@ export type Match = {
   id: string
   userBoardgameId: string
   maxUsers: number | null
+  createdAt?: string | null
+  updatedAt?: string | null
+  date?: string | null
+  playedAt?: string | null
+  duration?: number | null
 }
 
 /** MatchParticipantResponse */
@@ -34,4 +45,5 @@ export type MatchParticipant = {
 /** Partida com quem já está nela; a API não lista partidas por jogo, então isso é montado no front */
 export type MatchWithPlayers = Match & {
   participantIds: string[]
+  participants: MatchParticipant[]
 }

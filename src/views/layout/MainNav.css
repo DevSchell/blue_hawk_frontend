@@ -8,21 +8,44 @@
 }
 
 .main-nav__item {
-  padding: 8px 12px;
-  border-bottom: 3px solid transparent;
+  position: relative;
+  padding: 8px 12px 11px;
   color: var(--gelo);
   font: 600 16px/1 var(--texto);
   text-decoration: none;
   white-space: nowrap;
 }
 
+/* Marca açafrão embaixo do item: cresce do centro no hover e fica cheia no item da página atual */
+.main-nav__item::after {
+  content: '';
+  position: absolute;
+  left: 12px;
+  right: 12px;
+  bottom: 0;
+  height: 3px;
+  background: var(--acafrao);
+  transform: scaleX(0);
+  opacity: 0.6;
+}
+
 .main-nav__item:hover {
   color: var(--giz);
 }
 
+.main-nav__item:hover::after {
+  transform: scaleX(0.5);
+}
+
 .main-nav__item[aria-current='page'] {
   color: var(--giz);
-  border-bottom-color: var(--acafrao);
+}
+
+.main-nav__item[aria-current='page']::after {
+  transform: none;
+  opacity: 1;
+  /* Na troca de página, a marca desliza do item antigo para o novo (View Transitions) */
+  view-transition-name: main-nav-indicator;
 }
 
 .main-nav__item:focus-visible {
@@ -30,9 +53,26 @@
   outline-offset: 2px;
 }
 
+@media (prefers-reduced-motion: no-preference) {
+  .main-nav__item {
+    transition: color 0.18s ease;
+  }
+
+  .main-nav__item::after {
+    transition:
+      transform 0.25s cubic-bezier(0.2, 0.8, 0.2, 1),
+      opacity 0.25s ease;
+  }
+}
+
 @media (max-width: 480px) {
   .main-nav__item {
-    padding: 8px 8px;
+    padding: 8px 8px 11px;
     font-size: 15px;
+  }
+
+  .main-nav__item::after {
+    left: 8px;
+    right: 8px;
   }
 }

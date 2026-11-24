@@ -16,7 +16,7 @@
   width: 100%;
   padding: 13px 16px;
   font-size: 17px;
-  background: var(--giz);
+  background: var(--cut-edge-10), var(--giz);
   color: var(--noite);
   border: 0;
   border-radius: 0;

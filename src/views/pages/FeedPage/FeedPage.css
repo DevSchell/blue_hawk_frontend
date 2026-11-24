@@ -9,3 +9,24 @@
   margin-bottom: clamp(24px, 3vw, 36px);
   overflow-wrap: anywhere;
 }
+
+
+/* Título do feed com o atalho para voltar a todas as categorias */
+.feed-page__heading {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px 20px;
+  scroll-margin-top: 16px;
+}
+
+.feed-page__all {
+  font-size: 14px;
+  font-weight: 800;
+  color: var(--claro);
+}
+
+:root[data-theme='light'] .feed-page__all {
+  color: var(--ultramar);
+}

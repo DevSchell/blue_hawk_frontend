@@ -1,0 +1,329 @@
+/*
+ * Quinas cortadas com borda.
+ *
+ * O canto cortado da marca é feito com clip-path, e o clip-path corta também a borda (box-shadow inset)
+ * exatamente na diagonal: a quina fica "aberta". Aqui um ::after redesenha o fio da diagonal.
+ *
+ * Cada componente da lista declara:
+ *   --cut      tamanho do corte (o mesmo do clip-path)
+ *   --edge     cor da borda           (padrão: --surface-edge, que só aparece no tema claro)
+ *   --edge-w   espessura da borda     (padrão: 1px)
+ *   --edge-in / --edge-in-w   segunda cor por dentro, para os anéis de foco de duas cores
+ *
+ * Inputs, selects e textareas não têm ::after: neles a diagonal vai numa camada de fundo (fim deste arquivo).
+ * Componente novo com canto cortado e borda: inclua o seletor nas duas listas e defina --cut.
+ */
+
+:where(
+    .filter-select,
+    .pill-tabs__tab,
+    .market__empty,
+    .market-card,
+    .match-card,
+    .match-list,
+    .match-page__person,
+    .chat-bubble,
+    .shelf-card__price-tag,
+    .shelf-card__score,
+    .shelf-modal__fact,
+    .profile-layout__panel .account__section,
+    .profile-theme-swatch,
+    .profile-banner__photo,
+    .shelf-sale-toggle,
+    .store-chip,
+    .loading-card,
+    .modal__panel,
+    .review-item,
+    .button,
+    .icon-button--solid,
+    .shelf-d20-btn,
+    .user-link,
+    .avatar,
+    .offer-option
+  ) {
+  position: relative;
+  --edge: var(--surface-edge);
+  --edge-w: 1px;
+}
+
+:where(
+    .filter-select,
+    .pill-tabs__tab,
+    .market__empty,
+    .market-card,
+    .match-card,
+    .match-list,
+    .match-page__person,
+    .chat-bubble,
+    .shelf-card__price-tag,
+    .shelf-card__score,
+    .shelf-modal__fact,
+    .profile-layout__panel .account__section,
+    .profile-theme-swatch,
+    .profile-banner__photo,
+    .shelf-sale-toggle,
+    .store-chip,
+    .loading-card,
+    .modal__panel,
+    .review-item,
+    .button,
+    .icon-button--solid,
+    .shelf-d20-btn,
+    .user-link,
+    .avatar,
+    .offer-option
+  )::after {
+  content: '';
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  z-index: 2;
+  width: var(--cut, 0px);
+  height: var(--cut, 0px);
+  pointer-events: none;
+  background: linear-gradient(
+    var(--edge-dir, to bottom right),
+    transparent calc(50% - var(--edge-in-w, var(--edge-w))),
+    var(--edge-in, transparent) calc(50% - var(--edge-in-w, var(--edge-w))) calc(50% - var(--edge-w)),
+    var(--edge) calc(50% - var(--edge-w)) 50%,
+    transparent 50%
+  );
+}
+
+/* ---------- tamanho do corte e cor da borda de cada um ---------- */
+.filter-select {
+  --cut: 9px;
+  --edge: var(--line);
+}
+
+.multi-select__trigger.is-filtered {
+  --edge: var(--acafrao);
+  --edge-w: 2px;
+}
+
+.pill-tabs__tab {
+  --cut: 9px;
+}
+
+.market__empty,
+.market-card,
+.shelf-modal__fact {
+  --cut: 10px;
+}
+
+.match-card,
+.review-item {
+  --cut: 18px;
+}
+
+.match-card:hover {
+  --edge: var(--claro);
+  --edge-w: 2px;
+}
+
+.match-card--host {
+  --edge: var(--acafrao);
+  --edge-w: 2px;
+}
+
+.match-list,
+.loading-card,
+.profile-layout__panel .account__section {
+  --cut: var(--corte);
+}
+
+.match-page__person {
+  --cut: 8px;
+  --edge: transparent;
+}
+
+.match-page__person:hover {
+  --edge: var(--claro);
+}
+
+/* Balão dos outros: o corte é embaixo à esquerda; o seu (açafrão) não tem borda */
+.chat-bubble {
+  --cut: 8px;
+  --edge-dir: to bottom left;
+}
+
+.chat-bubble::after {
+  right: auto;
+  left: 0;
+}
+
+.chat-bubble--mine {
+  --edge: transparent;
+}
+
+.shelf-card__price-tag {
+  --cut: 8px;
+  --edge: var(--acafrao);
+}
+
+.shelf-card__score,
+.store-chip,
+.profile-banner__photo {
+  --cut: 8px;
+}
+
+.profile-banner__photo {
+  --edge: var(--noite);
+  --edge-w: 3px;
+}
+
+.profile-theme-swatch {
+  --cut: 12px;
+  --edge: transparent;
+}
+
+.profile-theme-swatch--dark {
+  --edge: var(--ultramar);
+}
+
+.profile-theme-swatch--light {
+  --edge: var(--gelo);
+}
+
+.profile-theme-swatch.is-on {
+  --edge: var(--acafrao);
+  --edge-w: 3px;
+}
+
+.shelf-sale-toggle {
+  --cut: 9px;
+}
+
+.modal__panel {
+  --cut: 22px;
+}
+
+/* Botões: sem borda; o anel de foco (duas cores) também fecha na diagonal */
+.button,
+.icon-button--solid,
+.shelf-d20-btn {
+  --edge: transparent;
+}
+
+.button {
+  --cut: var(--corte);
+}
+
+.icon-button--solid {
+  --cut: 10px;
+}
+
+.shelf-d20-btn {
+  --cut: var(--corte);
+}
+
+.button:focus-visible,
+.shelf-d20-btn:focus-visible {
+  --edge: var(--noite);
+  --edge-w: 3px;
+  --edge-in: var(--giz);
+  --edge-in-w: 5px;
+}
+
+.icon-button--solid:focus-visible {
+  --edge: var(--noite);
+  --edge-w: 3px;
+  --edge-in: var(--acafrao);
+  --edge-in-w: 5px;
+}
+
+/* ---------- Inputs (sem ::after): a diagonal vai numa camada de fundo ---------- */
+.text-field__input:focus-visible,
+.store-filters__search:focus-visible,
+.shelf-search input:focus-visible,
+.search-field input:focus-visible {
+  --focus-diagonal: linear-gradient(
+    to bottom right,
+    transparent calc(50% - 5px),
+    var(--acafrao) calc(50% - 5px) calc(50% - 3px),
+    var(--noite) calc(50% - 3px) 50%,
+    transparent 50%
+  );
+}
+
+.text-field__input:focus-visible {
+  background: var(--focus-diagonal) right bottom / 10px 10px no-repeat, var(--giz);
+}
+
+.store-filters__search:focus-visible,
+.shelf-search input:focus-visible {
+  background: var(--focus-diagonal) right bottom / 9px 9px no-repeat, var(--giz);
+}
+
+.search-field input:focus-visible {
+  background: var(--focus-diagonal) right bottom / var(--corte) var(--corte) no-repeat, var(--giz);
+}
+
+/* Select do perfil: a seta também é fundo, então as camadas vão juntas */
+.text-field__input.profile-select {
+  background-image:
+    linear-gradient(45deg, transparent 50%, var(--noite) 50%),
+    linear-gradient(135deg, var(--noite) 50%, transparent 50%),
+    var(--cut-edge-line);
+  background-position:
+    calc(100% - 20px) 52%,
+    calc(100% - 14px) 52%,
+    right bottom;
+  background-size:
+    6px 6px,
+    6px 6px,
+    10px 10px;
+  background-repeat: no-repeat;
+}
+
+.text-field__input.profile-select:focus-visible {
+  background-image:
+    linear-gradient(45deg, transparent 50%, var(--noite) 50%),
+    linear-gradient(135deg, var(--noite) 50%, transparent 50%),
+    var(--focus-diagonal);
+}
+
+/* Nome do usuário em badge (UserLink): a borda é a cor do texto, bem clarinha */
+.user-link {
+  --cut: 6px;
+  --edge: color-mix(in srgb, currentColor 35%, transparent);
+}
+
+.user-link:hover {
+  --edge: transparent;
+}
+
+.user-link:focus-visible {
+  --edge: var(--acafrao);
+  --edge-w: 2px;
+}
+
+/* Avatar: a moldura (Avatar.css) também fecha na diagonal; o corte acompanha o tamanho */
+.avatar {
+  --cut: 10px;
+  --edge: var(--avatar-ring);
+  --edge-w: var(--avatar-ring-w);
+}
+
+.avatar--sm {
+  --cut: 6px;
+}
+
+.avatar--xl {
+  --cut: 16px;
+}
+
+/* Opções do anúncio (estado e entrega) */
+.offer-option {
+  --cut: 10px;
+  --edge: var(--line);
+}
+
+.offer-option:hover {
+  --edge: var(--claro);
+}
+
+.offer-option.is-on {
+  --edge: var(--acafrao);
+  --edge-w: 2px;
+}

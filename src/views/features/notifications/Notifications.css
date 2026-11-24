@@ -1,0 +1,132 @@
+/* Sininho da topbar */
+.notification-bell {
+  position: relative;
+  display: inline-flex;
+}
+
+.notification-bell .icon-button {
+  color: var(--giz);
+}
+
+/* Contador sobre o sino: açafrão com contorno noite, para descolar da topbar */
+.notification-bell__count {
+  position: absolute;
+  top: 2px;
+  right: 0;
+  min-width: 20px;
+  padding: 0 5px;
+  background: var(--acafrao);
+  color: var(--noite);
+  font: 800 11px/18px var(--texto);
+  text-align: center;
+  pointer-events: none;
+  box-shadow: 0 0 0 2px var(--noite);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .notification-bell__count {
+    animation: bellPop 0.25s ease-out;
+  }
+}
+
+@keyframes bellPop {
+  from {
+    transform: scale(0.4);
+  }
+}
+
+/* Modal */
+.notifications__toolbar {
+  display: flex;
+  justify-content: flex-end;
+  margin: -4px 0 8px;
+}
+
+.notifications__list {
+  display: grid;
+  gap: 6px;
+  padding: 0;
+  margin: 0;
+  list-style: none;
+}
+
+.notification-item {
+  display: grid;
+  grid-template-columns: 34px minmax(0, 1fr);
+  align-items: start;
+  gap: 12px;
+  width: 100%;
+  padding: 12px;
+  border: 0;
+  background: var(--bg);
+  color: var(--text);
+  font: inherit;
+  font-size: 14px;
+  text-align: left;
+  cursor: pointer;
+  clip-path: polygon(0 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%);
+}
+
+.notification-item:hover {
+  background: var(--hover);
+}
+
+.notification-item:focus-visible {
+  outline: 3px solid var(--acafrao);
+  outline-offset: -3px;
+}
+
+/* Não lida: fio açafrão e texto em destaque */
+.notification-item.is-unread {
+  box-shadow: inset 4px 0 0 var(--acafrao);
+  font-weight: 700;
+}
+
+.notification-item__icon {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  background: var(--surface);
+  color: var(--claro);
+  clip-path: polygon(0 0, 100% 0, 100% calc(100% - 7px), calc(100% - 7px) 100%, 0 100%);
+}
+
+:root[data-theme='light'] .notification-item__icon {
+  color: var(--ultramar);
+}
+
+.notification-item.is-unread .notification-item__icon {
+  background: var(--acafrao);
+  color: var(--noite);
+}
+
+.notification-item__icon .icon {
+  width: 18px;
+  height: 18px;
+}
+
+.notification-item__text {
+  display: grid;
+  gap: 2px;
+  line-height: 1.4;
+}
+
+.notification-item__text time {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+.notifications__more {
+  display: flex;
+  justify-content: center;
+  margin-top: 12px;
+}
+
+.notifications__error {
+  display: grid;
+  justify-items: start;
+  gap: 10px;
+  color: var(--text-muted);
+}

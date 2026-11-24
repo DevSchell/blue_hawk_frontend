@@ -1,0 +1,119 @@
+.review-page__empty-action {
+  margin-top: 14px;
+}
+
+.review-page__notice {
+  margin-bottom: 18px;
+}
+
+.review-list {
+  display: grid;
+  gap: 16px;
+  padding: 0;
+  list-style: none;
+}
+
+.review-item {
+  display: grid;
+  grid-template-columns: 200px minmax(0, 1fr);
+  background: var(--surface);
+  box-shadow: inset 0 0 0 1px var(--surface-edge);
+  clip-path: polygon(0 0, 100% 0, 100% calc(100% - 18px), calc(100% - 18px) 100%, 0 100%);
+}
+
+.review-item__cover {
+  background: var(--noite);
+}
+
+.review-item__cover > svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.review-item__body {
+  padding: 18px 20px 20px;
+  min-width: 0;
+}
+
+.review-item__name {
+  font-size: 26px;
+  line-height: 1.1;
+  overflow-wrap: anywhere;
+}
+
+.review-item__facts {
+  margin-top: 4px;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-muted);
+}
+
+.review-item__description {
+  margin-top: 10px;
+  font-size: 15px;
+}
+
+.review-item__author {
+  margin-top: 8px;
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+.review-item__note {
+  margin-top: 6px;
+  font-size: 13px;
+  font-style: italic;
+  color: var(--acafrao);
+}
+
+:root[data-theme='light'] .review-item__note {
+  color: #8a5a00;
+}
+
+.review-item__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 14px;
+}
+
+.review-item__actions .button {
+  padding: 10px 20px;
+  font-size: 14px;
+}
+
+.review-item__reject {
+  display: grid;
+  gap: 6px;
+  margin-top: 14px;
+}
+
+.review-item__reject label {
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.review-item__reject textarea {
+  width: 100%;
+  padding: 10px 12px;
+  font: 400 15px/1.45 var(--texto);
+  background: var(--giz);
+  color: var(--noite);
+  border: 0;
+  box-shadow: inset 0 0 0 1px var(--surface-edge);
+  resize: vertical;
+}
+
+.review-item__reject textarea:focus-visible {
+  outline: 0;
+  box-shadow:
+    inset 0 0 0 3px var(--noite),
+    inset 0 0 0 5px var(--acafrao);
+}
+
+@media (max-width: 620px) {
+  .review-item {
+    grid-template-columns: 1fr;
+  }
+}

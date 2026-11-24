@@ -4,6 +4,7 @@ import { Wordmark } from '../Brand/Wordmark'
 import { IconButton } from '../IconButton/IconButton'
 import { CloseIcon } from '../Icons/Icons'
 import { cx } from '../../utils/classNames'
+import { lockBodyScroll } from '../../utils/scrollLock'
 import './Modal.css'
 
 type ModalProps = {
@@ -35,6 +36,7 @@ export function Modal({ open, onClose, title, lead, media, size = 'md', children
   useLayoutEffect(() => {
     const dialog = dialogRef.current
     if (!dialog) return
+    const unlockScroll = open ? lockBodyScroll() : undefined
     if (open && !dialog.open) {
       dialog.showModal()
       dialog.querySelector<HTMLElement>('[data-autofocus]')?.focus()
@@ -43,6 +45,7 @@ export function Modal({ open, onClose, title, lead, media, size = 'md', children
     // Ao ser desmontada ainda aberta, fecha antes: só assim o navegador devolve o foco a quem abriu.
     // No StrictMode (dev) isso também roda na desmontagem de teste, e o efeito reabre em seguida.
     return () => {
+      unlockScroll?.()
       if (dialog.open) {
         closingSilently.current = true
         dialog.close()

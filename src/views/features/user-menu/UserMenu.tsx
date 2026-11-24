@@ -10,17 +10,15 @@ import {
   CloseIcon,
   GamesIcon,
   LogoutIcon,
-  MatchesIcon,
   MoonIcon,
-  SettingsIcon,
+  ShieldCheckIcon,
   SunIcon,
   UserIcon,
 } from '../../components/Icons/Icons'
 import { MenuItem, MenuList } from '../../components/MenuList/MenuList'
+import { ACCOUNT_ROUTES, REVIEW_PATH } from '../../layout/navigation'
 import { Switch } from '../../components/Switch/Switch'
 import './UserMenu.css'
-
-const SOON = 'Em breve'
 
 type UserMenuProps = {
   session: Session | null
@@ -64,19 +62,24 @@ export function UserMenu({ session, onSignIn, onSignOut }: UserMenuProps) {
               </div>
             </div>
 
-            {/* Ainda sem páginas: os itens aparecem, mas não abrem nada */}
             <MenuList label="Sua conta">
-              <MenuItem icon={<UserIcon />} label="Meu Perfil" hint={SOON} disabled />
-              <MenuItem icon={<GamesIcon />} label="Meus Jogos" hint={SOON} disabled />
-              <MenuItem icon={<MatchesIcon />} label="Minhas Partidas" hint={SOON} disabled />
-              <MenuItem icon={<SettingsIcon />} label="Configurações" hint={SOON} disabled />
-              <MenuItem icon={<LogoutIcon />} label="Sair" onClick={signOut} />
+              <MenuItem icon={<UserIcon />} label="Meu Perfil" href={ACCOUNT_ROUTES.profile} onClick={closeMenu} />
+              <MenuItem icon={<GamesIcon />} label="Meus Jogos" href={ACCOUNT_ROUTES.shelf} onClick={closeMenu} />
+              {session.isAdmin && (
+                <MenuItem icon={<ShieldCheckIcon />} label="Aprovar jogos" href={REVIEW_PATH} onClick={closeMenu} />
+              )}
             </MenuList>
 
-            <div className="user-menu__theme">
-              {isDarkTheme ? <MoonIcon /> : <SunIcon />}
-              <span id="user-menu-theme-label">Modo escuro</span>
-              <Switch checked={isDarkTheme} onChange={toggleTheme} labelledBy="user-menu-theme-label" />
+            {/* Rodapé do menu: tema e, logo abaixo, sair */}
+            <div className="user-menu__footer">
+              <div className="user-menu__theme">
+                {isDarkTheme ? <MoonIcon /> : <SunIcon />}
+                <span id="user-menu-theme-label">Modo escuro</span>
+                <Switch checked={isDarkTheme} onChange={toggleTheme} labelledBy="user-menu-theme-label" />
+              </div>
+              <MenuList label="Sessão">
+                <MenuItem icon={<LogoutIcon />} label="Sair" onClick={signOut} />
+              </MenuList>
             </div>
           </>
         ) : (

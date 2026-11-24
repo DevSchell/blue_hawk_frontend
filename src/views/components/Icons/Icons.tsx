@@ -108,9 +108,150 @@ export const CalendarIcon = () => (
   </Icon>
 )
 
+/** Coração de curtir; {@code filled} quando curtido */
+export const HeartIcon = ({ filled = false }: { filled?: boolean }) => (
+  <svg
+    className="icon"
+    viewBox="0 0 24 24"
+    width="24"
+    height="24"
+    fill={filled ? 'currentColor' : 'none'}
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinejoin="round"
+    aria-hidden="true"
+  >
+    <path d="M12 20.5s-7.5-4.4-9.2-9.3C1.6 7.6 4 4.5 7.3 4.5c2 0 3.6 1.1 4.7 2.7 1.1-1.6 2.7-2.7 4.7-2.7 3.3 0 5.7 3.1 4.5 6.7-1.7 4.9-9.2 9.3-9.2 9.3z" />
+  </svg>
+)
+
+export const MapPinIcon = () => (
+  <Icon>
+    <path d="M12 21s-6.5-6.2-6.5-11a6.5 6.5 0 0 1 13 0c0 4.8-6.5 11-6.5 11z" />
+    <circle cx="12" cy="10" r="2.4" />
+  </Icon>
+)
+
+export const CheckIcon = () => (
+  <Icon>
+    <path d="M5 12.5l4.5 4.5L19 7.5" />
+  </Icon>
+)
+
+/** Balão de conversa: caixa de chats (partidas e negociações) */
+export const ChatIcon = () => (
+  <Icon>
+    <path d="M4 5h16v11H9l-5 4Z" />
+    <path d="M8 9.5h8M8 12.5h5" />
+  </Icon>
+)
+
+/** Sininho das notificações */
+export const BellIcon = () => (
+  <Icon>
+    <path d="M6 16V11a6 6 0 0 1 12 0v5l1.5 2h-15Z" />
+    <path d="M10 20.5a2.2 2.2 0 0 0 4 0" />
+  </Icon>
+)
+
+export const PlusIcon = () => (
+  <Icon>
+    <path d="M12 5v14M5 12h14" />
+  </Icon>
+)
+
+/** Escudo com check: área de aprovação do admin */
+export const ShieldCheckIcon = () => (
+  <Icon>
+    <path d="M12 3l7 3v5c0 4.4-3 8.3-7 10-4-1.7-7-5.6-7-10V6l7-3z" />
+    <path d="M9 12l2 2 4-4" />
+  </Icon>
+)
+
 export const LogoutIcon = () => (
   <Icon>
     <path d="M14 4h4a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-4" />
     <path d="M9 16l-4-4 4-4M5 12h11" />
+  </Icon>
+)
+
+export const CameraIcon = () => (
+  <Icon>
+    <path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z" />
+    <circle cx="12" cy="13" r="3" />
+  </Icon>
+)
+
+export const UploadIcon = () => (
+  <Icon>
+    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+    <polyline points="17 8 12 3 7 8" />
+    <line x1="12" y1="3" x2="12" y2="15" />
+  </Icon>
+)
+
+export const TrashIcon = () => (
+  <Icon>
+    <polyline points="3 6 5 6 21 6" />
+    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+  </Icon>
+)
+
+export const TrophyIcon = () => (
+  <Icon>
+    <path d="M6 9H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h2" />
+    <path d="M18 9h2a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2h-2" />
+    <path d="M4 22h16" />
+    <path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22" />
+    <path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22" />
+    <path d="M18 2H6v7a6 6 0 0 0 12 0V2Z" />
+  </Icon>
+)
+
+export const SparklesIcon = () => (
+  <Icon>
+    <path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z" />
+    <path d="M5 3v4M3 5h4M19 17v4M17 19h4" />
+  </Icon>
+)
+
+/** Dado de 20 faces no mesmo traço dos outros ícones (hexágono + faces internas) */
+export const D20Icon = ({ className }: { className?: string }) => (
+  <svg
+    className={className ? `icon ${className}` : 'icon'}
+    viewBox="0 0 24 24"
+    width="24"
+    height="24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="1.8"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    aria-hidden="true"
+  >
+    <path d="M12 2.5l8.5 4.9v9.2L12 21.5l-8.5-4.9V7.4z" />
+    <path d="M12 6.8l4.6 8H7.4z" />
+    <path d="M12 2.5v4.3M20.5 7.4l-3.9 7.4M3.5 7.4l3.9 7.4M12 21.5l4.6-6.7M12 21.5l-4.6-6.7" />
+  </svg>
+)
+
+export const ChevronLeftIcon = () => (
+  <Icon>
+    <path d="M15 6l-6 6 6 6" />
+  </Icon>
+)
+
+export const ChevronRightIcon = () => (
+  <Icon>
+    <path d="M9 6l6 6-6 6" />
+  </Icon>
+)
+
+/** Caminhão: forma de entrega do anúncio */
+export const TruckIcon = () => (
+  <Icon>
+    <path d="M3 6h11v10H3zM14 9h4l3 3v4h-7" />
+    <circle cx="7" cy="17.5" r="1.5" />
+    <circle cx="17" cy="17.5" r="1.5" />
   </Icon>
 )

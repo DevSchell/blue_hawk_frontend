@@ -1,0 +1,62 @@
+/* Página do jogo: selos "Na sua estante" e "Venda anunciada" na faixa de ação */
+.game-page__owned {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 44px;
+  padding: 0 14px 0 10px;
+  font-size: 14px;
+  font-weight: 800;
+  color: var(--text);
+  background: var(--bg);
+  box-shadow: inset 0 0 0 1px var(--line);
+}
+
+.game-page__owned .icon {
+  width: 18px;
+  height: 18px;
+  color: var(--acafrao);
+}
+
+:root[data-theme='light'] .game-page__owned .icon {
+  color: var(--ultramar);
+}
+
+.game-page__owned--sale {
+  padding-left: 14px;
+  color: var(--acafrao);
+  box-shadow:
+    inset 3px 0 0 var(--acafrao),
+    inset 0 0 0 1px var(--line);
+}
+
+:root[data-theme='light'] .game-page__owned--sale {
+  color: var(--ultramar);
+}
+
+/* "Sobre o jogo" na largura toda, logo abaixo da faixa de ação */
+.game-page__about {
+  margin-top: 22px;
+}
+
+/* Ofertas e partidas embaixo do "Sobre": duas colunas da mesma altura (uma embaixo da outra no celular) */
+.game-page__market {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-items: stretch;
+  gap: 16px;
+  margin-top: 16px;
+}
+
+.game-page__market .market {
+  margin: 0;
+  padding: 18px;
+  background: var(--surface);
+  box-shadow: inset 0 0 0 1px var(--surface-edge);
+}
+
+@media (max-width: 760px) {
+  .game-page__market {
+    grid-template-columns: 1fr;
+  }
+}

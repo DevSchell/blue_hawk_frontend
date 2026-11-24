@@ -6,6 +6,16 @@
   color: var(--noite);
   font: 800 16px/1 var(--texto);
   clip-path: polygon(0 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%);
+  overflow: hidden;
+  position: relative;
+  user-select: none;
+}
+
+.avatar--sm {
+  width: 34px;
+  height: 34px;
+  font-size: 13px;
+  clip-path: polygon(0 0, 100% 0, 100% calc(100% - 6px), calc(100% - 6px) 100%, 0 100%);
 }
 
 .avatar--md {
@@ -17,4 +27,45 @@
   width: 52px;
   height: 52px;
   font-size: 19px;
+}
+
+.avatar--xl {
+  width: 96px;
+  height: 96px;
+  font-size: 32px;
+  clip-path: polygon(0 0, 100% 0, 100% calc(100% - 16px), calc(100% - 16px) 100%, 0 100%);
+}
+
+.avatar__img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/*
+ * Moldura padrão: um anel por cima da foto (::before), para o avatar nunca se misturar com o fundo
+ * (ex.: uma ilustração de fundo ultramar sobre a faixa ultramar do perfil). A diagonal do canto cortado
+ * fecha via cutCorners.css (::after). Cor e espessura: --avatar-ring e --avatar-ring-w.
+ */
+.avatar {
+  --avatar-ring: var(--acafrao);
+  --avatar-ring-w: 2px;
+}
+
+.avatar::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  box-shadow: inset 0 0 0 var(--avatar-ring-w) var(--avatar-ring);
+}
+
+.avatar--sm {
+  --avatar-ring-w: 1.5px;
+}
+
+.avatar--xl {
+  --avatar-ring-w: 3px;
 }

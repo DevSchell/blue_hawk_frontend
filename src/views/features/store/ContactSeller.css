@@ -1,0 +1,32 @@
+/* Primeiro contato com quem vende (página do anúncio) */
+.contact-seller {
+  display: grid;
+  gap: 12px;
+  padding: 18px;
+  background: var(--bg);
+  box-shadow: inset 4px 0 0 var(--acafrao);
+}
+
+.contact-seller h3 {
+  font-size: 22px;
+}
+
+.contact-seller > p {
+  color: var(--text-muted);
+}
+
+.contact-seller > .button {
+  justify-self: start;
+}
+
+.contact-seller__lead {
+  margin-top: -6px;
+  font-size: 14px;
+  color: var(--text-muted);
+}
+
+.contact-seller__message {
+  min-height: 84px;
+  resize: vertical;
+  font: inherit;
+}

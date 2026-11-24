@@ -1,0 +1,205 @@
+/* Loja: fundo mais profundo, com um brilho ultramar no topo, para a vitrine "acender" */
+.store-page {
+  flex: 1;
+  padding-block: clamp(20px, 3vw, 32px) clamp(40px, 6vw, 72px);
+  background: var(--bg);
+}
+
+.store-page__skeleton {
+  min-height: 230px;
+  background: var(--skeleton);
+  opacity: 0.4;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .store-page__skeleton {
+    animation: storePulse 1.2s ease-in-out infinite alternate;
+  }
+}
+
+@keyframes storePulse {
+  to {
+    opacity: 0.15;
+  }
+}
+
+.store-page__empty-action {
+  margin-top: 14px;
+}
+
+.store-section {
+  margin-top: clamp(28px, 4vw, 44px);
+}
+
+.store-section__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--line);
+}
+
+.store-section__head h2 {
+  font-size: clamp(24px, 3vw, 32px);
+  line-height: 1.1;
+}
+
+/* Filtros de "Preços mais baixos" */
+.store-filters {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+
+.store-filters__search {
+  flex: 1 1 220px;
+  max-width: 320px;
+  padding: 10px 14px;
+  border: 0;
+  background: var(--cut-edge-9), var(--giz);
+  color: var(--noite);
+  font: 400 15px/1.3 var(--texto);
+  box-shadow: inset 0 0 0 1px var(--surface-edge);
+  clip-path: polygon(0 0, 100% 0, 100% calc(100% - 9px), calc(100% - 9px) 100%, 0 100%);
+}
+
+.store-filters__search:focus-visible {
+  outline: 0;
+  box-shadow:
+    inset 0 0 0 3px var(--noite),
+    inset 0 0 0 5px var(--acafrao);
+}
+
+.store-filters__chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.store-chip {
+  border: 0;
+  background: var(--cut-edge-8), var(--surface);
+  color: var(--text-muted);
+  box-shadow: inset 0 0 0 1px var(--surface-edge);
+  padding: 8px 12px;
+  font: 800 12px/1 var(--texto);
+  cursor: pointer;
+  clip-path: polygon(0 0, 100% 0, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0 100%);
+}
+
+.store-chip:hover {
+  color: var(--text);
+}
+
+.store-chip.is-on {
+  background: var(--claro);
+  color: var(--noite);
+}
+
+.store-chip--budget.is-on {
+  background: var(--acafrao);
+}
+
+.store-chip:focus-visible {
+  outline: 2px solid var(--acafrao);
+  outline-offset: 2px;
+}
+
+.store-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 16px;
+}
+
+/* Categoria e ordenação ao lado da busca, empurradas para a direita */
+.store-filters__selects {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  margin-left: auto;
+}
+
+.store-page .pill-tabs {
+  margin-bottom: clamp(18px, 3vw, 28px);
+}
+
+.store-page__notice {
+  margin-bottom: 18px;
+}
+
+/* Quadro de categoria leva direto ao "explorar" já filtrado */
+.store-section--explore {
+  scroll-margin-top: 16px;
+}
+
+/* Faixa de abertura da Loja: números da vitrine e o atalho para anunciar */
+.store-hero__stats {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: stretch;
+  gap: 10px;
+  padding: 0;
+  margin: 0;
+  list-style: none;
+}
+
+.store-hero__stats li {
+  display: grid;
+  align-content: center;
+  gap: 2px;
+  min-width: 120px;
+  padding: 10px 16px;
+  background: rgb(11 17 71 / 0.45);
+  clip-path: polygon(0 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%);
+}
+
+.store-hero__stats b {
+  font: 800 26px/1 var(--display);
+  color: var(--acafrao);
+  font-variant-numeric: tabular-nums;
+}
+
+.store-hero__stats span {
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--gelo);
+}
+
+.store-hero__stats li:last-child {
+  display: flex;
+  padding: 0;
+  background: none;
+}
+
+.store-hero__cta {
+  display: inline-flex;
+  align-items: center;
+  min-height: 56px;
+  padding: 0 20px;
+  background: var(--acafrao);
+  color: var(--noite);
+  font: 800 15px/1 var(--texto);
+  text-decoration: none;
+  clip-path: polygon(0 0, 100% 0, 100% calc(100% - var(--corte)), calc(100% - var(--corte)) 100%, 0 100%);
+}
+
+.store-hero__cta:hover {
+  background: var(--acafrao-hover);
+}
+
+.store-hero__cta:focus-visible {
+  outline: 3px solid var(--giz);
+  outline-offset: -3px;
+}
+
+/* Header da Loja mais justo embaixo: as abas logo em seguida não ficam "soltas" */
+.hero__content:has(.store-hero__stats) {
+  padding-bottom: clamp(28px, 4vw, 44px);
+}

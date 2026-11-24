@@ -1,0 +1,157 @@
+/* Mesmo bloco do EmptyState: superfície, borda só no tema claro */
+.loading-card {
+  display: grid;
+  justify-items: center;
+  gap: 6px;
+  padding: 28px 24px 24px;
+  background: var(--surface);
+  box-shadow: inset 0 0 0 1px var(--surface-edge);
+  clip-path: polygon(0 0, 100% 0, 100% calc(100% - var(--corte)), calc(100% - var(--corte)) 100%, 0 100%);
+}
+
+.loading-card__art {
+  width: 132px;
+  height: auto;
+  overflow: visible;
+}
+
+.loading-card__message {
+  color: var(--text-muted);
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.loading-card--compact {
+  padding: 18px 16px 14px;
+}
+
+.loading-card--compact .loading-card__art {
+  width: 92px;
+}
+
+.loading-card--compact .loading-card__message {
+  font-size: 13px;
+}
+
+.loading-card__die-body {
+  fill: var(--acafrao);
+  stroke: var(--noite);
+  stroke-width: 2;
+  stroke-linejoin: round;
+}
+
+.loading-card__die-face {
+  fill: var(--acafrao-hover);
+  stroke: var(--noite);
+  stroke-width: 1.6;
+  stroke-linejoin: round;
+}
+
+.loading-card__die-edge {
+  fill: none;
+  stroke: var(--noite);
+  stroke-width: 1.6;
+  stroke-linecap: round;
+}
+
+.loading-card__wing {
+  fill: var(--gelo);
+  stroke: var(--ultramar);
+  stroke-width: 1.6;
+  stroke-linejoin: round;
+  transform-box: view-box;
+}
+
+/* As asas giram presas na lateral do dado */
+.loading-card__wing--left {
+  transform-origin: 44px 39px;
+}
+
+.loading-card__wing--right {
+  transform-origin: 76px 39px;
+}
+
+.loading-card__shadow {
+  fill: var(--noite);
+  opacity: 0.35;
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+:root[data-theme='light'] .loading-card__shadow {
+  fill: var(--ultramar);
+  opacity: 0.18;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .loading-card__flyer {
+    animation: loadingFly 1.4s ease-in-out infinite alternate;
+  }
+
+  .loading-card__die {
+    transform-box: fill-box;
+    transform-origin: center;
+    animation: loadingTilt 2.8s ease-in-out infinite;
+  }
+
+  .loading-card__wing--left {
+    animation: loadingFlapLeft 0.32s ease-in-out infinite alternate;
+  }
+
+  .loading-card__wing--right {
+    animation: loadingFlapRight 0.32s ease-in-out infinite alternate;
+  }
+
+  .loading-card__shadow {
+    animation: loadingShadow 1.4s ease-in-out infinite alternate;
+  }
+}
+
+@keyframes loadingFly {
+  from {
+    transform: translateY(4px);
+  }
+  to {
+    transform: translateY(-6px);
+  }
+}
+
+@keyframes loadingTilt {
+  0%,
+  100% {
+    transform: rotate(-6deg);
+  }
+  50% {
+    transform: rotate(6deg);
+  }
+}
+
+@keyframes loadingFlapLeft {
+  from {
+    transform: rotate(16deg);
+  }
+  to {
+    transform: rotate(-22deg);
+  }
+}
+
+@keyframes loadingFlapRight {
+  from {
+    transform: rotate(-16deg);
+  }
+  to {
+    transform: rotate(22deg);
+  }
+}
+
+/* A sombra encolhe quando o dado sobe */
+@keyframes loadingShadow {
+  from {
+    transform: scaleX(1);
+    opacity: 0.35;
+  }
+  to {
+    transform: scaleX(0.7);
+    opacity: 0.18;
+  }
+}

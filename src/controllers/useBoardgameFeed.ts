@@ -16,19 +16,23 @@ type Result = {
  * Feed paginado de GET /boardgames. A API não devolve total, então
  * "tem mais" é inferido de uma página cheia.
  */
-export function useBoardgameFeed(query: string) {
-  // A página pertence à busca: trocar a busca volta para a página 0
-  const [cursor, setCursor] = useState({ query, page: 0 })
+export function useBoardgameFeed(query: string, category: string | null = null) {
+  // A página pertence à busca (nome + categoria): trocar a busca volta para a página 0
+  const search = `${query}\u0000${category ?? ''}`
+  const [cursor, setCursor] = useState({ query: search, page: 0 })
   const [attempt, setAttempt] = useState(0)
   const [result, setResult] = useState<Result>({ key: '', items: [], hasMore: false, error: null })
 
-  const page = cursor.query === query ? cursor.page : 0
-  const key = `${query}\u0000${page}\u0000${attempt}`
+  const page = cursor.query === search ? cursor.page : 0
+  const key = `${search}\u0000${page}\u0000${attempt}`
 
   useEffect(() => {
     const controller = new AbortController()
 
-    listBoardgames({ name: query.trim(), page, size: FEED_PAGE_SIZE }, controller.signal)
+    listBoardgames(
+      { name: query.trim(), category: category ?? undefined, page, size: FEED_PAGE_SIZE },
+      controller.signal,
+    )
       .then((items) => {
         setResult((prev) => ({
           key,
@@ -44,7 +48,7 @@ export function useBoardgameFeed(query: string) {
       })
 
     return () => controller.abort()
-  }, [key, query, page])
+  }, [key, query, category, page])
 
   const loading = result.key !== key
 
@@ -55,8 +59,13 @@ export function useBoardgameFeed(query: string) {
     /** Primeira página da busca atual ainda não chegou */
     loadingFirstPage: loading && page === 0,
     loadingMore: loading && page > 0,
-    loadMore: () => setCursor({ query, page: page + 1 }),
+    loadMore: () => setCursor({ query: search, page: page + 1 }),
     retry: () => setAttempt((n) => n + 1),
+    /** Volta à primeira página e busca de novo (depois de cadastrar ou editar um jogo) */
+    refresh: () => {
+      setCursor({ query: search, page: 0 })
+      setAttempt((n) => n + 1)
+    },
   }
 }
 

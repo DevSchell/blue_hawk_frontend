@@ -1,4 +1,4 @@
-import type { ReactNode } from 'react'
+import type { CSSProperties, ReactNode } from 'react'
 import { Container } from '../Container/Container'
 import './Hero.css'
 
@@ -17,7 +17,15 @@ export function Hero({ title, lead, children, art }: HeroProps) {
     <div className="hero">
       <Container className="hero__grid">
         <div className="hero__content">
-          <h1 className="hero__title">{title}</h1>
+          {/* Cada palavra sobe em sequência; o leitor de tela lê o título inteiro de uma vez */}
+          <h1 className="hero__title" aria-label={title}>
+            {title.split(' ').map((word, i) => (
+              <span key={i} className="hero__word" aria-hidden="true" style={{ '--i': i } as CSSProperties}>
+                {word}
+                {' '}
+              </span>
+            ))}
+          </h1>
           <p className="hero__lead">{lead}</p>
           {children}
         </div>

@@ -1,0 +1,275 @@
+.match-card {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  background: var(--surface);
+  box-shadow: inset 0 0 0 1px var(--surface-edge);
+  clip-path: polygon(0 0, 100% 0, 100% calc(100% - 18px), calc(100% - 18px) 100%, 0 100%);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .match-card {
+    transition: transform 0.18s ease, box-shadow 0.18s ease;
+  }
+
+  .match-card:hover {
+    transform: translateY(-3px);
+  }
+}
+
+.match-card:hover {
+  box-shadow: 0 12px 28px rgb(4 7 36 / 0.35), inset 0 0 0 2px var(--claro);
+}
+
+.match-card--host {
+  box-shadow: inset 0 0 0 2px var(--acafrao);
+}
+
+.match-card--cancelled {
+  opacity: 0.65;
+}
+
+.match-card__media {
+  position: relative;
+  background: var(--noite);
+}
+
+.match-card__media > svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+/* Folhinha de calendário sobre a capa */
+.match-card__date {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  display: grid;
+  justify-items: center;
+  min-width: 54px;
+  padding: 6px 8px 7px;
+  background: var(--giz);
+  color: var(--noite);
+  line-height: 1;
+  clip-path: polygon(0 0, 100% 0, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0 100%);
+  box-shadow: 0 6px 16px rgb(4 7 36 / 0.35);
+}
+
+.match-card__weekday {
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ultramar);
+}
+
+.match-card__day {
+  margin-top: 2px;
+  font: 800 26px/1 var(--display);
+}
+
+.match-card__month {
+  margin-top: 2px;
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.match-card__badge {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: var(--acafrao);
+  color: var(--noite);
+}
+
+.match-card__body {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 8px;
+  padding: 14px 16px 18px;
+}
+
+.match-card__title {
+  font-size: 22px;
+  line-height: 1.1;
+  overflow-wrap: anywhere;
+}
+
+.match-card__category {
+  color: var(--acafrao);
+}
+
+:root[data-theme='light'] .match-card__category {
+  color: var(--ultramar);
+}
+
+.match-card__facts {
+  display: grid;
+  gap: 4px;
+  padding: 0;
+  list-style: none;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.match-card__facts li {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+}
+
+.match-card__facts .icon {
+  flex: none;
+  width: 16px;
+  height: 16px;
+  color: var(--claro);
+}
+
+:root[data-theme='light'] .match-card__facts .icon {
+  color: var(--ultramar);
+}
+
+.match-card__host {
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+.match-card__host b {
+  color: var(--text);
+}
+
+.match-card__seats {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.match-card__dots {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.match-card__dot {
+  width: 12px;
+  height: 12px;
+  box-shadow: inset 0 0 0 1.5px var(--claro);
+}
+
+.match-card__dot.is-taken {
+  background: var(--acafrao);
+  box-shadow: none;
+}
+
+.match-card__seats-text {
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.match-card__notes {
+  font-size: 14px;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.match-card__reply {
+  padding: 8px 10px;
+  font-size: 13px;
+  background: var(--bg);
+  box-shadow: inset 3px 0 0 var(--acafrao);
+}
+
+/* Ação sempre no rodapé do card, alinhando os cards da grade */
+.match-card__actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 14px;
+  margin-top: auto;
+  padding-top: 10px;
+}
+
+.match-card__state {
+  font-size: 13px;
+  font-weight: 800;
+  color: var(--claro);
+}
+
+:root[data-theme='light'] .match-card__state {
+  color: var(--ultramar);
+}
+
+.match-card__state--ok {
+  color: var(--acafrao);
+}
+
+:root[data-theme='light'] .match-card__state--ok {
+  color: #8a5a00;
+}
+
+/* Situação do meu pedido, em badge padrão: dentro (açafrão) ou aguardando (contorno) */
+.match-state {
+  display: inline-flex;
+  align-items: center;
+  align-self: center;
+  min-height: 38px;
+  padding: 0 14px;
+  font-size: 12px;
+  --cut: 10px;
+  clip-path: polygon(0 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%);
+}
+
+.match-state--in {
+  background: var(--acafrao);
+  color: var(--noite);
+}
+
+.match-card__state--muted {
+  color: var(--text-muted);
+}
+
+
+/* O card inteiro abre a modal da partida; ações e links ficam acima da camada clicável */
+.match-card {
+  position: relative;
+}
+
+.match-card__open {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.match-card__open::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+}
+
+.match-card__open:focus-visible {
+  outline: 0;
+}
+
+.match-card:has(.match-card__open:focus-visible) {
+  outline: 3px solid var(--acafrao);
+  outline-offset: 2px;
+}
+
+.match-card__actions {
+  position: relative;
+  z-index: 1;
+}

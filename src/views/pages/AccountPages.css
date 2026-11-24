@@ -1,0 +1,14 @@
+.account { display: grid; gap: 28px; max-width: 640px; }
+.account__section { display: grid; gap: 14px; padding: 22px; background: var(--surface); box-shadow: inset 0 0 0 1px var(--surface-edge); }
+.account__section h2 { font-size: 26px; line-height: 1.1; }
+.account__section > p { color: var(--text-muted); }
+.account__identity { display: flex; align-items: center; gap: 16px; }
+.account__identity small { display: block; color: var(--text-muted); }
+.account__identity b { font: 800 22px/1.2 var(--texto); overflow-wrap: anywhere; }
+.account__row { display: flex; align-items: center; gap: 12px; }
+.account__row > span { flex: 1; }
+/* O texto da linha (span ou bloco com título e descrição) ocupa o espaço; o toggle fica sempre à direita */
+.account__row > :first-child { flex: 1; min-width: 0; }
+.account__row > .switch { flex: none; margin-left: auto; }
+.account__danger h2 { color: var(--acafrao); }
+.field-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 12px; }

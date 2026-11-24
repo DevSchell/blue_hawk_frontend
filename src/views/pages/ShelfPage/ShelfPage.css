@@ -1,0 +1,487 @@
+.shelf-bar {
+  background: var(--ultramar);
+  color: var(--giz);
+  border-bottom: 1px solid var(--painel);
+  padding: 14px 0;
+}
+
+.shelf-bar__inner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.shelf-bar__title-group {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.shelf-bar__accent {
+  width: 10px;
+  height: 28px;
+  background: var(--acafrao);
+  flex-shrink: 0;
+}
+
+.shelf-bar__title {
+  font-family: var(--marca);
+  font-size: clamp(28px, 3.2vw, 34px);
+  line-height: 1;
+}
+
+.shelf-bar__subtitle {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--gelo);
+}
+
+/* stretch: todas as estatísticas da fileira ficam com a mesma altura */
+.shelf-bar__stats {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: stretch;
+  gap: 10px;
+}
+
+.shelf-stat {
+  box-sizing: border-box;
+  min-height: 48px;
+  background: rgb(11 17 71 / 0.55);
+  color: var(--giz);
+  padding: 8px 14px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font: inherit;
+  line-height: 1;
+  clip-path: polygon(0 0, 100% 0, 100% calc(100% - 9px), calc(100% - 9px) 100%, 0 100%);
+}
+
+.shelf-stat--sale {
+  border: 0;
+  border-left: 3px solid var(--acafrao);
+  background: var(--noite);
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+
+.shelf-stat--sale:hover {
+  background: var(--painel);
+}
+
+.shelf-stat__label {
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--gelo);
+}
+
+.shelf-stat__label--accent {
+  color: var(--acafrao);
+}
+
+.shelf-stat__value {
+  font-family: var(--display);
+  font-size: 24px;
+  line-height: 1;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+}
+
+.shelf-stat__value--text {
+  font-size: 18px;
+  max-width: 170px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.shelf-stat__extra {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--claro);
+  font-variant-numeric: tabular-nums;
+}
+
+.shelf-page {
+  flex: 1;
+  padding: 28px 0 64px;
+}
+
+.shelf-controls {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin-bottom: 24px;
+}
+
+.shelf-controls__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--line);
+}
+
+.shelf-controls__heading-wrap {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px 12px;
+}
+
+.shelf-controls__title {
+  font-size: clamp(32px, 4vw, 42px);
+  line-height: 1;
+}
+
+.shelf-controls__counter {
+  font-size: 14px;
+  color: var(--text-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+/* D20: botão do sistema (açafrão, canto cortado) com o dado de traço e o rótulo "Sortear" */
+.shelf-d20-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+  padding: 9px 18px 9px 12px;
+  border: 0;
+  background: var(--acafrao);
+  color: var(--noite);
+  font: 800 14px/1.2 var(--texto);
+  white-space: nowrap;
+  cursor: pointer;
+  clip-path: polygon(0 0, 100% 0, 100% calc(100% - var(--corte)), calc(100% - var(--corte)) 100%, 0 100%);
+}
+
+.shelf-d20-btn:hover:not(:disabled) {
+  background: var(--acafrao-hover);
+}
+
+.shelf-d20-btn:focus-visible {
+  outline: 0;
+  box-shadow:
+    inset 0 0 0 3px var(--noite),
+    inset 0 0 0 5px var(--giz);
+}
+
+.shelf-d20-btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+/* Enquanto rola, o botão fica "aceso" mesmo desabilitado */
+.shelf-d20-btn--rolling:disabled {
+  opacity: 1;
+  cursor: progress;
+}
+
+.shelf-d20-btn__die {
+  display: grid;
+  place-items: center;
+}
+
+.shelf-d20-btn__icon {
+  width: 22px;
+  height: 22px;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .shelf-d20-btn__die {
+    transform-origin: 50% 55%;
+  }
+
+  /* Hover: o dado dá uma balançada, como se fosse ser jogado */
+  .shelf-d20-btn:hover:not(:disabled) .shelf-d20-btn__die {
+    animation: d20Wobble 0.6s ease-in-out;
+  }
+
+  /* Rolando: o dado gira e quica sem parar */
+  .shelf-d20-btn--rolling .shelf-d20-btn__die {
+    animation: d20Roll 0.5s cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite;
+  }
+
+  /* Parou: um quique final e um brilho no botão */
+  .shelf-d20-btn--landed .shelf-d20-btn__die {
+    animation: d20Land 0.55s cubic-bezier(0.2, 0.9, 0.3, 1.3);
+  }
+
+  .shelf-d20-btn--landed {
+    animation: d20Glow 0.9s ease-out;
+  }
+}
+
+@keyframes d20Wobble {
+  0%,
+  100% {
+    transform: rotate(0);
+  }
+  25% {
+    transform: rotate(-18deg);
+  }
+  60% {
+    transform: rotate(14deg);
+  }
+}
+
+@keyframes d20Roll {
+  0% {
+    transform: translateY(0) rotate(0deg) scale(1);
+  }
+  35% {
+    transform: translateY(-5px) rotate(140deg) scale(1.12);
+  }
+  70% {
+    transform: translateY(1px) rotate(280deg) scale(0.94);
+  }
+  100% {
+    transform: translateY(0) rotate(360deg) scale(1);
+  }
+}
+
+@keyframes d20Land {
+  0% {
+    transform: translateY(-8px) rotate(-40deg) scale(1.2);
+  }
+  55% {
+    transform: translateY(1px) rotate(6deg) scale(0.92);
+  }
+  100% {
+    transform: translateY(0) rotate(0) scale(1);
+  }
+}
+
+@keyframes d20Glow {
+  0% {
+    box-shadow: 0 0 0 0 rgb(255 176 0 / 0.6);
+  }
+  100% {
+    box-shadow: 0 0 0 14px rgb(255 176 0 / 0);
+  }
+}
+
+.shelf-controls__toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+}
+
+.shelf-search {
+  position: relative;
+  flex: 1 1 200px;
+  max-width: 280px;
+}
+
+/* Mesmo campo da busca da Loja: borda inset (some no tema escuro) e a diagonal do canto no fundo */
+.shelf-search input {
+  width: 100%;
+  border: 0;
+  background: var(--cut-edge-9), var(--giz);
+  color: var(--noite);
+  box-shadow: inset 0 0 0 1px var(--surface-edge);
+  padding: 9px 34px 9px 13px;
+  font-size: 13px;
+  font-weight: 600;
+  clip-path: polygon(0 0, 100% 0, 100% calc(100% - 9px), calc(100% - 9px) 100%, 0 100%);
+}
+
+.shelf-search input:focus-visible {
+  outline: 0;
+  box-shadow:
+    inset 0 0 0 3px var(--noite),
+    inset 0 0 0 5px var(--acafrao);
+}
+
+.shelf-search__clear {
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  border: 0;
+  background: transparent;
+  color: var(--noite);
+  cursor: pointer;
+  padding: 2px;
+}
+
+.shelf-search__clear .icon {
+  width: 16px;
+  height: 16px;
+}
+
+.shelf-sale-toggle {
+  border: 0;
+  background: var(--surface);
+  color: var(--text);
+  box-shadow: inset 0 0 0 1px var(--surface-edge);
+  padding: 8px 14px;
+  font-size: 13px;
+  font-weight: 800;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  clip-path: polygon(0 0, 100% 0, 100% calc(100% - 9px), calc(100% - 9px) 100%, 0 100%);
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.shelf-sale-toggle__dot {
+  width: 8px;
+  height: 8px;
+  background: var(--acafrao);
+}
+
+.shelf-sale-toggle--active {
+  background: var(--acafrao);
+  color: var(--noite);
+}
+
+.shelf-sale-toggle--active .shelf-sale-toggle__dot {
+  background: var(--noite);
+}
+
+.shelf-controls__selects {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  margin-left: auto;
+}
+
+.shelf-winner-banner {
+  background: var(--ultramar);
+  color: var(--giz);
+  border-left: 4px solid var(--acafrao);
+  padding: 12px 16px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  clip-path: polygon(0 0, 100% 0, 100% calc(100% - 9px), calc(100% - 9px) 100%, 0 100%);
+}
+
+.shelf-winner-banner__text {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+}
+
+.shelf-winner-banner__badge {
+  background: var(--acafrao);
+  color: var(--noite);
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  padding: 4px 10px;
+}
+
+.shelf-winner-banner__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.shelf-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 20px;
+}
+
+@media (max-width: 1040px) {
+  .shelf-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 580px) {
+  .shelf-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.shelf-skeleton {
+  height: 290px;
+  background: var(--surface);
+  opacity: 0.6;
+}
+
+.shelf-empty-action {
+  margin-top: 14px;
+}
+
+.shelf-toasts {
+  position: fixed;
+  right: 20px;
+  bottom: 20px;
+  z-index: 60;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  pointer-events: none;
+}
+
+.shelf-toast {
+  background: var(--acafrao);
+  color: var(--noite);
+  font-size: 14px;
+  font-weight: 800;
+  padding: 12px 16px;
+  box-shadow: 0 10px 24px rgb(0 0 0 / 0.35);
+  clip-path: polygon(0 0, 100% 0, 100% calc(100% - 9px), calc(100% - 9px) 100%, 0 100%);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.shelf-toast__dot {
+  width: 8px;
+  height: 8px;
+  background: var(--noite);
+  flex-shrink: 0;
+}
+
+/* Cabeçalho da estante: cadastrar jogo + D20 */
+.shelf-controls__header-actions {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.shelf-add-game-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 9px 18px 9px 14px;
+  font-size: 14px;
+  white-space: nowrap;
+}
+
+.shelf-add-game-btn .icon {
+  width: 18px;
+  height: 18px;
+}
+
+.shelf-empty-action {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+@media (max-width: 520px) {
+  /* No celular, só o ícone + texto curto cabem ao lado do título */
+  .shelf-controls__header {
+    flex-wrap: wrap;
+  }
+}
