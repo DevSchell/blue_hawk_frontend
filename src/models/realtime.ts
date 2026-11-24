@@ -30,6 +30,8 @@ let wanted = false
 let attempts = 0
 let retryTimer: number | undefined
 let pingTimer: number | undefined
+/** Último token enviado no auth desta aba */
+let authToken: string | null = null
 
 /** Endereço do socket a partir da base da API ("/api" em dev, pelo proxy do Vite, ou uma URL absoluta) */
 export function realtimeUrl(apiBase: string, location: { protocol: string; host: string }): string {
@@ -67,7 +69,10 @@ function open() {
   }
   socket = ws
 
-  ws.onopen = () => ws.send(JSON.stringify({ type: 'auth', token }))
+  ws.onopen = () => {
+    authToken = token
+    ws.send(JSON.stringify({ type: 'auth', token }))
+  }
   ws.onmessage = (raw) => {
     let event: { type?: string }
     try {
@@ -78,6 +83,8 @@ function open() {
     if (event.type === 'ready') {
       attempts = 0
       setConnected(true)
+      // Ao (re)conectar, eventos perdidos enquanto estava fora não chegam: os contadores buscam de novo
+      listeners.forEach((listener) => listener({ type: 'notifications.changed' }))
       window.clearInterval(pingTimer)
       pingTimer = window.setInterval(() => {
         if (ws.readyState === WebSocket.OPEN) ws.send(JSON.stringify({ type: 'ping' }))
@@ -91,11 +98,29 @@ function open() {
     if (socket === ws) socket = null
     window.clearInterval(pingTimer)
     setConnected(false)
-    // 4401: token recusado (sessão expirou); só tenta de novo se o token mudar (novo login)
-    if (close.code === 4401) return
+    // 4401: token recusado ou vencido. Só tenta de novo se já houver um token diferente (renovado por
+    // outra aba, ou novo login); com o mesmo token a API recusaria de novo.
+    if (close.code === 4401 && !shouldRetryAfterUnauthorized(authToken, readToken())) return
     scheduleRetry()
   }
   ws.onerror = () => ws.close()
+}
+
+/** Depois de um 4401, vale reconectar? Só com um token diferente do que foi recusado. */
+export function shouldRetryAfterUnauthorized(sent: string | null, current: string | null): boolean {
+  return current !== null && current !== sent
+}
+
+/**
+ * A API fecha o socket quando o token usado no auth vence. Quando o token da sessão é renovado
+ * (apiClient), manda o novo pela mesma conexão: a validade do socket acompanha a da sessão.
+ */
+export function renewRealtimeAuth() {
+  const token = readToken()
+  const ws = socket
+  if (!token || token === authToken || !ws || !connected || ws.readyState !== WebSocket.OPEN) return
+  authToken = token
+  ws.send(JSON.stringify({ type: 'auth', token }))
 }
 
 /** Liga o tempo real (com sessão). Chamar de novo depois de um login troca a conexão. */

@@ -1,9 +1,9 @@
-/** Caixa de conversas (botão de chat da topbar): chats das partidas e negociações da Loja */
+/** Caixa de conversas (botão de chat da topbar): chats das partidas, negociações da Loja e conversas diretas */
 
-export type ChatInboxKind = 'MATCH_TABLE' | 'MATCH_DIRECT' | 'NEGOTIATION'
+export type ChatInboxKind = 'MATCH_TABLE' | 'MATCH_DIRECT' | 'NEGOTIATION' | 'DIRECT'
 
 export type ChatInboxItem = {
-  /** "match:{id}:table", "match:{id}:{outraPessoa}" ou "neg:{id}" */
+  /** "match:{id}:table", "match:{id}:{outraPessoa}", "neg:{id}" ou "dm:{id}" */
   key: string
   kind: ChatInboxKind
   title: string
@@ -11,6 +11,8 @@ export type ChatInboxItem = {
   matchId: string | null
   withUserId: string | null
   negotiationId: string | null
+  /** Conversa direta (DIRECT) */
+  directConversationId?: string | null
   status: 'OPEN' | 'CANCELLED' | 'ACCEPTED' | 'CLOSED' | 'PENDING' | 'REJECTED'
   unread: number
   lastActivityAt: string
@@ -22,7 +24,7 @@ export const OPEN_CHAT_EVENT = 'bluehawk:open-chat'
 
 export type OpenChatDetail = { key?: string; filter?: ChatInboxFilter }
 
-export type ChatInboxFilter = 'todas' | 'mesas' | 'negociacoes'
+export type ChatInboxFilter = 'todas' | 'mesas' | 'negociacoes' | 'diretas'
 
 export function openChatInbox(detail: OpenChatDetail = {}) {
   window.dispatchEvent(new CustomEvent<OpenChatDetail>(OPEN_CHAT_EVENT, { detail }))
@@ -30,7 +32,8 @@ export function openChatInbox(detail: OpenChatDetail = {}) {
 
 /** Itens do filtro escolhido */
 export function filterInbox(items: ChatInboxItem[], filter: ChatInboxFilter) {
-  if (filter === 'mesas') return items.filter((i) => i.kind !== 'NEGOTIATION')
+  if (filter === 'mesas') return items.filter((i) => i.kind === 'MATCH_TABLE' || i.kind === 'MATCH_DIRECT')
+  if (filter === 'diretas') return items.filter((i) => i.kind === 'DIRECT')
   if (filter === 'negociacoes') return items.filter((i) => i.kind === 'NEGOTIATION')
   return items
 }

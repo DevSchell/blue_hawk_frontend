@@ -29,6 +29,8 @@ export type MyProfile = {
   showShelf: boolean
   matchAlerts: boolean
   offerAlerts: boolean
+  /** Outras pessoas podem iniciar conversa direta pelo perfil */
+  allowDirectMessages: boolean
   avatarPreset: string | null
   /** Caminho relativo à API (foto enviada) */
   avatarUrl: string | null
@@ -45,6 +47,8 @@ export type PublicProfile = {
   avatarUrl: string | null
   isPublic: boolean
   isMe: boolean
+  /** A pessoa aceita mensagens diretas (botão "Iniciar conversa") */
+  acceptsDirectMessages: boolean
   /** null quando o perfil é privado */
   profile: {
     bio: string | null

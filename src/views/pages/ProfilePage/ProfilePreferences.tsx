@@ -4,7 +4,7 @@ import type { MyProfileInput } from '../../../models/userProfile'
 import { Alert } from '../../components/Alert/Alert'
 import { Switch } from '../../components/Switch/Switch'
 
-type PreferenceKey = 'isPublic' | 'showShelf' | 'matchAlerts' | 'offerAlerts'
+type PreferenceKey = 'isPublic' | 'showShelf' | 'allowDirectMessages' | 'matchAlerts' | 'offerAlerts'
 
 const PREFERENCES: { key: PreferenceKey; id: string; title: string; text: string }[] = [
   {
@@ -18,6 +18,12 @@ const PREFERENCES: { key: PreferenceKey; id: string; title: string; text: string
     id: 'pref-estante',
     title: 'Mostrar minha estante no perfil',
     text: 'Quem abrir seu perfil vê os jogos da sua coleção e quais estão à venda.',
+  },
+  {
+    key: 'allowDirectMessages',
+    id: 'pref-mensagens',
+    title: 'Aceitar mensagens diretas',
+    text: 'Outros jogadores podem iniciar uma conversa com você pelo seu perfil. Conversas já abertas continuam legíveis.',
   },
   {
     key: 'matchAlerts',

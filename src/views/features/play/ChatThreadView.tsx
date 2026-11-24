@@ -1,4 +1,5 @@
 import { useEffect, useId, useRef, useState, type FormEvent, type KeyboardEvent } from 'react'
+import { useDirectThread } from '../../../controllers/useDirectThread'
 import { useChatThread } from '../../../controllers/useMatchChat'
 import { CHAT_MESSAGE_MAX, type ChatTarget } from '../../../models/matchChat'
 import { Button } from '../../components/Button/Button'
@@ -9,21 +10,39 @@ import { cx } from '../../utils/classNames'
 const time = new Intl.DateTimeFormat('pt-BR', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' })
 
 type ChatThreadViewProps = {
-  matchId: string
+  /** Conversa da partida (com {@code target}) ou, com {@code conversationId}, uma conversa direta */
+  matchId?: string
   /** null = mesa; senão, a outra pessoa da conversa */
-  target: ChatTarget
+  target?: ChatTarget
+  conversationId?: string
   /** Nome da conversa, para o campo e o leitor de tela */
   label: string
   /** Na mesa, cada balão mostra quem mandou */
   showSenderNames: boolean
   /** Partida cancelada: dá para ler, não para mandar */
   readOnly: boolean
+  /** Texto no lugar do campo quando não dá para mandar */
+  readOnlyText?: string
   emptyText: string
 }
 
 /** Uma conversa: balões (os seus à direita) e o campo de envio. Enter envia; Shift+Enter quebra a linha. */
-export function ChatThreadView({ matchId, target, label, showSenderNames, readOnly, emptyText }: ChatThreadViewProps) {
-  const chat = useChatThread(matchId, target, true)
+export function ChatThreadView({
+  matchId = '',
+  target = null,
+  conversationId,
+  label,
+  showSenderNames,
+  readOnly,
+  readOnlyText = 'Partida encerrada: a conversa fica só para leitura.',
+  emptyText,
+}: ChatThreadViewProps) {
+  const direct = Boolean(conversationId)
+  const matchChat = useChatThread(matchId, target, !direct)
+  const directChat = useDirectThread(conversationId ?? '', direct)
+  const chat = direct ? directChat : matchChat
+  // Conversa direta: a outra pessoa pode ter desligado as mensagens diretas
+  const locked = readOnly || (direct && directChat.conversation !== null && !directChat.conversation.canSend)
   const [draft, setDraft] = useState('')
   const listRef = useRef<HTMLOListElement>(null)
   const inputId = useId()
@@ -74,8 +93,10 @@ export function ChatThreadView({ matchId, target, label, showSenderNames, readOn
         </ol>
       )}
 
-      {readOnly ? (
-        <p className="chat-thread__readonly">Partida encerrada: a conversa fica só para leitura.</p>
+      {locked ? (
+        <p className="chat-thread__readonly">
+          {readOnly ? readOnlyText : 'Essa pessoa não está aceitando mensagens diretas agora.'}
+        </p>
       ) : (
         <form className="chat-composer" onSubmit={submit}>
           <label className="visually-hidden" htmlFor={inputId}>

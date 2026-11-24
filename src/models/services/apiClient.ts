@@ -1,4 +1,5 @@
 import { clearSession, readToken, updateToken } from '../session'
+import { renewRealtimeAuth } from '../realtime'
 
 const API_BASE = (import.meta.env.VITE_API_URL || '/api').replace(/\/$/, '')
 
@@ -28,6 +29,12 @@ function headers(extra: Record<string, string> = {}, withToken = true) {
   }
 }
 
+/** Guarda o token renovado pela API e repassa ao socket de tempo real, que vale só enquanto o token vale */
+function rotateToken(token: string) {
+  updateToken(token)
+  renewRealtimeAuth()
+}
+
 /**
  * Lê o corpo da resposta. Rotas autenticadas vêm embrulhadas em { data, accessToken }
  * (ApiResponseAdvice), com um token novo que passa a valer; as públicas vêm cruas.
@@ -41,7 +48,7 @@ async function readBody<T>(response: Response, label: string): Promise<T> {
   const body: unknown = JSON.parse(text)
   if (body !== null && typeof body === 'object' && !Array.isArray(body) && 'data' in body) {
     const wrapped = body as { data: T; accessToken?: unknown }
-    if (typeof wrapped.accessToken === 'string') updateToken(wrapped.accessToken)
+    if (typeof wrapped.accessToken === 'string') rotateToken(wrapped.accessToken)
     return wrapped.data
   }
   return body as T
@@ -70,7 +77,7 @@ async function request<T>(method: string, path: string, label: string, payload?:
     })
     // Em respostas de erro o token novo só vem no cabeçalho
     const rotated = response.headers.get('X-New-Token')
-    if (rotated && authenticated) updateToken(rotated)
+    if (rotated && authenticated) rotateToken(rotated)
     const result = await readBody<T>(response, label).catch((error: unknown) => {
       if (error instanceof ApiError && error.status === 401 && authenticated) {
         // Token recusado: a sessão acabou

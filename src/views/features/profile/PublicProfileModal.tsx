@@ -1,11 +1,16 @@
 import { useEffect, useState } from 'react'
-import { apiUrl } from '../../../models/services/apiClient'
+import { openChatInbox } from '../../../models/chatInbox'
+import { directKey } from '../../../models/directConversation'
+import { requestLogin } from '../../../models/loginPrompt'
+import { readUserId } from '../../../models/session'
+import { ApiError, apiUrl } from '../../../models/services/apiClient'
+import { startDirectConversation } from '../../../models/services/directService'
 import { avatarImageOf, getPublicProfile } from '../../../models/services/userProfileService'
 import { storeOfferHref } from '../../../models/store'
 import { levelLabel, splitGenres, type PublicProfile } from '../../../models/userProfile'
 import { Avatar } from '../../components/Avatar/Avatar'
 import { Button } from '../../components/Button/Button'
-import { MapPinIcon } from '../../components/Icons/Icons'
+import { ChatIcon, MapPinIcon } from '../../components/Icons/Icons'
 import { LoadingCard } from '../../components/LoadingCard/LoadingCard'
 import { Modal } from '../../components/Modal/Modal'
 import { ACCOUNT_ROUTES } from '../../layout/navigation'
@@ -147,6 +152,8 @@ function ProfileBody({ profile: p, onClose }: { profile: PublicProfile; onClose:
         </>
       )}
 
+      {!p.isMe && <StartConversation profile={p} onClose={onClose} />}
+
       {p.isMe && (
         <div className="public-profile__me">
           <Button
@@ -160,6 +167,53 @@ function ProfileBody({ profile: p, onClose }: { profile: PublicProfile; onClose:
             Editar meu perfil
           </Button>
         </div>
+      )}
+    </div>
+  )
+}
+
+/** "Iniciar conversa": abre (ou reaproveita) a conversa direta e mostra ela na caixa de conversas */
+function StartConversation({ profile: p, onClose }: { profile: PublicProfile; onClose: () => void }) {
+  const [starting, setStarting] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+  const signedIn = Boolean(readUserId())
+
+  async function start() {
+    if (!signedIn) {
+      onClose()
+      requestLogin()
+      return
+    }
+    setStarting(true)
+    setError(null)
+    try {
+      const conversation = await startDirectConversation(p.id)
+      onClose()
+      openChatInbox({ key: directKey(conversation.id), filter: 'diretas' })
+    } catch (err) {
+      setError(
+        err instanceof ApiError && err.status === 403
+          ? `${p.name} não está aceitando mensagens diretas.`
+          : 'Não deu para abrir a conversa. Tente de novo.',
+      )
+      setStarting(false)
+    }
+  }
+
+  return (
+    <div className="public-profile__me">
+      {p.acceptsDirectMessages ? (
+        <Button type="button" onClick={start} disabled={starting}>
+          <ChatIcon />
+          {starting ? 'Abrindo…' : 'Iniciar conversa'}
+        </Button>
+      ) : (
+        <p className="public-profile__locked">{p.name} não está aceitando mensagens diretas.</p>
+      )}
+      {error && (
+        <p className="public-profile__error" role="alert">
+          {error}
+        </p>
       )}
     </div>
   )
