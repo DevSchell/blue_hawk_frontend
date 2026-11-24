@@ -28,6 +28,11 @@ export type Match = {
   id: string
   userBoardgameId: string
   maxUsers: number | null
+  createdAt?: string | null
+  updatedAt?: string | null
+  date?: string | null
+  playedAt?: string | null
+  duration?: number | null
 }
 
 /** MatchParticipantResponse */

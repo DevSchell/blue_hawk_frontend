@@ -14,6 +14,8 @@ export type MyMatch = {
   players: Player[]
 }
 
+export { resolveMatchDate, resolveMatchDuration } from '../../views/pages/MatchesPage/matchesUtils'
+
 export const createMatch = (userBoardgameId: string) => apiPost<Match>('/matches', { userBoardgameId })
 
 /** Tira um jogador da partida (ou o próprio usuário, ao sair) */
