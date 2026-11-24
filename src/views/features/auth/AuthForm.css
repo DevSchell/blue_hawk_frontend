@@ -24,6 +24,33 @@
   font-size: 15px;
 }
 
+/* Aceite dos termos no cadastro: caixa alinhada à primeira linha do texto */
+.auth-form__consent {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 10px;
+  align-items: start;
+  font-size: 14px;
+  line-height: 1.45;
+  color: var(--text-muted);
+  cursor: pointer;
+}
+
+.auth-form__consent input {
+  width: 18px;
+  height: 18px;
+  margin: 1px 0 0;
+  accent-color: var(--acafrao);
+  cursor: pointer;
+}
+
+.auth-form__consent a {
+  color: var(--text);
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
 .auth-form__switch {
   margin-top: 18px;
   padding-top: 14px;
