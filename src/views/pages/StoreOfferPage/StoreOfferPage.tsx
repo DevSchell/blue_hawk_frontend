@@ -20,6 +20,7 @@ import { BackButton } from '../../components/BackButton/BackButton'
 import '../../features/boardgames/CategoryTag.css'
 import { requestLogin } from '../../../models/loginPrompt'
 import { readUserId } from '../../../models/session'
+import { StorePage } from '../StorePage/StorePage'
 import '../ProductPage.css'
 
 type Loaded = { offer: StoreOffer; related: StoreOffer[] }
@@ -34,35 +35,16 @@ export function StoreOfferPage({ offerId }: { offerId: string }) {
   return <OfferDetails offerId={offerId} />
 }
 
-/** Visitante abriu um anúncio: pede login (a modal abre sozinha) e oferece voltar para a Loja */
+/**
+ * Visitante abriu um anúncio: só abre a modal de login, com a vitrine da Loja ao fundo.
+ * O endereço continua o do anúncio, então ao entrar na conta a página dele aparece.
+ */
 function OfferLoginGate() {
   useEffect(() => {
     requestLogin()
   }, [])
 
-  return (
-    <main className="product-page">
-      <Container>
-        <BackButton fallback="/loja" />
-        <EmptyState
-          icon={<Raven variant="noite" />}
-          title="Entre para ver o anúncio"
-          action={
-            <div className="product-page__state">
-              <Button type="button" onClick={requestLogin}>
-                Entrar
-              </Button>
-              <a className="button button--secondary" href="/loja">
-                Voltar à Loja
-              </a>
-            </div>
-          }
-        >
-          Os detalhes do exemplar e o contato com quem vende ficam disponíveis para quem tem conta no Blue Hawk.
-        </EmptyState>
-      </Container>
-    </main>
-  )
+  return <StorePage />
 }
 
 function OfferDetails({ offerId }: { offerId: string }) {
