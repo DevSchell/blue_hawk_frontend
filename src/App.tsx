@@ -18,6 +18,7 @@ import {
   PLAY_PATH,
   PRIVACY_PATH,
   REVIEW_PATH,
+  requiresSignIn,
   STORE_OFFER_PATH_PREFIX,
   storeOfferPath,
   CATEGORY_PATH_PREFIX,
@@ -59,9 +60,10 @@ function App() {
 
   useEffect(
     () =>
-      // Visitante clicou num anúncio da Loja: abre a modal de login sem sair de onde está (nem rolar a tela)
+      // Visitante clicou num link de tela só para quem tem conta (anúncio, estante, perfil): abre a modal de
+      // login sem sair de onde está (nem rolar a tela)
       interceptLinkClicks((to) => {
-        if (readUserId() || !to.startsWith(STORE_OFFER_PATH_PREFIX)) return false
+        if (readUserId() || !requiresSignIn(to)) return false
         requestLoginThen(to)
         return true
       }),
